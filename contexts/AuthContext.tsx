@@ -1,11 +1,16 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
+import {
+  signInWithGoogle as startGoogleSignIn,
+  type GoogleSignInResult,
+} from "../lib/auth/google-oauth";
 
 type AuthContextType = {
   session: Session | null;
   user: User | null;
   isLoading: boolean;
+  isAuthorzed: boolean;
   signIn: (
     email: string,
     password: string,
@@ -15,6 +20,7 @@ type AuthContextType = {
     password: string,
   ) => Promise<{ error: string | null; needsEmailConfirmation?: boolean }>;
   signOut: () => Promise<void>;
+  signInWithGoogle: () => Promise<GoogleSignInResult>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -22,6 +28,8 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const signInWithGoogle = async () => startGoogleSignIn();
+
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -53,7 +61,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ session, user: session?.user ?? null, isLoading, signIn, signUp, signOut }}
+      value={{
+        session,
+        isAuthorzed: !!session,
+        user: session?.user ?? null,
+        isLoading,
+        signIn,
+        signUp,
+        signOut,
+        signInWithGoogle,
+      }}
     >
       {children}
     </AuthContext.Provider>
