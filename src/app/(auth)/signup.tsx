@@ -7,6 +7,7 @@ import { router, Link } from "expo-router";
 import { Input } from "../../components/ui/Input";
 import { Button } from "../../components/ui/Button";
 import { useAuth } from "../../../contexts/AuthContext";
+import { Lock, Mail } from "lucide-react-native";
 
 const signupSchema = z
   .object({
@@ -67,12 +68,14 @@ export default function Signup() {
         name="email"
         render={({ field: { onChange, value } }) => (
           <Input
-            label="Correo"
+            label="Correo electrónico"
+            placeholder="Ingresa tu correo"
+            keyboardType="email-address"
+            autoCapitalize="none"
+            icon={Mail}
             value={value}
             onChangeText={onChange}
             error={errors.email?.message}
-            autoCapitalize="none"
-            keyboardType="email-address"
           />
         )}
       />
@@ -83,10 +86,12 @@ export default function Signup() {
         render={({ field: { onChange, value } }) => (
           <Input
             label="Contraseña"
+            placeholder="Ingresa tu contraseña"
+            secureTextEntry
+            icon={Lock}
             value={value}
             onChangeText={onChange}
             error={errors.password?.message}
-            secureTextEntry
           />
         )}
       />

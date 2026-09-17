@@ -7,6 +7,7 @@ import { Link } from "expo-router";
 import { Input } from "../../components/ui/Input";
 import { Button } from "../../components/ui/Button";
 import { useAuth } from "../../../contexts/AuthContext";
+import { Mail, Lock } from "lucide-react-native";
 
 const loginSchema = z.object({
   email: z.string().email("Correo inválido"),
@@ -16,9 +17,10 @@ const loginSchema = z.object({
 type LoginForm = z.infer<typeof loginSchema>;
 
 export default function Login() {
-  const { signIn } = useAuth();
+  const { signIn, signInWithGoogle } = useAuth();
   const [serverError, setServerError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
 
   const {
     control,
@@ -38,21 +40,33 @@ export default function Login() {
     // si no hay error, (app)/_layout.tsx redirige solo al detectar la sesión
   };
 
+  const handleGoogleSignIn = async () => {
+    setServerError(null);
+    setGoogleLoading(true);
+
+    const result = await signInWithGoogle();
+
+    setGoogleLoading(false);
+
+    if (result.status === "error") {
+      setServerError(result.message);
+    }
+  };
   return (
     <View className="flex-1 justify-center px-6">
-      <Text className="mb-8 text-2xl font-bold">Iniciar sesión</Text>
-
       <Controller
         control={control}
         name="email"
         render={({ field: { onChange, value } }) => (
           <Input
-            label="Correo"
+            label="Correo electrónico"
+            placeholder="Ingresa tu correo"
+            keyboardType="email-address"
+            autoCapitalize="none"
+            icon={Mail}
             value={value}
             onChangeText={onChange}
             error={errors.email?.message}
-            autoCapitalize="none"
-            keyboardType="email-address"
           />
         )}
       />
@@ -63,10 +77,12 @@ export default function Login() {
         render={({ field: { onChange, value } }) => (
           <Input
             label="Contraseña"
+            placeholder="Ingresa tu contraseña"
+            secureTextEntry
+            icon={Lock}
             value={value}
             onChangeText={onChange}
             error={errors.password?.message}
-            secureTextEntry
           />
         )}
       />
@@ -79,6 +95,13 @@ export default function Login() {
         title="Entrar"
         onPress={handleSubmit(onSubmit)}
         loading={loading}
+      />
+
+      <Button
+        title="Continuar con Google"
+        onPress={handleGoogleSignIn}
+        loading={googleLoading}
+        disabled={loading}
       />
 
       <Link
