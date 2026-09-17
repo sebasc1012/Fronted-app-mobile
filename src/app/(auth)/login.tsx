@@ -7,6 +7,7 @@ import { Link, router } from "expo-router";
 import { Input } from "../../components/ui/Input";
 import { Button } from "../../components/ui/Button";
 import { useAuth } from "../../../contexts/AuthContext";
+import { Mail, Lock } from "lucide-react-native";
 
 const loginSchema = z.object({
   email: z.string().email("Correo inválido"),
@@ -53,22 +54,21 @@ export default function Login() {
     }
     // si hay sesión, (app)/_layout.tsx redirige automáticamente
   };
-
   return (
     <View className="flex-1 justify-center px-6">
-      <Text className="mb-8 text-2xl font-bold">Iniciar sesión</Text>
-
       <Controller
         control={control}
         name="email"
         render={({ field: { onChange, value } }) => (
           <Input
-            label="Correo"
+            label="Correo electrónico"
+            placeholder="Ingresa tu correo"
+            keyboardType="email-address"
+            autoCapitalize="none"
+            icon={Mail}
             value={value}
             onChangeText={onChange}
             error={errors.email?.message}
-            autoCapitalize="none"
-            keyboardType="email-address"
           />
         )}
       />
@@ -79,10 +79,12 @@ export default function Login() {
         render={({ field: { onChange, value } }) => (
           <Input
             label="Contraseña"
+            placeholder="Ingresa tu contraseña"
+            secureTextEntry
+            icon={Lock}
             value={value}
             onChangeText={onChange}
             error={errors.password?.message}
-            secureTextEntry
           />
         )}
       />
@@ -100,15 +102,17 @@ export default function Login() {
       <View className="my-6 border-t border-gray-300" />
 
       <Button
-        title="Google Sign In"
+        title="Continuar con Google"
         onPress={() => handleOAuth('google')}
         loading={oauthLoading}
+        disabled={loading}
       />
 
       <Button
-        title="Sign in with Apple"
+        title="Continuar con Apple"
         onPress={() => handleOAuth('apple')}
         loading={oauthLoading}
+        disabled={loading}
       />
 
       <Link
