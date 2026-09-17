@@ -1,0 +1,6 @@
+{
+  "*.{ts,tsx,js,jsx}": [
+    "npm run typecheck",
+    "npm run test -- --bail --findRelatedTests"
+  ]
+}
