@@ -22,9 +22,10 @@ const signupSchema = z
 type SignupForm = z.infer<typeof signupSchema>;
 
 export default function Signup() {
-  const { signUp } = useAuth();
+  const { signUp, signInWithOAuth } = useAuth();
   const [serverError, setServerError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [oauthLoading, setOauthLoading] = useState(false);
 
   const {
     control,
@@ -56,6 +57,21 @@ export default function Signup() {
       return;
     }
     // sin confirmación pendiente, (app)/_layout.tsx redirige solo
+  };
+
+  const handleOAuth = async (provider: 'google' | 'apple') => {
+    setServerError(null);
+    setOauthLoading(true);
+    const { error, needsEmailConfirmation } = await signInWithOAuth(provider);
+    setOauthLoading(false);
+    if (error) setServerError(error);
+    if (needsEmailConfirmation) {
+      router.push({
+        pathname: "/(auth)/verify-email",
+        params: { email: `${provider} account` },
+      });
+    }
+    // si hay sesión, (app)/_layout.tsx redirige automáticamente
   };
 
   return (
@@ -113,6 +129,20 @@ export default function Signup() {
         title="Registrarme"
         onPress={handleSubmit(onSubmit)}
         loading={loading}
+      />
+
+      <View className="my-6 border-t border-gray-300" />
+
+      <Button
+        title="Google Sign Up"
+        onPress={() => handleOAuth('google')}
+        loading={oauthLoading}
+      />
+
+      <Button
+        title="Sign up with Apple"
+        onPress={() => handleOAuth('apple')}
+        loading={oauthLoading}
       />
 
       <Link

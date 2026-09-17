@@ -14,6 +14,9 @@ type AuthContextType = {
     email: string,
     password: string,
   ) => Promise<{ error: string | null; needsEmailConfirmation?: boolean }>;
+  signInWithOAuth: (
+    provider: 'google' | 'apple',
+  ) => Promise<{ error: string | null; needsEmailConfirmation?: boolean }>;
   signOut: () => Promise<void>;
 };
 
@@ -47,13 +50,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   return { error: error?.message ?? null, needsEmailConfirmation };
 };
 
+  const signInWithOAuth = async (provider: 'google' | 'apple') => {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider,
+      options: {
+        redirectTo: `mobileapp://`,
+        skipBrowserRedirect: true,
+      },
+    });
+
+    if (error) {
+      return { error: error.message };
+    }
+
+    // OAuth en React Native: esperamos que Supabase devuelva sesión directamente.
+    // Si no hay sesión inmediata, significa que puede necesitar confirmación.
+    const needsEmailConfirmation = !data.session;
+    return { error: null, needsEmailConfirmation };
+  };
+
   const signOut = async () => {
     await supabase.auth.signOut();
   };
 
   return (
     <AuthContext.Provider
-      value={{ session, user: session?.user ?? null, isLoading, signIn, signUp, signOut }}
+      value={{ session, user: session?.user ?? null, isLoading, signIn, signUp, signInWithOAuth, signOut }}
     >
       {children}
     </AuthContext.Provider>

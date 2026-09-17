@@ -3,7 +3,7 @@ import { View, Text } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 import { Input } from "../../components/ui/Input";
 import { Button } from "../../components/ui/Button";
 import { useAuth } from "../../../contexts/AuthContext";
@@ -16,9 +16,10 @@ const loginSchema = z.object({
 type LoginForm = z.infer<typeof loginSchema>;
 
 export default function Login() {
-  const { signIn } = useAuth();
+  const { signIn, signInWithOAuth } = useAuth();
   const [serverError, setServerError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [oauthLoading, setOauthLoading] = useState(false);
 
   const {
     control,
@@ -36,6 +37,21 @@ export default function Login() {
     setLoading(false);
     if (error) setServerError(error);
     // si no hay error, (app)/_layout.tsx redirige solo al detectar la sesión
+  };
+
+  const handleOAuth = async (provider: 'google' | 'apple') => {
+    setServerError(null);
+    setOauthLoading(true);
+    const { error, needsEmailConfirmation } = await signInWithOAuth(provider);
+    setOauthLoading(false);
+    if (error) setServerError(error);
+    if (needsEmailConfirmation) {
+      router.push({
+        pathname: '/(auth)/verify-email',
+        params: { email: `${provider} account` },
+      });
+    }
+    // si hay sesión, (app)/_layout.tsx redirige automáticamente
   };
 
   return (
@@ -79,6 +95,20 @@ export default function Login() {
         title="Entrar"
         onPress={handleSubmit(onSubmit)}
         loading={loading}
+      />
+
+      <View className="my-6 border-t border-gray-300" />
+
+      <Button
+        title="Google Sign In"
+        onPress={() => handleOAuth('google')}
+        loading={oauthLoading}
+      />
+
+      <Button
+        title="Sign in with Apple"
+        onPress={() => handleOAuth('apple')}
+        loading={oauthLoading}
       />
 
       <Link
