@@ -1,16 +1,6 @@
 import { z } from "zod";
 import { GENDERS } from "../../types/genders";
 
-const optionalText = (maxLength: number) =>
-  z.preprocess((value) => {
-    if (typeof value !== "string") return value;
-
-    const trimmed = value.trim();
-
-    return trimmed === "" ? undefined : trimmed;
-  }, z.string().max(maxLength).optional());
-
-
 export const onboardingSchema = z.object({
   fullName: z
     .string()

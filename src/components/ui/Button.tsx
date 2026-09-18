@@ -1,20 +1,7 @@
-import React, { useState } from "react";
-import {
-  Pressable,
-  Text,
-  ActivityIndicator,
-  View,
-  Platform,
-} from "react-native";
-import { GlassView } from "expo-glass-effect";
-import type { LucideIcon } from "lucide-react-native";
+import React, { useState, type ReactNode } from "react";
+import { Pressable, Text, ActivityIndicator } from "react-native";
 
-type ButtonVariant =
-  | "primary"
-  | "secondary"
-  | "glass"
-  | "destructive"
-  | "ghost";
+type ButtonVariant = "primary" | "secondary" | "destructive" | "ghost" | "outline";
 
 type ButtonProps = {
   title: string;
@@ -22,7 +9,10 @@ type ButtonProps = {
   loading?: boolean;
   disabled?: boolean;
   variant?: ButtonVariant;
-  icon?: LucideIcon;
+  icon?: ReactNode;
+  pill?: boolean;
+  color?: string;
+  radius?: number;
 };
 
 export function Button({
@@ -31,40 +21,24 @@ export function Button({
   loading = false,
   disabled = false,
   variant = "primary",
-  icon: Icon,
+  icon,
+  pill = false,
+  color,
+  radius,
 }: ButtonProps) {
   const [pressed, setPressed] = useState(false);
 
   const isDisabled = disabled || loading;
-
-  const isGlass = variant === "glass";
-
-  const textColor = isGlass
-    ? "#111827"
+  const textColor = variant === "primary" ? "#FFFFFF" : "#111827";
+  const background = color
+    ? ""
     : variant === "primary"
-      ? "#FFFFFF"
-      : "#111827";
-
-  const iconColor = textColor;
-
-  const content = (
-    <>
-      {loading ? (
-        <ActivityIndicator size="small" color={textColor} />
-      ) : (
-        <View className="flex-row items-center justify-center">
-          {Icon && <Icon size={18} color={iconColor} strokeWidth={2} />}
-
-          <Text
-            className={`text-base font-semibold ${Icon ? "ml-2" : ""}`}
-            style={{ color: textColor }}
-          >
-            {title}
-          </Text>
-        </View>
-      )}
-    </>
-  );
+      ? "bg-primary"
+      : variant === "outline"
+        ? "border border-gray-300"
+        : "bg-gray-200";
+  const roundedClass =
+    radius === undefined ? (pill ? "rounded-full" : "rounded-2xl") : "";
 
   return (
     <Pressable
@@ -72,34 +46,26 @@ export function Button({
       disabled={isDisabled}
       onPressIn={() => setPressed(true)}
       onPressOut={() => setPressed(false)}
-      className={`h-[52px] overflow-hidden rounded-2xl ${
-        isDisabled ? "opacity-50" : ""
-      }`}
+      className={`h-[52px] flex-row items-center justify-center overflow-hidden ${roundedClass} ${background} ${isDisabled ? "opacity-50" : ""}`}
       style={{
-        transform: [
-          {
-            scale: pressed && !isDisabled ? 0.98 : 1,
-          },
-        ],
+        transform: [{ scale: pressed && !isDisabled ? 0.98 : 1 }],
+        ...(color ? { backgroundColor: color } : {}),
+        ...(radius !== undefined ? { borderRadius: radius } : {}),
       }}
     >
-      {isGlass ? (
-        <GlassView
-          glassEffectStyle="regular"
-          isInteractive={!isDisabled}
-          tintColor="#FFFFFF"
-          className="flex-1 items-center justify-center"
-        >
-          {content}
-        </GlassView>
+      {loading ? (
+        <ActivityIndicator size="small" color={textColor} />
       ) : (
-        <View
-          className={`flex-1 items-center justify-center ${
-            variant === "primary" ? "bg-primary" : "bg-gray-200"
-          }`}
-        >
-          {content}
-        </View>
+        <>
+          {icon}
+
+          <Text
+            className={`text-base font-semibold ${icon ? "ml-2" : ""}`}
+            style={{ color: textColor }}
+          >
+            {title}
+          </Text>
+        </>
       )}
     </Pressable>
   );

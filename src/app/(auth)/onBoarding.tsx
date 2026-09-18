@@ -1,32 +1,30 @@
 import { useState } from "react";
+import { View, Text, ScrollView } from "react-native";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { View, Text, ScrollView, Switch, Pressable } from "react-native";
 import * as ImagePicker from "expo-image-picker";
-import { router } from "expo-router";
-
 import { Input } from "../../components/ui/Input";
 import { Button } from "../../components/ui/Button";
-import { useAuth } from "../../../contexts/AuthContext";
-import { supabase } from "../../../lib/supabase";
+import { Select } from "../../components/ui/Select";
 import { useUpsertProfile } from "@/hooks/useUpsertProfile";
 import {
   OnboardingFormValues,
   onboardingSchema,
 } from "@/squema/onboarding.schema";
-import { Select } from "@/components/ui/Select";
 import { GENDER_OPTIONS } from "@/constants/gender.const";
+import { supabase } from "../../../lib/supabase";
+import { useAuth } from "../../../contexts/AuthContext";
+import { router } from "expo-router";
 
 export default function Onboarding() {
   const { user } = useAuth();
   const { mutateAsync, isPending } = useUpsertProfile();
-
   const [avatarUri, setAvatarUri] = useState<string | null>(null);
+  const [serverError, setServerError] = useState<string | null>(null);
 
   const {
     control,
     handleSubmit,
-    setError,
     formState: { errors },
   } = useForm<OnboardingFormValues>({
     resolver: zodResolver(onboardingSchema),
@@ -41,10 +39,7 @@ export default function Onboarding() {
 
   const pickImage = async () => {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
-
-    if (!permission.granted) {
-      return;
-    }
+    if (!permission.granted) return;
 
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -59,63 +54,57 @@ export default function Onboarding() {
   };
 
   const uploadAvatar = async (): Promise<string | undefined> => {
-    if (!avatarUri || !user) {
-      return undefined;
-    }
+    if (!avatarUri || !user) return undefined;
 
     const response = await fetch(avatarUri);
     const blob = await response.blob();
-
     const path = `${user.id}/avatar.jpg`;
 
     const { error } = await supabase.storage
       .from("avatars")
-      .upload(path, blob, {
-        contentType: "image/jpeg",
-        upsert: true,
-      });
+      .upload(path, blob, { contentType: "image/jpeg", upsert: true });
 
-    if (error) {
-      throw error;
-    }
-
+    if (error) throw error;
     const { data } = supabase.storage.from("avatars").getPublicUrl(path);
-
     return data.publicUrl;
   };
 
   const onSubmit = async (data: OnboardingFormValues) => {
     try {
+      // setServerError(null);
       const avatarUrl = await uploadAvatar();
-
       await mutateAsync({
         ...data,
         gender: data.gender ?? undefined,
         avatarUrl,
       });
-
-      router.replace("/(app)");
     } catch (error) {
-      console.error("Error completing onboarding:", error);
-
-      setError("root", {
-        message: "No fue posible completar tu perfil. Inténtalo nuevamente.",
-      });
+      setServerError(
+        error instanceof Error ? error.message : "Error al completar perfil",
+      );
     }
   };
 
   const onSkip = async () => {
     try {
+      setServerError(null);
       await mutateAsync({});
-      router.replace("/(app)");
     } catch (error) {
-      console.error("Error skipping onboarding:", error);
-
-      setError("root", {
-        message: "No fue posible completar el proceso. Inténtalo nuevamente.",
-      });
+      setServerError(
+        error instanceof Error ? error.message : "Error al completar proceso",
+      );
     }
   };
+  const { signOut } = useAuth();
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      router.replace("/(auth)/login")
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
+  }
 
   return (
     <ScrollView
@@ -123,8 +112,9 @@ export default function Onboarding() {
       contentContainerStyle={{ paddingBottom: 40 }}
       keyboardShouldPersistTaps="handled"
     >
-      <Text className="mb-2 text-2xl font-bold">Cuéntanos sobre ti</Text>
+      <Button title="Cerrar sesión" onPress={handleSignOut} variant="secondary" />
 
+      <Text className="mb-2 text-2xl font-bold">Cuéntanos sobre ti</Text>
       <Text className="mb-6 text-base text-gray-500">
         Estos datos son opcionales. Puedes completarlos ahora o hacerlo más
         adelante.
@@ -189,44 +179,20 @@ export default function Onboarding() {
         )}
       />
 
-      <View className="mb-4">
-        <Button
-          title={avatarUri ? "Cambiar foto" : "Elegir foto de perfil"}
-          onPress={pickImage}
-          variant="secondary"
-          disabled={isPending}
-        />
-
-        {avatarUri && (
-          <Text className="mt-2 text-sm text-gray-500">Foto seleccionada</Text>
-        )}
-      </View>
-
-      <Controller
-        control={control}
-        name="notificationsEnabled"
-        render={({ field: { onChange, value } }) => (
-          <View className="my-4 flex-row items-center justify-between">
-            <View className="flex-1 pr-4">
-              <Text className="text-base font-medium">Notificaciones</Text>
-
-              <Text className="mt-1 text-sm text-gray-500">
-                Recibe notificaciones importantes de la aplicación.
-              </Text>
-            </View>
-
-            <Switch
-              value={value}
-              onValueChange={onChange}
-              disabled={isPending}
-            />
-          </View>
-        )}
+      <Button
+        title={avatarUri ? "Cambiar foto" : "Elegir foto de perfil"}
+        onPress={pickImage}
+        variant="secondary"
+        disabled={isPending}
       />
 
-      {errors.root?.message && (
-        <Text className="mb-4 text-center text-sm text-red-500">
-          {errors.root.message}
+      {avatarUri && (
+        <Text className="mt-2 text-sm text-gray-500">Foto seleccionada</Text>
+      )}
+
+      {serverError && (
+        <Text className="mb-4 mt-4 text-center text-sm text-red-500">
+          {serverError}
         </Text>
       )}
 

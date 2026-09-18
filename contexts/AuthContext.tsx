@@ -1,16 +1,10 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
-import {
-  signInWithGoogle as startGoogleSignIn,
-  type GoogleSignInResult,
-} from "../lib/auth/google-oauth";
-
 type AuthContextType = {
   session: Session | null;
   user: User | null;
   isLoading: boolean;
-  isAuthorzed: boolean;
   signIn: (
     email: string,
     password: string,
@@ -19,8 +13,10 @@ type AuthContextType = {
     email: string,
     password: string,
   ) => Promise<{ error: string | null; needsEmailConfirmation?: boolean }>;
+  signInWithOAuth: (
+    provider: 'google' | 'apple' | 'facebook',
+  ) => Promise<{ error: string | null; needsEmailConfirmation?: boolean }>;
   signOut: () => Promise<void>;
-  signInWithGoogle: () => Promise<GoogleSignInResult>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -28,7 +24,6 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const signInWithGoogle = async () => startGoogleSignIn();
 
 
   useEffect(() => {
@@ -55,22 +50,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   return { error: error?.message ?? null, needsEmailConfirmation };
 };
 
+  const signInWithOAuth = async (provider: 'google' | 'apple' | 'facebook') => {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider,
+      options: {
+        redirectTo: `mobileapp://`,
+        skipBrowserRedirect: true,
+      },
+    });
+
+    if (error) {
+      return { error: error.message };
+    }
+
+    // OAuth en React Native: esperamos que Supabase devuelva sesión directamente.
+    // Si no hay sesión inmediata, significa que puede necesitar confirmación.
+    const needsEmailConfirmation = !data.flowId;
+    return { error: null, needsEmailConfirmation };
+  };
+
   const signOut = async () => {
     await supabase.auth.signOut();
   };
 
   return (
     <AuthContext.Provider
-      value={{
-        session,
-        isAuthorzed: !!session,
-        user: session?.user ?? null,
-        isLoading,
-        signIn,
-        signUp,
-        signOut,
-        signInWithGoogle,
-      }}
+      value={{ session, user: session?.user ?? null, isLoading, signIn, signUp, signInWithOAuth, signOut }}
     >
       {children}
     </AuthContext.Provider>
