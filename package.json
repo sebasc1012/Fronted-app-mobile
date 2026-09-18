@@ -50,6 +50,8 @@
     "@testing-library/user-event": "^14.6.7",
     "@types/jest": "^30.0.0",
     "@types/react": "~19.2.2",
+    "eslint": "^9.0.0",
+    "eslint-config-expo": "~57.0.2",
     "husky": "^9.1.7",
     "jest": "^30.5.1",
     "lint-staged": "^17.5.1",
