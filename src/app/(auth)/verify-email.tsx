@@ -1,8 +1,7 @@
 import { View, Text } from "react-native";
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, router } from "expo-router";
 import { Button } from "../../components/ui/Button";
 import { AuthBackground } from "../../components/ui/AuthBackground";
-import { router } from "expo-router";
 
 export default function VerifyEmail() {
   const { email } = useLocalSearchParams<{ email: string }>();
