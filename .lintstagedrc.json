@@ -1,5 +1,5 @@
 {
   "*.{ts,tsx,js,jsx}": [
-    "npm run typecheck"
+    "bash -c 'npm run typecheck'"
   ]
 }

@@ -30,7 +30,7 @@ Backend Fases 1-7 completas (Profile, Categories, Commitments, Occurrences, Paym
 
 ---
 
-## Estado actual (2026-09-17)
+## Estado actual (2026-09-18)
 
 ### ✅ Completado
 
@@ -38,25 +38,27 @@ Backend Fases 1-7 completas (Profile, Categories, Commitments, Occurrences, Paym
 - [x] Cliente Supabase (`lib/supabase.ts` + SecureStore adapter)
 - [x] Cliente HTTP Axios (`lib/api.ts` + interceptor Bearer)
 - [x] TanStack Query (`lib/queryClient.ts` + `QueryClientProvider`)
-- [x] `AuthContext` (signIn, signUp, signOut, sesión persistente)
-- [x] NativeWind + componentes base (`Input.tsx`, `Button.tsx`)
-- [x] Rutas protegidas (auth/app grupos con condicional de sesión)
-- [x] Onboarding de perfil (pantalla + integración `useUpsertProfile`)
+- [x] `AuthContext` (signIn, signUp, signInWithOAuth, signOut, sesión persistente)
+- [x] `useOAuth` (`src/hooks/useOAuth.ts`) — handler reutilizable de OAuth (loading/error) para login y signup
+- [x] NativeWind + componentes base (`Input.tsx`, `Button.tsx`, `Select.tsx`)
+- [x] **Login UI** (`src/app/(auth)/login.tsx`) — email/password + Zod + react-hook-form + botones OAuth
+- [x] **Signup UI** (`src/app/(auth)/signup.tsx`) — email/password/confirmación + Zod + botones OAuth
+- [x] **Google/Apple Sign-In** — `signInWithOAuth` en `AuthContext` + `useOAuth`, deep link `mobileapp://`
+- [x] Gate de rutas centralizado en `src/app/_layout.tsx` (`Stack.Protected`, única fuente de verdad — ver
+      sección "Arquitectura de autenticación y enrutamiento")
+- [x] Onboarding de perfil (pantalla + integración `useUpsertProfile`, selector de género con `Select.tsx`)
 - [x] Flujo verificación de email (`(auth)/verify-email.tsx`)
-- [x] Hooks: `useProfile`, `useUpsertProfile`
+- [x] Hooks: `useProfile` (distingue 404 "sin perfil" de 401 "sesión inválida"), `useUpsertProfile`
+- [x] Logout básico — botón "Cerrar sesión" en `(app)/index.tsx` (sin modal de confirmación aún)
 
 ### ⏳ Pendiente (Tareas priorizadas MVP)
 
-- [ ] **Login UI** (`(auth)/login.tsx`) — email/password + validación Zod + react-hook-form
-- [ ] **Signup UI** (`(auth)/signup.tsx`) — email/password/confirmación + validación
-- [ ] **Google Sign-In** — Botón + deep link + `signInWithOAuth('google')`
-- [ ] **Apple Sign-In** — Botón + deep link + `signInWithOAuth('apple')`
-- [ ] **Logout completo** — Botón + confirmación + limpiar sesión
-- [ ] **Onboarding refinado** — Definir contenido (qué campos, obligatorios vs opcionales)
-- [ ] **Selector país** — Dropdown ISO 3166-1
-- [ ] **Selector género** — Radio buttons M/F/Other/Prefer not to say
-- [ ] **Avatar picker** — Supabase Storage bucket + upload + preview
-- [ ] **Jest setup** — Unit tests para hooks, validación, AuthContext
+- [ ] **Logout con confirmación** — modal antes de `signOut()`
+- [ ] **Pantalla "Mi Perfil"** (`(app)/profile.tsx`) — separar de `(app)/index.tsx`
+- [ ] **Selector país** — actualmente `Input` de texto libre (código ISO manual); falta dropdown ISO 3166-1
+- [ ] **Avatar picker** — upload a Supabase Storage ya implementado en onboarding; falta preview/edición post-onboarding
+- [ ] **Notificaciones en onboarding** — el campo `notificationsEnabled` existe en backend pero no hay control en la UI actual
+- [ ] **Jest setup** — hay `jest.config.js`/`jest.setup.js` y `src/__tests__/validation.test.ts`; faltan tests de `useProfile`, `useUpsertProfile` y `AuthContext`
 
 ---
 
@@ -83,6 +85,62 @@ Backend Fases 1-7 completas (Profile, Categories, Commitments, Occurrences, Paym
 **Recomendación:** Mantén las 4 prioritarias. Avatar + selectors son parte de onboarding (agregables ahora). Pantallas de (app) esperan wireframes.
 
 ---
+
+## Arquitectura de autenticación y enrutamiento
+
+Puerta única de acceso en `src/app/_layout.tsx` (`RootNavigation`). Ningún otro
+archivo decide si se muestra `(auth)` o `(app)` — evita la duplicación de lógica
+que causó el bug de routing de 2026-09-17/18 (ver log de esa fecha).
+
+```
+useAuth()        → session, authLoading
+useProfile(!!session) → profile, profileLoading   (misma query en toda la app: ["profile"])
+
+isReady      = !authLoading && !profileLoading
+isAuthorized = !!session && !!profile?.onboardingCompleted
+
+<Stack>
+  <Stack.Protected guard={isAuthorized}>  <Stack.Screen name="(app)" />  </Stack.Protected>
+  <Stack.Protected guard={!isAuthorized}> <Stack.Screen name="(auth)" /> </Stack.Protected>
+</Stack>
+```
+
+Mientras `!isReady`, no se renderiza nada (splash screen visible). `Stack.Protected`
+monta/desmonta el grupo completo según `isAuthorized`; Expo Router redirige solo
+cuando el guard cambia, no en cada render.
+
+**`(auth)/_layout.tsx`** — solo entra aquí cuando `!isAuthorized`, es decir, sin
+sesión O con sesión pero onboarding incompleto. Dentro del grupo:
+- Si `session` existe (onboarding incompleto es la única razón de estar aquí) y la
+  ruta actual no es `/onBoarding`, hace `<Redirect href="/(auth)/onBoarding" />`.
+  La comparación de ruta (`usePathname() !== "/onBoarding"`) es obligatoria: sin
+  ella, el redirect se dispara en cada render incluso estando ya en onBoarding →
+  bucle infinito ("Maximum update depth exceeded").
+- Si no hay `session`, renderiza `<Stack/>` normal y Expo Router muestra la
+  pantalla de archivo que corresponda (`login`, `signup`, `verify-email`).
+- `export const unstable_settings = { initialRouteName: "login" }` es necesario
+  porque el grupo no tiene `index.tsx`; sin esto, Expo Router no sabe qué pantalla
+  mostrar cuando se entra al grupo sin un path específico.
+
+**`(app)/_layout.tsx`** — es un `<Stack/>` plano, sin chequeos de sesión. No los
+necesita: el root ya garantiza que este grupo solo se monta con
+`session && onboardingCompleted`.
+
+**`src/hooks/useProfile.ts`** — `fetchProfile` distingue tres casos del `GET
+/api/users/profile`:
+- `404` → `return null` (usuario autenticado, perfil aún no existe → onboarding).
+- `401` → token inválido/expirado (típicamente una sesión vieja que quedó en
+  SecureStore/Keychain de una prueba anterior). Se fuerza `supabase.auth.signOut()`
+  y se retorna `null`; el cambio de sesión hace que el root re-evalúe y muestre
+  login. **Sin este caso**, un 401 se trataba igual que un 404 y el usuario
+  terminaba en onboarding creyendo que no tenía sesión.
+- Cualquier otro error → `throw`, para que TanStack Query lo refleje como
+  `isError` en vez de esconderlo como "sin perfil".
+
+**Onboarding sin navegación manual:** `useUpsertProfile` invalida la query
+`["profile"]` en `onSuccess`. El root vuelve a evaluar `isAuthorized`, y si ya es
+`true`, `Stack.Protected` cambia a `(app)` solo — no hace falta `router.replace`
+en `onBoarding.tsx`.
 
 ## Decisiones técnicas (log)
 
@@ -126,52 +184,82 @@ Backend Fases 1-7 completas (Profile, Categories, Commitments, Occurrences, Paym
   - Razón: Unit tests hooks, validación, lógica (no E2E MVP)
   - Agregar: Paralelo a login/signup
 
+### 2026-09-18
+
+- **Bug corregido:** la app abría en `onBoarding` (o directo en `(app)`) en vez de
+  `login`, incluso sin sesión real.
+  - Causa raíz 1: `src/app/_layout.tsx` había perdido el guard `Stack.Protected`
+    (dos `Stack.Screen` sin proteger). Como `(app)/index.tsx` mapea a `/` y
+    `(auth)` no tiene `index.tsx`, la app siempre montaba `(app)` al arrancar,
+    sin importar el estado de sesión.
+  - Causa raíz 2: `(auth)/_layout.tsx` había dejado de renderizar `<Stack/>` y
+    decidía a mano entre `<Login/>`/`<Onboarding/>` ignorando la ruta navegada
+    (`signup`/`verify-email` quedaban inalcanzables), duplicando la lógica que
+    ya vive en el gate raíz.
+  - Causa raíz 3: `useProfile.fetchProfile` convertía **cualquier** error (401
+    de token inválido, error de red, 500) en "perfil no existe", igual que un
+    404 legítimo. Una sesión vieja en SecureStore/Keychain (de pruebas de OAuth
+    en esta rama) hacía que un token inválido pareciera "sesión válida sin
+    onboarding".
+  - Decisión: puerta única en `src/app/_layout.tsx` con `Stack.Protected`
+    (`isAuthorized = session && onboardingCompleted`); `(auth)/_layout.tsx`
+    vuelve a ser un `<Stack/>` de archivos, con un único `Redirect` para el caso
+    "hay sesión, falta onboarding"; `useProfile` solo trata 404 como "sin
+    perfil" y fuerza `signOut()` en 401. Ver sección "Arquitectura de
+    autenticación y enrutamiento" arriba para el detalle completo.
+  - Bug secundario encontrado al aplicar el fix: el `Redirect` a `/onBoarding`
+    dentro de `(auth)/_layout.tsx` se disparaba en cada render, incluso ya
+    estando en esa pantalla → "Maximum update depth exceeded". Fix: excluir la
+    ruta actual (`usePathname() !== "/onBoarding"`) de la condición del
+    redirect.
+
 ---
 
-## Estructura recomendada
+## Estructura actual
+
+`app/` vive dentro de `src/` (no en la raíz); `contexts/` y `lib/` sí están en la
+raíz. Alias `@/*` → `./src/*` (`tsconfig.json`).
 
 ```
 mobile-app/
-├── app/
-│   ├── _layout.tsx                    # Stack + QueryClientProvider + AuthProvider
-│   ├── (auth)/
-│   │   ├── _layout.tsx                # Condicional sesión
-│   │   ├── login.tsx                  # ⏳ Tarea 1
-│   │   ├── signup.tsx                 # ⏳ Tarea 2
-│   │   ├── verify-email.tsx           # ✅ Existente
-│   │   └── onboarding.tsx             # ⏳ Tarea (refinada)
-│   └── (app)/
-│       ├── _layout.tsx                # Condicional onboarding
-│       ├── index.tsx                  # Home (diseño pendiente)
-│       └── profile.tsx                # ⏳ Mi perfil + logout (Tarea 3)
-├── components/
-│   ├── ui/
-│   │   ├── Input.tsx                  # ✅
-│   │   ├── Button.tsx                 # ✅
-│   │   ├── Select.tsx                 # ⏳ Dropdowns país/género
-│   │   └── Avatar.tsx                 # ⏳ Picker + upload
-│   └── auth/
-│       └── OAuthButton.tsx            # ⏳ Google + Apple (Tarea 2)
+├── src/
+│   ├── app/
+│   │   ├── _layout.tsx                # Root gate: Stack.Protected (auth)/(app) — ver
+│   │   │                               # "Arquitectura de autenticación y enrutamiento"
+│   │   ├── (auth)/
+│   │   │   ├── _layout.tsx            # <Stack/> + Redirect a onBoarding si hay sesión
+│   │   │   ├── login.tsx              # ✅ email/password + OAuth
+│   │   │   ├── signup.tsx             # ✅ email/password/confirmación + OAuth
+│   │   │   ├── verify-email.tsx       # ✅
+│   │   │   └── onBoarding.tsx         # ✅ (nota: B mayúscula en el nombre de archivo)
+│   │   └── (app)/
+│   │       ├── _layout.tsx            # <Stack/> plano (protección ya la hizo el root)
+│   │       └── index.tsx              # Home + botón "Cerrar sesión" — ⏳ separar en profile.tsx
+│   ├── components/
+│   │   └── ui/
+│   │       ├── Input.tsx              # ✅
+│   │       ├── Button.tsx             # ✅
+│   │       └── Select.tsx             # ✅ (usado para género en onboarding)
+│   ├── constants/
+│   │   └── gender.const.ts            # ✅ GENDER_OPTIONS
+│   ├── hooks/
+│   │   ├── useProfile.ts              # ✅ distingue 404/401/otros errores
+│   │   ├── useUpsertProfile.ts        # ✅
+│   │   ├── useOAuth.ts                # ✅ handler compartido login/signup
+│   │   └── __tests__/                 # ⏳ falta useProfile/useUpsertProfile/AuthContext
+│   ├── squema/
+│   │   ├── auth.schema.ts             # ✅ Zod login/signup
+│   │   └── onboarding.schema.ts       # ✅ Zod onboarding
+│   └── __tests__/
+│       └── validation.test.ts         # ✅
 ├── contexts/
-│   └── AuthContext.tsx                # ✅
-├── hooks/
-│   ├── useProfile.ts                  # ✅
-│   ├── useUpsertProfile.ts            # ✅
-│   └── __tests__/
-│       ├── useProfile.test.ts         # ⏳ Tarea 4
-│       ├── useUpsertProfile.test.ts   # ⏳ Tarea 4
-│       └── AuthContext.test.ts        # ⏳ Tarea 4
+│   └── AuthContext.tsx                # ✅ signIn, signUp, signInWithOAuth, signOut
 ├── lib/
-│   ├── supabase.ts                    # ✅
-│   ├── api.ts                         # ✅
-│   ├── validation.ts                  # ⏳ Zod schemas (login, signup, onboarding)
-│   └── __tests__/
-│       └── validation.test.ts         # ⏳ Tarea 4
-├── jest.config.js                     # ⏳ Tarea 4
-├── tailwind.config.js                 # ✅
-├── global.css                         # ✅
-├── babel.config.js                    # ✅
-├── metro.config.js                    # ✅
+│   ├── supabase.ts                    # ✅ SecureStore adapter
+│   ├── api.ts                         # ✅ Axios + interceptor Bearer
+│   └── queryClient.ts                 # ✅
+├── jest.config.js / jest.setup.js     # ✅
+├── tsconfig.json                      # alias @/* → ./src/*
 └── CLAUDE.md                          # ← Estás aquí
 ```
 
@@ -179,7 +267,7 @@ mobile-app/
 
 ## Tareas priorizadas MVP
 
-### Tarea 1: Login UI
+### Tarea 1: Login UI ✅ Implementado
 
 - Email + password inputs
 - Validación Zod + react-hook-form
@@ -189,7 +277,7 @@ mobile-app/
 
 **Definición hecha:** Archivo `(auth)/login.tsx`
 
-### Tarea 2: Signup UI
+### Tarea 2: Signup UI ✅ Implementado
 
 - Email + password + password confirmation
 - Validación Zod + react-hook-form
@@ -199,7 +287,7 @@ mobile-app/
 
 **Definición hecha:** Archivo `(auth)/signup.tsx`
 
-### Tarea 2b: OAuth UI (Google + Apple)
+### Tarea 2b: OAuth UI (Google + Apple) ✅ Implementado (vía `useOAuth`, no `OAuthButton.tsx` separado)
 
 - Botones "Sign in with Google" y "Sign in with Apple"
 - `supabase.auth.signInWithOAuth({ provider: 'google'|'apple' })`

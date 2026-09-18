@@ -14,7 +14,7 @@ type AuthContextType = {
     password: string,
   ) => Promise<{ error: string | null; needsEmailConfirmation?: boolean }>;
   signInWithOAuth: (
-    provider: 'google' | 'apple',
+    provider: 'google' | 'apple' | 'facebook',
   ) => Promise<{ error: string | null; needsEmailConfirmation?: boolean }>;
   signOut: () => Promise<void>;
 };
@@ -50,7 +50,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   return { error: error?.message ?? null, needsEmailConfirmation };
 };
 
-  const signInWithOAuth = async (provider: 'google' | 'apple') => {
+  const signInWithOAuth = async (provider: 'google' | 'apple' | 'facebook') => {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
@@ -65,7 +65,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // OAuth en React Native: esperamos que Supabase devuelva sesión directamente.
     // Si no hay sesión inmediata, significa que puede necesitar confirmación.
-    const needsEmailConfirmation = !data.session;
+    const needsEmailConfirmation = !data.flowId;
     return { error: null, needsEmailConfirmation };
   };
 

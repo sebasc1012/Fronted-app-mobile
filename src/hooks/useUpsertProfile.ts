@@ -16,9 +16,12 @@ export function useUpsertProfile() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (input: ProfileInput) => api.post("/users/profile", input),
+    mutationFn: (input: ProfileInput) => api.post("/api/users/profile", input),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["profile"] });
     },
+    onError: (error: unknown) => {
+      console.error("Error upserting profile:", error);
+    }
   });
 }

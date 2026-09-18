@@ -12,28 +12,22 @@ export const Input = forwardRef<TextInput, InputProps>(
   ({ label, error, icon: Icon, ...props }, ref) => {
     const [isFocused, setIsFocused] = useState(false);
 
-    const getContainerStyle = () => {
-      if (error) {
-        return "border-danger";
-      }
-
-      if (isFocused) {
-        return "border-primary";
-      }
-
-      return "border-transparent";
-    };
+    const borderStyle = error
+      ? "border-danger"
+      : isFocused
+        ? "border-primary"
+        : "border-transparent";
 
     return (
       <View className="mb-4">
         {label && (
-          <Text className="mb-2 text-sm font-medium text-gray-700">
+          <Text className="mb-2 text-sm font-medium text-[#2E2A28]">
             {label}
           </Text>
         )}
 
         <View
-          className={`h-[52px] flex-row items-center rounded-xl border bg-gray-100 px-4 ${getContainerStyle()}`}
+          className={`h-[52px] flex-row items-center rounded-[5px] border bg-white px-4 ${borderStyle}`}
         >
           {Icon && (
             <Icon
@@ -44,7 +38,7 @@ export const Input = forwardRef<TextInput, InputProps>(
 
           <TextInput
             ref={ref}
-            className={`flex-1 text-base text-gray-900 ${Icon ? "ml-3" : ""}`}
+            className={`flex-1 text-base text-[#2E2A28] ${Icon ? "ml-3" : ""}`}
             placeholderTextColor="#9CA3AF"
             onFocus={(event) => {
               setIsFocused(true);
