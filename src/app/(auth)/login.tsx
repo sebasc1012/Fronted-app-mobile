@@ -4,6 +4,7 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Link } from "expo-router";
+import { useTranslation } from "react-i18next";
 import { Input } from "../../components/ui/Input";
 import { Button } from "../../components/ui/Button";
 import { AuthBackground } from "../../components/ui/AuthBackground";
@@ -24,6 +25,7 @@ const loginSchema = z.object({
 type LoginForm = z.infer<typeof loginSchema>;
 
 export default function Login() {
+  const { t } = useTranslation();
   const { signIn } = useAuth();
   const { handleOAuth, oauthLoading, oauthError } = useOAuth();
   const [serverError, setServerError] = useState<string | null>(null);
@@ -55,8 +57,8 @@ export default function Login() {
             name="email"
             render={({ field: { onChange, value } }) => (
               <Input
-                label="Email"
-                placeholder="Enter your email"
+                label={t("auth.login.emailLabel")}
+                placeholder={t("auth.login.emailPlaceholder")}
                 keyboardType="email-address"
                 autoCapitalize="none"
                 icon={Mail}
@@ -72,8 +74,8 @@ export default function Login() {
             name="password"
             render={({ field: { onChange, value } }) => (
               <Input
-                label="Password"
-                placeholder="password"
+                label={t("auth.login.passwordLabel")}
+                placeholder={t("auth.login.passwordPlaceholder")}
                 secureTextEntry
                 icon={Lock}
                 value={value}
@@ -90,11 +92,11 @@ export default function Login() {
           )}
 
           <Text className="mb-6 text-right text-sm text-[#2E2A28]">
-            Forgot Password ?
+            {t("auth.login.forgotPassword")}
           </Text>
 
           <Button
-            title="NEXT"
+            title={t("auth.login.next")}
             onPress={handleSubmit(onSubmit)}
             loading={loading}
             color="#8A6F56"
@@ -103,13 +105,15 @@ export default function Login() {
 
           <View className="my-6 flex-row items-center">
             <View className="h-px flex-1 bg-gray-300" />
-            <Text className="mx-3 text-sm text-gray-500">Or</Text>
+            <Text className="mx-3 text-sm text-gray-500">
+              {t("auth.login.or")}
+            </Text>
             <View className="h-px flex-1 bg-gray-300" />
           </View>
 
           <View className="gap-3">
             <Button
-              title="Continue with Apple"
+              title={t("auth.login.continueWithApple")}
               variant="outline"
               pill
               icon={<AppleIcon />}
@@ -119,7 +123,7 @@ export default function Login() {
             />
 
             <Button
-              title="Continue with Google"
+              title={t("auth.login.continueWithGoogle")}
               variant="outline"
               pill
               icon={<GoogleIcon />}
@@ -129,7 +133,7 @@ export default function Login() {
             />
 
             <Button
-              title="Continue with Facebook"
+              title={t("auth.login.continueWithFacebook")}
               variant="outline"
               pill
               icon={<FacebookIcon />}
@@ -139,7 +143,7 @@ export default function Login() {
             />
           </View>
           <Text className="mt-6 w-full text-center text-sm text-primary">
-            <Link href="/(auth)/signup">¿No tienes cuenta?</Link>
+            <Link href="/(auth)/signup">{t("auth.login.noAccount")}</Link>
           </Text>
         </GlassPanel>
       </View>
