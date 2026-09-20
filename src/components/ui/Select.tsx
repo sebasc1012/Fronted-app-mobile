@@ -37,26 +37,28 @@ export function Select<T extends string>({
   return (
     <View className="mb-4">
       {label && (
-        <Text className="mb-1 text-sm font-medium text-gray-700">{label}</Text>
+        <Text className="mb-2 text-sm font-medium text-[#2E2A28]">
+          {label}
+        </Text>
       )}
 
       <Pressable
         onPress={() => setOpen(true)}
         disabled={disabled}
-        className={`rounded-lg border px-4 py-3 ${
-          error ? "border-danger" : "border-gray-300"
+        className={`h-[52px] flex-row items-center rounded-[5px] border bg-white px-4 ${
+          error ? "border-danger" : "border-transparent"
         } ${disabled ? "opacity-50" : ""}`}
       >
         <Text
           className={`text-base ${
-            selectedOption ? "text-gray-900" : "text-gray-400"
+            selectedOption ? "text-[#2E2A28]" : "text-[#9CA3AF]"
           }`}
         >
           {selectedOption?.label ?? placeholder}
         </Text>
       </Pressable>
 
-      {error && <Text className="mt-1 text-xs text-danger">{error}</Text>}
+      {error && <Text className="mt-1.5 text-xs text-danger">{error}</Text>}
 
       <Modal
         visible={open}

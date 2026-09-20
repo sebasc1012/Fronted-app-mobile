@@ -16,21 +16,23 @@ Backend Fases 1-7 completas (Profile, Categories, Commitments, Occurrences, Paym
 
 ## Stack técnico
 
-- **Runtime:** React Native 0.76 + Expo SDK 54 + CNG (Config Plugins)
-- **Lenguaje:** TypeScript
+- **Runtime:** React Native 0.86 + React 19.2 + Expo SDK 57 + CNG (`/ios` y `/android` en `.gitignore`); React Compiler y `typedRoutes` activados en `app.json`
+- **Lenguaje:** TypeScript ~6.0
 - **Routing:** Expo Router (grupos `(auth)` / `(app)`, deep links)
-- **Styling:** NativeWind (Tailwind CSS para RN)
+- **Styling:** NativeWind 4 + Tailwind 3 (`global.css`, `tailwind.config.js`)
+- **i18n:** i18next + react-i18next + `expo-localization` (en/es, `lib/i18n.ts`, `src/locales/`)
 - **HTTP:** Axios + interceptor Bearer token
 - **State + Cache:** TanStack Query (@tanstack/react-query)
 - **Auth:** Supabase JS SDK + `expo-secure-store`
 - **Storage:** Supabase Storage (avatars con RLS)
 - **Validación:** Zod + react-hook-form
-- **Testing:** Jest + React Native Testing Library
+- **Testing:** Jest 30 + React Native Testing Library (`@react-native/jest-preset`)
+- **Calidad:** ESLint (`expo lint`), `tsc --noEmit`, Husky + lint-staged (pre-commit = typecheck), CI en GitHub Actions (lint + typecheck + tests en PR/push a `main`/`develop`)
 - **Build/Deploy:** EAS Build + EAS Submit → App Store Connect / Google Play Console
 
 ---
 
-## Estado actual (2026-09-18)
+## Estado actual (2026-09-20)
 
 ### ✅ Completado
 
@@ -46,7 +48,12 @@ Backend Fases 1-7 completas (Profile, Categories, Commitments, Occurrences, Paym
 - [x] **Google/Apple Sign-In** — `signInWithOAuth` en `AuthContext` + `useOAuth`, deep link `mobileapp://`
 - [x] Gate de rutas centralizado en `src/app/_layout.tsx` (`Stack.Protected`, única fuente de verdad — ver
       sección "Arquitectura de autenticación y enrutamiento")
-- [x] Onboarding de perfil (pantalla + integración `useUpsertProfile`, selector de género con `Select.tsx`)
+- [x] Onboarding de perfil (pantalla + integración `useUpsertProfile`, selector de género con `Select.tsx`, **avatar picker con `expo-image-picker` + upload a Supabase Storage bucket `avatars` ya implementado en `onBoarding.tsx`**; botón para cerrar sesión desde onboarding)
+- [x] UI de auth con estilo glass: `AuthBackground`, `GlassPanel`, iconos `AppleIcon`/`GoogleIcon`/`FacebookIcon` (`components/ui/`)
+- [x] Botones OAuth Google, Apple y **Facebook** en login y signup
+- [x] Tooling: Husky + lint-staged, CI (`.github/workflows/ci.yml`), `.HUSKY.md`
+- [x] Tests de componentes: `Button.test.tsx`, `Input.test.tsx` (+ `validation.test.ts`)
+- [~] **i18n (rama `in8Configuration`, sin commitear)** — `lib/i18n.ts` detecta idioma del dispositivo (`es` → es, resto → en); `login.tsx` ya usa `useTranslation`; `signup.tsx` casi no (2 usos); `onBoarding`, `verify-email` y `(app)` siguen con strings hardcodeados; `en.json`/`es.json` solo tienen `auth.login.*`
 - [x] Flujo verificación de email (`(auth)/verify-email.tsx`)
 - [x] Hooks: `useProfile` (distingue 404 "sin perfil" de 401 "sesión inválida"), `useUpsertProfile`
 - [x] Logout básico — botón "Cerrar sesión" en `(app)/index.tsx` (sin modal de confirmación aún)
@@ -56,13 +63,16 @@ Backend Fases 1-7 completas (Profile, Categories, Commitments, Occurrences, Paym
 - [ ] **Logout con confirmación** — modal antes de `signOut()`
 - [ ] **Pantalla "Mi Perfil"** (`(app)/profile.tsx`) — separar de `(app)/index.tsx`
 - [ ] **Selector país** — actualmente `Input` de texto libre (código ISO manual); falta dropdown ISO 3166-1
-- [ ] **Avatar picker** — upload a Supabase Storage ya implementado en onboarding; falta preview/edición post-onboarding
-- [ ] **Notificaciones en onboarding** — el campo `notificationsEnabled` existe en backend pero no hay control en la UI actual
-- [ ] **Jest setup** — hay `jest.config.js`/`jest.setup.js` y `src/__tests__/validation.test.ts`; faltan tests de `useProfile`, `useUpsertProfile` y `AuthContext`
+- [ ] **Avatar post-onboarding** — falta preview/edición fuera del onboarding
+- [ ] **Notificaciones en onboarding** — `notificationsEnabled` va con `true` por defecto en el form pero no hay control (Switch) en la UI
+- [ ] **Completar i18n** — traducir signup, onboarding, verify-email, home y mensajes de error Zod (`src/squema/*` están hardcodeados en español)
+- [ ] **Limpieza de `lib/auth/google-oauth.ts`** — `signInWithGoogle` (WebBrowser + `setSession`, redirect `mobileapp://auth/callback`) no lo usa nadie; el flujo real es `AuthContext.signInWithOAuth` (redirect `mobileapp://`, `skipBrowserRedirect: true`, sin abrir el navegador). Revisar que el OAuth realmente complete la sesión y que `needsEmailConfirmation = !data.flowId` sea correcto; decidir cuál flujo se queda
+- [ ] **Limpiar archivos del template Expo** — `animated-icon*`, `app-tabs`, `external-link`, `hint-row`, `themed-*`, `web-badge`, `collapsible`, `hooks/use-*`, `constants/theme.ts`, `scripts/reset-project.js`
+- [ ] **Jest** — faltan tests de `useProfile`, `useUpsertProfile`, `AuthContext` y `Select`
 
 ---
 
-## Análisis de tareas (Usuario propuso 4, ¿agregar más?)
+## Análisis de tareas (histórico — la mayoría ya resueltas, ver "Estado actual")
 
 **Propuestas del usuario:**
 1. ✅ Ajustar onboarding — definir contenido (campos + obligatorios?)
@@ -213,11 +223,28 @@ en `onBoarding.tsx`.
     ruta actual (`usePathname() !== "/onBoarding"`) de la condición del
     redirect.
 
+### 2026-09-20
+
+- **i18n:** `i18next` + `react-i18next` + `expo-localization`. `lib/i18n.ts` se importa
+  como side-effect en `src/app/_layout.tsx`; idioma = `es` si el dispositivo es español,
+  si no `en` (fallback `en`). Claves bajo `auth.login.*` por ahora; migración del resto
+  de pantallas pendiente.
+- **Versiones:** el proyecto está en Expo SDK 57 / RN 0.86 / TS 6 (este archivo decía
+  SDK 54 / RN 0.76).
+- **Avatar:** picker + upload a Storage ya vive en `onBoarding.tsx`
+  (`${user.id}/avatar.jpg`, `upsert: true`, `getPublicUrl`). Usa
+  `ImagePicker.MediaTypeOptions` (API en desuso en versiones recientes de expo-image-picker;
+  revisar al tocar ese archivo).
+- **OAuth:** coexisten dos implementaciones (`AuthContext.signInWithOAuth`, usada por
+  `useOAuth`, y `lib/auth/google-oauth.ts`, sin uso). Facebook añadido como proveedor en UI.
+- **Calidad:** Husky/lint-staged ejecutan `typecheck` en pre-commit; CI corre lint,
+  typecheck y tests.
+
 ---
 
 ## Estructura actual
 
-`app/` vive dentro de `src/` (no en la raíz); `contexts/` y `lib/` sí están en la
+`app/` vive dentro de `src/` (no en la raíz); `contexts/`, `lib/` y `types/` sí están en la
 raíz. Alias `@/*` → `./src/*` (`tsconfig.json`).
 
 ```
@@ -234,19 +261,23 @@ mobile-app/
 │   │   │   └── onBoarding.tsx         # ✅ (nota: B mayúscula en el nombre de archivo)
 │   │   └── (app)/
 │   │       ├── _layout.tsx            # <Stack/> plano (protección ya la hizo el root)
-│   │       └── index.tsx              # Home + botón "Cerrar sesión" — ⏳ separar en profile.tsx
+│   │       └── index.tsx              # Home + botón "Cerrar sesión" (strings hardcodeados) — ⏳ separar en profile.tsx
 │   ├── components/
 │   │   └── ui/
 │   │       ├── Input.tsx              # ✅
 │   │       ├── Button.tsx             # ✅
-│   │       └── Select.tsx             # ✅ (usado para género en onboarding)
+│   │       ├── Select.tsx             # ✅ (usado para género en onboarding)
+│   │       ├── AuthBackground.tsx     # ✅ fondo de pantallas auth
+│   │       ├── GlassPanel.tsx         # ✅ contenedor glass (expo-blur)
+│   │       ├── icons/                 # ✅ Apple, Google, Facebook
+│   │       └── __tests__/             # ✅ Button.test, Input.test
 │   ├── constants/
 │   │   └── gender.const.ts            # ✅ GENDER_OPTIONS
+│   ├── locales/                       # 🚧 en.json / es.json (solo auth.login por ahora)
 │   ├── hooks/
 │   │   ├── useProfile.ts              # ✅ distingue 404/401/otros errores
 │   │   ├── useUpsertProfile.ts        # ✅
 │   │   ├── useOAuth.ts                # ✅ handler compartido login/signup
-│   │   └── __tests__/                 # ⏳ falta useProfile/useUpsertProfile/AuthContext
 │   ├── squema/
 │   │   ├── auth.schema.ts             # ✅ Zod login/signup
 │   │   └── onboarding.schema.ts       # ✅ Zod onboarding
@@ -254,10 +285,16 @@ mobile-app/
 │       └── validation.test.ts         # ✅
 ├── contexts/
 │   └── AuthContext.tsx                # ✅ signIn, signUp, signInWithOAuth, signOut
+├── types/
+│   └── genders.ts                 # ✅ GENDERS (enum compartido con schema Zod)
 ├── lib/
+│   ├── i18n.ts                        # 🚧 init i18next (import en root _layout)
+│   ├── auth/google-oauth.ts           # ⚠️ sin uso — ver Pendiente
 │   ├── supabase.ts                    # ✅ SecureStore adapter
 │   ├── api.ts                         # ✅ Axios + interceptor Bearer
 │   └── queryClient.ts                 # ✅
+├── .github/workflows/ci.yml           # ✅ lint + typecheck + test
+├── .husky/ + .lintstagedrc.json       # ✅ pre-commit: typecheck
 ├── jest.config.js / jest.setup.js     # ✅
 ├── tsconfig.json                      # alias @/* → ./src/*
 └── CLAUDE.md                          # ← Estás aquí

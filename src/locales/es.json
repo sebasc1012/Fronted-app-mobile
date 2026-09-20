@@ -1,0 +1,17 @@
+{
+  "auth": {
+    "login": {
+      "emailLabel": "Correo",
+      "emailPlaceholder": "Ingresa tu correo",
+      "passwordLabel": "Contraseña",
+      "passwordPlaceholder": "contraseña",
+      "forgotPassword": "¿Olvidaste tu contraseña?",
+      "next": "SIGUIENTE",
+      "or": "O",
+      "continueWithApple": "Continuar con Apple",
+      "continueWithGoogle": "Continuar con Google",
+      "continueWithFacebook": "Continuar con Facebook",
+      "noAccount": "¿No tienes cuenta?"
+    }
+  }
+}

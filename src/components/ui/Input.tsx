@@ -38,7 +38,8 @@ export const Input = forwardRef<TextInput, InputProps>(
 
           <TextInput
             ref={ref}
-            className={`flex-1 text-base text-[#2E2A28] ${Icon ? "ml-3" : ""}`}
+            className={`flex-1 text-base leading-[16px] text-[#2E2A28] ${Icon ? "ml-3" : ""}`}
+            textAlignVertical="center"
             placeholderTextColor="#9CA3AF"
             onFocus={(event) => {
               setIsFocused(true);
