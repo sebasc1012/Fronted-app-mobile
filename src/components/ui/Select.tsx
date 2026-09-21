@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Modal, Pressable, Text, View } from "react-native";
+import { useTranslation } from "react-i18next";
 
 export type SelectOption<T extends string> = {
   label: string;
@@ -21,10 +22,11 @@ export function Select<T extends string>({
   value,
   options,
   onChange,
-  placeholder = "Selecciona una opción",
+  placeholder,
   error,
   disabled = false,
 }: SelectProps<T>) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
 
   const selectedOption = options.find((option) => option.value === value);
@@ -54,7 +56,7 @@ export function Select<T extends string>({
             selectedOption ? "text-[#2E2A28]" : "text-[#9CA3AF]"
           }`}
         >
-          {selectedOption?.label ?? placeholder}
+          {selectedOption?.label ?? placeholder ?? t("common.selectOption")}
         </Text>
       </Pressable>
 
@@ -104,7 +106,7 @@ export function Select<T extends string>({
               onPress={() => setOpen(false)}
               className="mt-3 items-center rounded-lg bg-gray-200 py-3"
             >
-              <Text className="font-semibold text-gray-900">Cancelar</Text>
+              <Text className="font-semibold text-gray-900">{t("common.cancel")}</Text>
             </Pressable>
           </Pressable>
         </Pressable>

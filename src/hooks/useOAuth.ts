@@ -20,10 +20,7 @@ export function useOAuth() {
     }
 
     if (needsEmailConfirmation) {
-      router.push({
-        pathname: "/(auth)/verify-email",
-        params: { email: `${provider} account` },
-      });
+      router.push("/(auth)/verify-email");
     }
   };
 

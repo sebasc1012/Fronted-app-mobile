@@ -51,9 +51,10 @@ Backend Fases 1-7 completas (Profile, Categories, Commitments, Occurrences, Paym
 - [x] Onboarding de perfil (pantalla + integración `useUpsertProfile`, selector de género con `Select.tsx`, **avatar picker con `expo-image-picker` + upload a Supabase Storage bucket `avatars` ya implementado en `onBoarding.tsx`**; botón para cerrar sesión desde onboarding)
 - [x] UI de auth con estilo glass: `AuthBackground`, `GlassPanel`, iconos `AppleIcon`/`GoogleIcon`/`FacebookIcon` (`components/ui/`)
 - [x] Botones OAuth Google, Apple y **Facebook** en login y signup
+- [x] **Limpieza del template Expo (2026-09-20)** — eliminados `animated-icon*`, `app-tabs`, `external-link`, `hint-row`, `themed-*`, `web-badge`, `ui/collapsible`, `hooks/use-color-scheme*`, `hooks/use-theme`, `constants/theme.ts`, `scripts/reset-project.js` (+ script npm), assets `expo-logo`, `logo-glow`, `expo-badge*`, `react-logo*`, `tutorial-web.png`, `tabIcons/`
 - [x] Tooling: Husky + lint-staged, CI (`.github/workflows/ci.yml`), `.HUSKY.md`
 - [x] Tests de componentes: `Button.test.tsx`, `Input.test.tsx` (+ `validation.test.ts`)
-- [~] **i18n (rama `in8Configuration`, sin commitear)** — `lib/i18n.ts` detecta idioma del dispositivo (`es` → es, resto → en); `login.tsx` ya usa `useTranslation`; `signup.tsx` casi no (2 usos); `onBoarding`, `verify-email` y `(app)` siguen con strings hardcodeados; `en.json`/`es.json` solo tienen `auth.login.*`
+- [x] **i18n completo (2026-09-21)** — todas las pantallas y componentes (`login`, `signup`, `verify-email`, `onBoarding`, home, `Select`, géneros) usan `t()`. Claves en `src/locales/{en,es}.json`: `common.*`, `errors.*`, `auth.{common,login,signup,verifyEmail}.*`, `onboarding.*`, `gender.*`, `home.*`. Schemas Zod (`src/squema/auth.schema.ts`, `onboarding.schema.ts`) devuelven **claves i18n** como mensaje; la pantalla traduce con `t(errors.x.message)`. Errores de Supabase se mapean en `lib/authErrors.ts` (`invalid_credentials`, `email_not_confirmed`, `user_already_exists`, `over_email_send_rate_limit`) con fallback `errors.generic`; `AuthContext` devuelve la clave, no el mensaje crudo. Tests: `validation.test.ts` (schemas + paridad en/es)
 - [x] Flujo verificación de email (`(auth)/verify-email.tsx`)
 - [x] Hooks: `useProfile` (distingue 404 "sin perfil" de 401 "sesión inválida"), `useUpsertProfile`
 - [x] Logout básico — botón "Cerrar sesión" en `(app)/index.tsx` (sin modal de confirmación aún)
@@ -65,9 +66,7 @@ Backend Fases 1-7 completas (Profile, Categories, Commitments, Occurrences, Paym
 - [ ] **Selector país** — actualmente `Input` de texto libre (código ISO manual); falta dropdown ISO 3166-1
 - [ ] **Avatar post-onboarding** — falta preview/edición fuera del onboarding
 - [ ] **Notificaciones en onboarding** — `notificationsEnabled` va con `true` por defecto en el form pero no hay control (Switch) en la UI
-- [ ] **Completar i18n** — traducir signup, onboarding, verify-email, home y mensajes de error Zod (`src/squema/*` están hardcodeados en español)
 - [ ] **Limpieza de `lib/auth/google-oauth.ts`** — `signInWithGoogle` (WebBrowser + `setSession`, redirect `mobileapp://auth/callback`) no lo usa nadie; el flujo real es `AuthContext.signInWithOAuth` (redirect `mobileapp://`, `skipBrowserRedirect: true`, sin abrir el navegador). Revisar que el OAuth realmente complete la sesión y que `needsEmailConfirmation = !data.flowId` sea correcto; decidir cuál flujo se queda
-- [ ] **Limpiar archivos del template Expo** — `animated-icon*`, `app-tabs`, `external-link`, `hint-row`, `themed-*`, `web-badge`, `collapsible`, `hooks/use-*`, `constants/theme.ts`, `scripts/reset-project.js`
 - [ ] **Jest** — faltan tests de `useProfile`, `useUpsertProfile`, `AuthContext` y `Select`
 
 ---
@@ -223,7 +222,25 @@ en `onBoarding.tsx`.
     ruta actual (`usePathname() !== "/onBoarding"`) de la condición del
     redirect.
 
+### 2026-09-21
+
+- **i18n completado:** todas las cadenas visibles pasan por `t()`. Mensajes de Zod =
+  claves i18n (traducidas en la pantalla). Errores de auth: `lib/authErrors.ts` mapea
+  4 códigos de Supabase y el resto cae en `errors.generic`; el detalle crudo va a
+  `console.error`. Errores de onboarding: mensaje genérico traducido, detalle a consola.
+- **Fix:** `useOAuth` ya no pasa `"<provider> account"` como email a `verify-email`;
+  la pantalla muestra texto genérico si no hay email.
+- **Tests:** `validation.test.ts` ahora prueba los schemas reales y que `en.json` y
+  `es.json` tengan las mismas claves.
+
 ### 2026-09-20
+
+- **Limpieza del template Expo:** se borró todo el código y assets huérfanos del
+  template (ver "Estado actual"). Typecheck y tests pasan. Dependencias sin import
+  directo (`expo-symbols`, `expo-device`, `@expo/ui`, `expo-status-bar`,
+  `@testing-library/jest-native`, `@testing-library/user-event`) se **dejan instaladas**
+  por decisión del desarrollador; las demás sin import son peers de `expo-router`,
+  `expo-auth-session`, reanimated o RNTL y deben quedarse.
 
 - **i18n:** `i18next` + `react-i18next` + `expo-localization`. `lib/i18n.ts` se importa
   como side-effect en `src/app/_layout.tsx`; idioma = `es` si el dispositivo es español,
@@ -273,13 +290,13 @@ mobile-app/
 │   │       └── __tests__/             # ✅ Button.test, Input.test
 │   ├── constants/
 │   │   └── gender.const.ts            # ✅ GENDER_OPTIONS
-│   ├── locales/                       # 🚧 en.json / es.json (solo auth.login por ahora)
+│   ├── locales/                       # ✅ en.json / es.json
 │   ├── hooks/
 │   │   ├── useProfile.ts              # ✅ distingue 404/401/otros errores
 │   │   ├── useUpsertProfile.ts        # ✅
 │   │   ├── useOAuth.ts                # ✅ handler compartido login/signup
 │   ├── squema/
-│   │   ├── auth.schema.ts             # ✅ Zod login/signup
+│   │   ├── auth.schema.ts             # ✅ Zod login/signup (mensajes = claves i18n)
 │   │   └── onboarding.schema.ts       # ✅ Zod onboarding
 │   └── __tests__/
 │       └── validation.test.ts         # ✅
@@ -288,7 +305,8 @@ mobile-app/
 ├── types/
 │   └── genders.ts                 # ✅ GENDERS (enum compartido con schema Zod)
 ├── lib/
-│   ├── i18n.ts                        # 🚧 init i18next (import en root _layout)
+│   ├── i18n.ts                        # ✅ init i18next (import en root _layout)
+│   ├── authErrors.ts                  # ✅ error.code Supabase → clave i18n
 │   ├── auth/google-oauth.ts           # ⚠️ sin uso — ver Pendiente
 │   ├── supabase.ts                    # ✅ SecureStore adapter
 │   ├── api.ts                         # ✅ Axios + interceptor Bearer

@@ -17,8 +17,10 @@ import { GENDER_OPTIONS } from "@/constants/gender.const";
 import { supabase } from "../../../lib/supabase";
 import { useAuth } from "../../../contexts/AuthContext";
 import { router } from "expo-router";
+import { useTranslation } from "react-i18next";
 
 export default function Onboarding() {
+  const { t } = useTranslation();
   const { signOut } = useAuth();
   const { user } = useAuth();
   const { mutateAsync, isPending } = useUpsertProfile();
@@ -74,7 +76,7 @@ export default function Onboarding() {
 
   const onSubmit = async (data: OnboardingFormValues) => {
     try {
-      // setServerError(null);
+      setServerError(null);
       const avatarUrl = await uploadAvatar();
       await mutateAsync({
         ...data,
@@ -82,9 +84,8 @@ export default function Onboarding() {
         avatarUrl,
       });
     } catch (error) {
-      setServerError(
-        error instanceof Error ? error.message : "Error al completar perfil",
-      );
+      console.error("Error completing profile:", error);
+      setServerError("errors.generic");
     }
   };
 
@@ -93,9 +94,8 @@ export default function Onboarding() {
       setServerError(null);
       await mutateAsync({});
     } catch (error) {
-      setServerError(
-        error instanceof Error ? error.message : "Error al completar proceso",
-      );
+      console.error("Error skipping onboarding:", error);
+      setServerError("errors.generic");
     }
   };
 
@@ -117,10 +117,9 @@ export default function Onboarding() {
         keyboardShouldPersistTaps="handled"
       >
         <GlassPanel>
-          <Text className="mb-2 text-2xl font-bold">Cuéntanos sobre ti</Text>
+          <Text className="mb-2 text-2xl font-bold">{t("onboarding.title")}</Text>
           <Text className="mb-6 text-base text-gray-500">
-            Estos datos son opcionales. Puedes completarlos ahora o hacerlo
-            más adelante.
+            {t("onboarding.subtitle")}
           </Text>
 
           <Controller
@@ -128,10 +127,10 @@ export default function Onboarding() {
             name="fullName"
             render={({ field: { onChange, value } }) => (
               <Input
-                label="Nombre completo"
+                label={t("onboarding.fullName")}
                 value={value ?? ""}
                 onChangeText={onChange}
-                error={errors.fullName?.message}
+                error={errors.fullName && t(errors.fullName.message!)}
               />
             )}
           />
@@ -141,11 +140,11 @@ export default function Onboarding() {
             name="phone"
             render={({ field: { onChange, value } }) => (
               <Input
-                label="Teléfono"
+                label={t("onboarding.phone")}
                 value={value ?? ""}
                 onChangeText={onChange}
                 keyboardType="phone-pad"
-                error={errors.phone?.message}
+                error={errors.phone && t(errors.phone.message!)}
               />
             )}
           />
@@ -155,13 +154,13 @@ export default function Onboarding() {
             name="country"
             render={({ field: { onChange, value } }) => (
               <Input
-                label="País"
-                placeholder="Ej: CO"
+                label={t("onboarding.country")}
+                placeholder={t("onboarding.countryPlaceholder")}
                 value={value ?? ""}
                 onChangeText={onChange}
                 maxLength={2}
                 autoCapitalize="characters"
-                error={errors.country?.message}
+                error={errors.country && t(errors.country.message!)}
               />
             )}
           />
@@ -174,19 +173,19 @@ export default function Onboarding() {
               fieldState: { error },
             }) => (
               <Select
-                label="Género"
+                label={t("onboarding.gender")}
                 value={value}
-                options={GENDER_OPTIONS}
+                options={GENDER_OPTIONS.map((o) => ({ ...o, label: t(o.label) }))}
                 onChange={onChange}
-                placeholder="Selecciona tu género"
-                error={error?.message}
+                placeholder={t("onboarding.genderPlaceholder")}
+                error={error && t(error.message!)}
                 disabled={isPending}
               />
             )}
           />
 
           <Button
-            title={avatarUri ? "Cambiar foto" : "Elegir foto de perfil"}
+            title={avatarUri ? t("onboarding.changePhoto") : t("onboarding.pickPhoto")}
             onPress={pickImage}
             variant="secondary"
             disabled={isPending}
@@ -194,18 +193,18 @@ export default function Onboarding() {
 
           {avatarUri && (
             <Text className="mt-2 text-sm text-gray-500">
-              Foto seleccionada
+              {t("onboarding.photoSelected")}
             </Text>
           )}
 
           {serverError && (
             <Text className="mb-4 mt-4 text-center text-sm text-red-500">
-              {serverError}
+              {t(serverError)}
             </Text>
           )}
 
           <Button
-            title="Crear perfil"
+            title={t("onboarding.submit")}
             onPress={handleSubmit(onSubmit)}
             loading={isPending}
             disabled={isPending}
@@ -214,7 +213,7 @@ export default function Onboarding() {
           <View className="h-3" />
 
           <Button
-            title="Omitir por ahora"
+            title={t("onboarding.skip")}
             onPress={onSkip}
             variant="secondary"
             disabled={isPending}
@@ -223,7 +222,7 @@ export default function Onboarding() {
           <View className="h-3" />
 
           <Button
-            title="Cerrar sesión"
+            title={t("common.signOut")}
             onPress={handleSignOut}
             variant="secondary"
           />

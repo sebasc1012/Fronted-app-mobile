@@ -2,7 +2,6 @@ import { useState } from "react";
 import { View, Text } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { Link } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { Input } from "../../components/ui/Input";
@@ -15,14 +14,9 @@ import { FacebookIcon } from "../../components/ui/icons/FacebookIcon";
 import { useAuth } from "../../../contexts/AuthContext";
 import { useOAuth } from "@/hooks/useOAuth";
 import { Mail, Lock } from "lucide-react-native";
+import { loginSchema, LoginForm } from "@/squema/auth.schema";
 
 
-const loginSchema = z.object({
-  email: z.string().email("Correo inválido"),
-  password: z.string().min(6, "Mínimo 6 caracteres"),
-});
-
-type LoginForm = z.infer<typeof loginSchema>;
 
 export default function Login() {
   const { t } = useTranslation();
@@ -57,14 +51,14 @@ export default function Login() {
             name="email"
             render={({ field: { onChange, value } }) => (
               <Input
-                label={t("auth.login.emailLabel")}
-                placeholder={t("auth.login.emailPlaceholder")}
+                label={t("auth.common.emailLabel")}
+                placeholder={t("auth.common.emailPlaceholder")}
                 keyboardType="email-address"
                 autoCapitalize="none"
                 icon={Mail}
                 value={value}
                 onChangeText={onChange}
-                error={errors.email?.message}
+                error={errors.email && t(errors.email.message!)}
               />
             )}
           />
@@ -74,20 +68,20 @@ export default function Login() {
             name="password"
             render={({ field: { onChange, value } }) => (
               <Input
-                label={t("auth.login.passwordLabel")}
-                placeholder={t("auth.login.passwordPlaceholder")}
+                label={t("auth.common.passwordLabel")}
+                placeholder={t("auth.common.passwordPlaceholder")}
                 secureTextEntry
                 icon={Lock}
                 value={value}
                 onChangeText={onChange}
-                error={errors.password?.message}
+                error={errors.password && t(errors.password.message!)}
               />
             )}
           />
 
           {(serverError || oauthError) && (
             <Text className="mb-3 text-sm text-danger">
-              {serverError || oauthError}
+              {t(serverError ?? oauthError!)}
             </Text>
           )}
 
@@ -96,7 +90,7 @@ export default function Login() {
           </Text>
 
           <Button
-            title={t("auth.login.next")}
+            title={t("auth.common.next")}
             onPress={handleSubmit(onSubmit)}
             loading={loading}
             color="#8A6F56"
@@ -106,14 +100,14 @@ export default function Login() {
           <View className="my-6 flex-row items-center">
             <View className="h-px flex-1 bg-gray-300" />
             <Text className="mx-3 text-sm text-gray-500">
-              {t("auth.login.or")}
+              {t("auth.common.or")}
             </Text>
             <View className="h-px flex-1 bg-gray-300" />
           </View>
 
           <View className="gap-3">
             <Button
-              title={t("auth.login.continueWithApple")}
+              title={t("auth.common.continueWithApple")}
               variant="outline"
               pill
               icon={<AppleIcon />}
@@ -123,7 +117,7 @@ export default function Login() {
             />
 
             <Button
-              title={t("auth.login.continueWithGoogle")}
+              title={t("auth.common.continueWithGoogle")}
               variant="outline"
               pill
               icon={<GoogleIcon />}
@@ -133,7 +127,7 @@ export default function Login() {
             />
 
             <Button
-              title={t("auth.login.continueWithFacebook")}
+              title={t("auth.common.continueWithFacebook")}
               variant="outline"
               pill
               icon={<FacebookIcon />}

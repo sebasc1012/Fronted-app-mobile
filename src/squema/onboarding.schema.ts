@@ -5,7 +5,7 @@ export const onboardingSchema = z.object({
   fullName: z
     .string()
     .trim()
-    .max(100, "El nombre no puede superar los 100 caracteres")
+    .max(100, "errors.nameMax")
     .optional()
     .or(z.literal("")),
 
@@ -17,13 +17,13 @@ export const onboardingSchema = z.object({
     .toUpperCase()
     .refine(
       (value) => value === "" || /^[A-Z]{2}$/.test(value),
-      "Ingresa un código de país válido de 2 letras",
+      "errors.countryInvalid",
     ),
 
   phone: z
     .string()
     .trim()
-    .max(20, "El teléfono no puede superar los 20 caracteres")
+    .max(20, "errors.phoneMax")
     .optional()
     .or(z.literal("")),
 

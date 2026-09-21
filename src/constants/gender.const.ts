@@ -1,18 +1,18 @@
 export const GENDER_OPTIONS = [
   {
-    label: "Hombre",
+    label: "gender.MALE",
     value: "MALE",
   },
   {
-    label: "Mujer",
+    label: "gender.FEMALE",
     value: "FEMALE",
   },
   {
-    label: "Otro",
+    label: "gender.OTHER",
     value: "OTHER",
   },
   {
-    label: "Prefiero no decirlo",
+    label: "gender.PREFER_NOT_TO_SAY",
     value: "PREFER_NOT_TO_SAY",
   },
 ] as const;
