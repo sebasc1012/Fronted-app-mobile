@@ -1,17 +1,73 @@
 {
+  "common": {
+    "cancel": "Cancelar",
+    "selectOption": "Selecciona una opción",
+    "signOut": "Cerrar sesión"
+  },
+  "errors": {
+    "emailInvalid": "Correo inválido",
+    "passwordMin": "Mínimo 6 caracteres",
+    "passwordsMismatch": "Las contraseñas no coinciden",
+    "nameMax": "El nombre no puede superar los 100 caracteres",
+    "phoneMax": "El teléfono no puede superar los 20 caracteres",
+    "countryInvalid": "Ingresa un código de país válido de 2 letras",
+    "generic": "Algo salió mal. Inténtalo de nuevo.",
+    "invalidCredentials": "Correo o contraseña incorrectos.",
+    "emailNotConfirmed": "Confirma tu correo antes de iniciar sesión.",
+    "userExists": "Ya existe una cuenta con este correo.",
+    "rateLimit": "Demasiados intentos. Espera un momento e inténtalo de nuevo."
+  },
   "auth": {
-    "login": {
+    "common": {
       "emailLabel": "Correo",
       "emailPlaceholder": "Ingresa tu correo",
       "passwordLabel": "Contraseña",
       "passwordPlaceholder": "contraseña",
-      "forgotPassword": "¿Olvidaste tu contraseña?",
       "next": "SIGUIENTE",
       "or": "O",
       "continueWithApple": "Continuar con Apple",
       "continueWithGoogle": "Continuar con Google",
-      "continueWithFacebook": "Continuar con Facebook",
+      "continueWithFacebook": "Continuar con Facebook"
+    },
+    "login": {
+      "forgotPassword": "¿Olvidaste tu contraseña?",
       "noAccount": "¿No tienes cuenta?"
+    },
+    "signup": {
+      "title": "Crear cuenta",
+      "confirmPasswordLabel": "Confirmar contraseña",
+      "confirmPasswordPlaceholder": "Confirma tu contraseña",
+      "hasAccount": "¿Ya tienes cuenta? Inicia sesión"
+    },
+    "verifyEmail": {
+      "title": "Revisa tu correo",
+      "message": "Enviamos un enlace de confirmación a {{email}}. Ábrelo para activar tu cuenta.",
+      "messageNoEmail": "Te enviamos un enlace de confirmación. Ábrelo para activar tu cuenta.",
+      "goToLogin": "Ir a iniciar sesión"
     }
+  },
+  "onboarding": {
+    "title": "Cuéntanos sobre ti",
+    "subtitle": "Estos datos son opcionales. Puedes completarlos ahora o hacerlo más adelante.",
+    "fullName": "Nombre completo",
+    "phone": "Teléfono",
+    "country": "País",
+    "countryPlaceholder": "Ej: CO",
+    "gender": "Género",
+    "genderPlaceholder": "Selecciona tu género",
+    "pickPhoto": "Elegir foto de perfil",
+    "changePhoto": "Cambiar foto",
+    "photoSelected": "Foto seleccionada",
+    "submit": "Crear perfil",
+    "skip": "Omitir por ahora"
+  },
+  "gender": {
+    "MALE": "Hombre",
+    "FEMALE": "Mujer",
+    "OTHER": "Otro",
+    "PREFER_NOT_TO_SAY": "Prefiero no decirlo"
+  },
+  "home": {
+    "welcome": "¡Bienvenido!"
   }
 }

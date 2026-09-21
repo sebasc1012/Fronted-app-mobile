@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
+import { authErrorKey } from '../lib/authErrors';
 type AuthContextType = {
   session: Session | null;
   user: User | null;
@@ -41,13 +42,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signIn = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
-    return { error: error?.message ?? null };
+    return { error: error ? authErrorKey(error) : null };
   };
 
   const signUp = async (email: string, password: string) => {
   const { data, error } = await supabase.auth.signUp({ email, password });
   const needsEmailConfirmation = !error && !data.session;
-  return { error: error?.message ?? null, needsEmailConfirmation };
+  return { error: error ? authErrorKey(error) : null, needsEmailConfirmation };
 };
 
   const signInWithOAuth = async (provider: 'google' | 'apple' | 'facebook') => {
@@ -60,7 +61,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     if (error) {
-      return { error: error.message };
+      return { error: authErrorKey(error) };
     }
 
     // OAuth en React Native: esperamos que Supabase devuelva sesión directamente.

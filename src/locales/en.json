@@ -1,17 +1,73 @@
 {
+  "common": {
+    "cancel": "Cancel",
+    "selectOption": "Select an option",
+    "signOut": "Sign out"
+  },
+  "errors": {
+    "emailInvalid": "Invalid email",
+    "passwordMin": "At least 6 characters",
+    "passwordsMismatch": "Passwords don't match",
+    "nameMax": "Name can't exceed 100 characters",
+    "phoneMax": "Phone can't exceed 20 characters",
+    "countryInvalid": "Enter a valid 2-letter country code",
+    "generic": "Something went wrong. Please try again.",
+    "invalidCredentials": "Incorrect email or password.",
+    "emailNotConfirmed": "Please confirm your email before signing in.",
+    "userExists": "An account with this email already exists.",
+    "rateLimit": "Too many attempts. Please wait a moment and try again."
+  },
   "auth": {
-    "login": {
+    "common": {
       "emailLabel": "Email",
       "emailPlaceholder": "Enter your email",
       "passwordLabel": "Password",
       "passwordPlaceholder": "password",
-      "forgotPassword": "Forgot Password?",
       "next": "NEXT",
       "or": "Or",
       "continueWithApple": "Continue with Apple",
       "continueWithGoogle": "Continue with Google",
-      "continueWithFacebook": "Continue with Facebook",
+      "continueWithFacebook": "Continue with Facebook"
+    },
+    "login": {
+      "forgotPassword": "Forgot Password?",
       "noAccount": "Don't have an account?"
+    },
+    "signup": {
+      "title": "Create account",
+      "confirmPasswordLabel": "Confirm Password",
+      "confirmPasswordPlaceholder": "Confirm your password",
+      "hasAccount": "Already have an account? Sign in"
+    },
+    "verifyEmail": {
+      "title": "Check your email",
+      "message": "We sent a confirmation link to {{email}}. Open it to activate your account.",
+      "messageNoEmail": "We sent you a confirmation link. Open it to activate your account.",
+      "goToLogin": "Go to sign in"
     }
+  },
+  "onboarding": {
+    "title": "Tell us about yourself",
+    "subtitle": "This information is optional. You can fill it in now or later.",
+    "fullName": "Full name",
+    "phone": "Phone",
+    "country": "Country",
+    "countryPlaceholder": "E.g. CO",
+    "gender": "Gender",
+    "genderPlaceholder": "Select your gender",
+    "pickPhoto": "Choose a profile photo",
+    "changePhoto": "Change photo",
+    "photoSelected": "Photo selected",
+    "submit": "Create profile",
+    "skip": "Skip for now"
+  },
+  "gender": {
+    "MALE": "Male",
+    "FEMALE": "Female",
+    "OTHER": "Other",
+    "PREFER_NOT_TO_SAY": "Prefer not to say"
+  },
+  "home": {
+    "welcome": "Welcome!"
   }
 }
