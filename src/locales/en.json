@@ -69,6 +69,13 @@
     "PREFER_NOT_TO_SAY": "Prefer not to say"
   },
   "home": {
-    "welcome": "Welcome!"
+    "welcome": "Welcome!",
+    "profile": "My profile"
+  },
+  "nav": {
+    "home": "Home",
+    "library": "Library",
+    "finances": "Finances",
+    "settings": "Settings"
   }
 }

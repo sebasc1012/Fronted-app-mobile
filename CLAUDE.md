@@ -16,14 +16,15 @@ Backend Fases 1-7 completas (Profile, Categories, Commitments, Occurrences, Paym
 
 ## Stack técnico
 
-- **Runtime:** React Native 0.86 + React 19.2 + Expo SDK 57 + CNG (`/ios` y `/android` en `.gitignore`); React Compiler y `typedRoutes` activados en `app.json`
+- **Runtime:** React Native 0.86 + React 19.2 + Expo SDK 57 + CNG (`/ios` y `/android` en `.gitignore`); React Compiler y `typedRoutes` activados en `app.json`; Node fijado en 22 (`.nvmrc`)
+- **Identidad app:** nombre "Fincho", dominio `finchoapp.com`, `bundleIdentifier`/`package` = `com.finchoapp.fincho` (`app.json`, decidido 2026-09-21; antes `com.anonymous.mobile-app`)
 - **Lenguaje:** TypeScript ~6.0
 - **Routing:** Expo Router (grupos `(auth)` / `(app)`, deep links)
 - **Styling:** NativeWind 4 + Tailwind 3 (`global.css`, `tailwind.config.js`)
 - **i18n:** i18next + react-i18next + `expo-localization` (en/es, `lib/i18n.ts`, `src/locales/`)
 - **HTTP:** Axios + interceptor Bearer token
 - **State + Cache:** TanStack Query (@tanstack/react-query)
-- **Auth:** Supabase JS SDK + `expo-secure-store`
+- **Auth:** Supabase JS SDK (flujo **PKCE**, `flowType: 'pkce'`) + `expo-secure-store`
 - **Storage:** Supabase Storage (avatars con RLS)
 - **Validación:** Zod + react-hook-form
 - **Testing:** Jest 30 + React Native Testing Library (`@react-native/jest-preset`)
@@ -32,11 +33,11 @@ Backend Fases 1-7 completas (Profile, Categories, Commitments, Occurrences, Paym
 
 ---
 
-## Estado actual (2026-09-20)
+## Estado actual (2026-09-22)
 
 ### ✅ Completado
 
-- [x] Setup Expo SDK 54 + Expo Router (CNG)
+- [x] Setup Expo SDK 57 + Expo Router (CNG)
 - [x] Cliente Supabase (`lib/supabase.ts` + SecureStore adapter)
 - [x] Cliente HTTP Axios (`lib/api.ts` + interceptor Bearer)
 - [x] TanStack Query (`lib/queryClient.ts` + `QueryClientProvider`)
@@ -45,7 +46,14 @@ Backend Fases 1-7 completas (Profile, Categories, Commitments, Occurrences, Paym
 - [x] NativeWind + componentes base (`Input.tsx`, `Button.tsx`, `Select.tsx`)
 - [x] **Login UI** (`src/app/(auth)/login.tsx`) — email/password + Zod + react-hook-form + botones OAuth
 - [x] **Signup UI** (`src/app/(auth)/signup.tsx`) — email/password/confirmación + Zod + botones OAuth
-- [x] **Google/Apple Sign-In** — `signInWithOAuth` en `AuthContext` + `useOAuth`, deep link `mobileapp://`
+- [x] **OAuth PKCE funcional (2026-09-22)** — `lib/auth/oauth.ts` (`signInWithProvider`): abre
+      `WebBrowser.openAuthSessionAsync`, recibe `code` del callback único `mobileapp://auth/callback`,
+      `exchangeCodeForSession`. Reemplaza el `google-oauth.ts` sin uso y el flujo implicit roto
+      anterior. Probado en simulador iOS: **Google funciona end-to-end** (login, cancelado, sin
+      internet, sesión persistida); **Facebook** redirige bien pero Meta rechaza por dominio de app
+      no configurado (pendiente del lado del developer, ver log 2026-09-22); **Apple** muestra el
+      error esperado `errors.providerDisabled` (proveedor aún no habilitado en Supabase — nativo
+      queda para una fase aparte)
 - [x] Gate de rutas centralizado en `src/app/_layout.tsx` (`Stack.Protected`, única fuente de verdad — ver
       sección "Arquitectura de autenticación y enrutamiento")
 - [x] Onboarding de perfil (pantalla + integración `useUpsertProfile`, selector de género con `Select.tsx`, **avatar picker con `expo-image-picker` + upload a Supabase Storage bucket `avatars` ya implementado en `onBoarding.tsx`**; botón para cerrar sesión desde onboarding)
@@ -57,17 +65,22 @@ Backend Fases 1-7 completas (Profile, Categories, Commitments, Occurrences, Paym
 - [x] **i18n completo (2026-09-21)** — todas las pantallas y componentes (`login`, `signup`, `verify-email`, `onBoarding`, home, `Select`, géneros) usan `t()`. Claves en `src/locales/{en,es}.json`: `common.*`, `errors.*`, `auth.{common,login,signup,verifyEmail}.*`, `onboarding.*`, `gender.*`, `home.*`. Schemas Zod (`src/squema/auth.schema.ts`, `onboarding.schema.ts`) devuelven **claves i18n** como mensaje; la pantalla traduce con `t(errors.x.message)`. Errores de Supabase se mapean en `lib/authErrors.ts` (`invalid_credentials`, `email_not_confirmed`, `user_already_exists`, `over_email_send_rate_limit`) con fallback `errors.generic`; `AuthContext` devuelve la clave, no el mensaje crudo. Tests: `validation.test.ts` (schemas + paridad en/es)
 - [x] Flujo verificación de email (`(auth)/verify-email.tsx`)
 - [x] Hooks: `useProfile` (distingue 404 "sin perfil" de 401 "sesión inválida"), `useUpsertProfile`
+- [x] **Bug corregido (2026-09-22): onboarding ahora redirige a `(app)`** — `useProfile` devolvía `{ profile }` en vez del perfil (ver log 2026-09-22)
+- [x] **Tab bar nativa (2026-09-22): `NativeTabs` de Expo Router (`expo-router/unstable-native-tabs`) en `(app)/_layout.tsx` — en iOS 26 es Liquid Glass con las animaciones del sistema (píldora que se desliza, lente al presionar/arrastrar); visible en todas las rutas de `(app)`, nunca en login/onboarding. Tabs: Inicio (`index`, `house`), Biblioteca (`library`, `book`), Finanzas (`finances`, `wallet.bifold`), Configuración (`profile`, `gearshape`) con SF Symbols en iOS y Material en Android; activo en `#4F46E5` / `#818CF8` (dark). Reemplaza al `NavBar.tsx` propio con lucide (eliminado)**
 - [x] Logout básico — botón "Cerrar sesión" en `(app)/index.tsx` (sin modal de confirmación aún)
 
 ### ⏳ Pendiente (Tareas priorizadas MVP)
 
+- [ ] **Tab bar: definir íconos, páginas y funcionalidad** — decidir las secciones definitivas (hoy Inicio/Biblioteca/Finanzas/Configuración), reemplazar los placeholders `library.tsx` y `finances.tsx` con contenido real y revisar que el contenido con scroll no quede tapado por la barra
 - [ ] **Logout con confirmación** — modal antes de `signOut()`
-- [ ] **Pantalla "Mi Perfil"** (`(app)/profile.tsx`) — separar de `(app)/index.tsx`
+- [ ] **Pantalla "Mi Perfil"** (`(app)/profile.tsx`) — creada (2026-09-22) con título "Fincho", email y cerrar sesión (también siguen en `index.tsx` mientras tanto; se entra tocando el avatar del header de Home); falta definir contenido. Sin botón "volver" (headers ocultos): se vuelve con swipe desde el borde
+- [x] **Header de Home (2026-09-22): "Fincho" a la izquierda + avatar circular a la derecha (`profile.avatarUrl` vía `useProfile`, fallback a inicial si no hay foto o falla la carga; tap → Mi Perfil); light/dark con clases `dark:` de NativeWind (sigue al sistema)**
 - [ ] **Selector país** — actualmente `Input` de texto libre (código ISO manual); falta dropdown ISO 3166-1
 - [ ] **Avatar post-onboarding** — falta preview/edición fuera del onboarding
 - [ ] **Notificaciones en onboarding** — `notificationsEnabled` va con `true` por defecto en el form pero no hay control (Switch) en la UI
-- [ ] **Limpieza de `lib/auth/google-oauth.ts`** — `signInWithGoogle` (WebBrowser + `setSession`, redirect `mobileapp://auth/callback`) no lo usa nadie; el flujo real es `AuthContext.signInWithOAuth` (redirect `mobileapp://`, `skipBrowserRedirect: true`, sin abrir el navegador). Revisar que el OAuth realmente complete la sesión y que `needsEmailConfirmation = !data.flowId` sea correcto; decidir cuál flujo se queda
-- [ ] **Jest** — faltan tests de `useProfile`, `useUpsertProfile`, `AuthContext` y `Select`
+- [ ] **Facebook: configurar "Dominios de la app"** en Meta for Developers con `wzweyulubfehjednoaan.supabase.co` (el dominio del proyecto Supabase) — sin esto, Facebook rechaza el login con "El dominio de esta URL no está incluido en los dominios de la app"
+- [ ] **Apple Sign-In nativo** — fuera de alcance de esta fase; usar `expo-apple-authentication` + `signInWithIdToken` en iOS cuando se retome (ver decisión 2026-09-21 en el log)
+- [ ] **Jest** — faltan tests de `useProfile`, `useUpsertProfile` y `Select` (`AuthContext` y `useOAuth` ya cubiertos, 2026-09-21)
 
 ---
 
@@ -125,6 +138,15 @@ sesión O con sesión pero onboarding incompleto. Dentro del grupo:
   La comparación de ruta (`usePathname() !== "/onBoarding"`) es obligatoria: sin
   ella, el redirect se dispara en cada render incluso estando ya en onBoarding →
   bucle infinito ("Maximum update depth exceeded").
+- **Guard simétrico (2026-09-22):** si NO hay `session` y la ruta actual SÍ es
+  `/onBoarding`, hace `<Redirect href="/(auth)/login" />`. Cubre cerrar sesión
+  desde dentro de onBoarding: limpiar `session` ahí no cambia `isAuthorized` en el
+  root (ya era `false` por onboarding incompleto), así que `Stack.Protected` no
+  remonta nada solo. Antes, `onBoarding.tsx` resolvía esto con un
+  `router.replace("/(auth)/login")` manual que competía con este mismo componente
+  y producía el mismo "Maximum update depth exceeded" en ciclos repetidos de
+  login/logout — ver log 2026-09-22. `handleSignOut` en `onBoarding.tsx` ahora
+  solo llama `signOut()`, sin navegación manual, igual que `(app)/index.tsx`.
 - Si no hay `session`, renderiza `<Stack/>` normal y Expo Router muestra la
   pantalla de archivo que corresponda (`login`, `signup`, `verify-email`).
 - `export const unstable_settings = { initialRouteName: "login" }` es necesario
@@ -222,6 +244,92 @@ en `onBoarding.tsx`.
     ruta actual (`usePathname() !== "/onBoarding"`) de la condición del
     redirect.
 
+### 2026-09-22
+
+- **Bundle ID definitivo:** `com.finchoapp.fincho` (iOS `bundleIdentifier` y Android
+  `package` en `app.json`), app "Fincho", dominio `finchoapp.com`. Antes
+  `com.anonymous.mobile-app` (placeholder de Expo). Registro real en Apple Developer
+  queda pendiente para cuando se implemente Sign in with Apple nativo (no bloquea
+  Google/Facebook).
+- **Bug corregido — OAuth nunca completaba sesión:** `AuthContext.signInWithOAuth`
+  pedía la URL a Supabase (`skipBrowserRedirect: true`) pero nunca la abría, y
+  `needsEmailConfirmation = !data.flowId` daba siempre `true` porque `flowId` solo
+  existe con `flowType: 'pkce'` (el cliente usaba `implicit`, el default). Resultado:
+  cualquier botón OAuth llevaba directo a `verify-email` sin abrir navegador ni
+  enviar correo. Confirmado con logs reales en el simulador (`hasUrl: true`,
+  `flowId: null`) antes de tocar código.
+- **Decisión — PKCE + flujo único:** `lib/supabase.ts` pasa a `flowType: 'pkce'`.
+  Nuevo `lib/auth/oauth.ts` (`signInWithProvider`) generaliza el patrón que ya
+  existía sin usar en `google-oauth.ts` (WebBrowser + extraer código de la URL) a
+  los tres proveedores, pero canjea con `exchangeCodeForSession(code)` en vez de
+  `setSession(tokens)` — con PKCE nunca viajan tokens en la URL del deep link.
+  Devuelve `{ status: 'success' | 'cancelled' | 'error' }` explícito.
+  `AuthContext.signInWithOAuth` y `useOAuth` se simplifican: ya no navegan a
+  `verify-email` en éxito (el guard de rutas reacciona solo al cambio de
+  `session`, igual que el login por email); cancelado no muestra error.
+  `google-oauth.ts` eliminado. Nuevo mapeo `provider_disabled` →
+  `errors.providerDisabled` en `authErrors.ts` (útil para Apple/Facebook mientras
+  no estén configurados en Supabase).
+- **Bug corregido — "Maximum update depth exceeded" al cerrar sesión desde
+  onBoarding:** ver "Arquitectura de autenticación y enrutamiento" arriba (guard
+  simétrico). Encontrado probando el ciclo login→onBoarding→logout repetido.
+- **Resultados de prueba en simulador (iPhone Air, dev build `expo run:ios`):**
+  Google funciona completo (login, cancelado, sin internet, persistencia de
+  sesión). Facebook redirige bien pero Meta bloquea por "Dominios de la app" sin
+  configurar — falta agregar `wzweyulubfehjednoaan.supabase.co` en Meta for
+  Developers (pendiente, developer). Apple muestra el error esperado
+  (`provider_disabled`), consistente con que aún no está habilitado en Supabase.
+  Onboarding no redirigía a `(app)` tras completarse — bug aparte, resuelto
+  el mismo día (ver entrada siguiente).
+- **Pantalla base "Mi Perfil":** `(app)/profile.tsx` con título "Fincho" (nombre
+  de marca, sin i18n), email y cerrar sesión. Home (`index.tsx`) navega con
+  `router.push("/profile")` (clave i18n `home.profile`) y, por decisión del
+  developer, conserva email + cerrar sesión mientras se define el contenido del
+  perfil. Nota: con `typedRoutes`, una ruta nueva no tipa hasta regenerar
+  `.expo/types/router.d.ts` (basta con levantar Metro).
+- **Header de Home + dark mode:** `index.tsx` muestra "Fincho" (`text-4xl`,
+  `text-black dark:text-white`) a la izquierda y un avatar de 44pt a la derecha
+  que navega a `/profile` (reemplaza al botón "Mi perfil"). La imagen sale de
+  `profile.avatarUrl` (misma query `["profile"]`, sin request extra) con
+  `expo-image`; si no hay URL o `onError`, muestra la inicial de `fullName` o
+  del email. Safe area con `useSafeAreaInsets`. Dark/light: clases `dark:` de
+  NativeWind (modo `media` por defecto = sigue al sistema,
+  `userInterfaceStyle: automatic`); fondo `bg-white dark:bg-black`. Mismas
+  clases aplicadas a `profile.tsx`. Verificado en simulador en ambos modos.
+  Encontrado: el perfil de prueba local tenía
+  `avatar_url = https://example.com/avatar.jpg` (dato ficticio) → motivó el
+  fallback por `onError`.
+- **Tab bar nativa (reemplaza NavBar propia):** primero se maquetó un
+  `components/ui/NavBar.tsx` (lucide + `expo-blur`). Al pedir las animaciones de
+  la tab bar de iOS 26 (píldora que se desliza, "lente" de vidrio al presionar y
+  arrastrar), se decidió usar `NativeTabs` (`expo-router/unstable-native-tabs`)
+  en vez de recrearlas con Reanimated: comportamiento idéntico al sistema y cero
+  código de animación. Costos aceptados: cada ícono es una ruta (se crearon
+  placeholders `library.tsx` y `finances.tsx`; `profile.tsx` pasa a ser el tab
+  Configuración) y los íconos son SF Symbols (`house`, `book`, `wallet.bifold`,
+  `gearshape`) + Material en Android, no lucide. `tintColor` `#4F46E5` /
+  `#818CF8` (dark). Labels i18n `nav.{home,library,finances,settings}`. No
+  requirió rebuild del dev build (usa `react-native-screens` ya enlazado).
+  `NavBar.tsx` eliminado. El avatar del header (`router.push("/profile")`)
+  cambia al tab Configuración. Verificado en simulador (iOS 26.5) light/dark.
+  - Pendiente menor: `Button` no tiene padding horizontal ("Sign out" queda
+    angosto cuando el padre usa `items-center`).
+- **Bug corregido — onboarding no redirigía a `(app)`:** el POST funcionaba
+  (backend guarda `onboardingCompleted: true` y `useUpsertProfile` invalida
+  `["profile"]`), pero `useProfile` leía `data` como el perfil plano, pero el backend responde `{ profile }`
+  (`res.json({ profile })`). Resultado: `profile.onboardingCompleted` siempre
+  `undefined` → `isAuthorized` siempre `false` → `Stack.Protected` nunca montaba
+  `(app)`. Mismo origen: usuarios con onboarding completo volvían a onboarding en
+  cada login. Fix: `api.get<{ profile: Profile }>` + `return data.profile` en
+  `src/hooks/useProfile.ts` (único consumidor: root layout). Destino tras
+  onboarding = `(app)/index.tsx` (Home), sin navegación manual. Probado en
+  simulador.
+- **Entorno de build:** CocoaPods instalado (no venía en esta Mac), `.nvmrc` fijado
+  en `22` (esta shell traía Node 20.14 por defecto vía `nvm`), `LANG=en_US.UTF-8`
+  agregado a `~/.zshrc` (CocoaPods fallaba con `UnicodeNormalize.normalize` sin
+  esto). `.claude/launch.json` con configuración `metro` para levantar el bundler
+  del dev build.
+
 ### 2026-09-21
 
 - **i18n completado:** todas las cadenas visibles pasan por `t()`. Mensajes de Zod =
@@ -277,8 +385,11 @@ mobile-app/
 │   │   │   ├── verify-email.tsx       # ✅
 │   │   │   └── onBoarding.tsx         # ✅ (nota: B mayúscula en el nombre de archivo)
 │   │   └── (app)/
-│   │       ├── _layout.tsx            # <Stack/> plano (protección ya la hizo el root)
-│   │       └── index.tsx              # Home + botón "Cerrar sesión" (strings hardcodeados) — ⏳ separar en profile.tsx
+│   │       ├── _layout.tsx            # NativeTabs (tab bar nativa); protección ya la hizo el root
+│   │       ├── library.tsx            # placeholder (tab Biblioteca)
+│   │       ├── finances.tsx           # placeholder (tab Finanzas)
+│   │       ├── index.tsx              # Home: header (Fincho + avatar → perfil), bienvenida, email, cerrar sesión
+│   │       └── profile.tsx            # Mi Perfil (base): título "Fincho", email, cerrar sesión — contenido por definir
 │   ├── components/
 │   │   └── ui/
 │   │       ├── Input.tsx              # ✅
@@ -295,6 +406,7 @@ mobile-app/
 │   │   ├── useProfile.ts              # ✅ distingue 404/401/otros errores
 │   │   ├── useUpsertProfile.ts        # ✅
 │   │   ├── useOAuth.ts                # ✅ handler compartido login/signup
+│   │   └── __tests__/useOAuth.test.ts # ✅
 │   ├── squema/
 │   │   ├── auth.schema.ts             # ✅ Zod login/signup (mensajes = claves i18n)
 │   │   └── onboarding.schema.ts       # ✅ Zod onboarding
@@ -307,12 +419,14 @@ mobile-app/
 ├── lib/
 │   ├── i18n.ts                        # ✅ init i18next (import en root _layout)
 │   ├── authErrors.ts                  # ✅ error.code Supabase → clave i18n
-│   ├── auth/google-oauth.ts           # ⚠️ sin uso — ver Pendiente
-│   ├── supabase.ts                    # ✅ SecureStore adapter
+│   ├── auth/oauth.ts                  # ✅ signInWithProvider — PKCE, único flujo OAuth
+│   ├── supabase.ts                    # ✅ SecureStore adapter, flowType: 'pkce'
 │   ├── api.ts                         # ✅ Axios + interceptor Bearer
 │   └── queryClient.ts                 # ✅
+├── contexts/__tests__/AuthContext.test.tsx  # ✅
 ├── .github/workflows/ci.yml           # ✅ lint + typecheck + test
 ├── .husky/ + .lintstagedrc.json       # ✅ pre-commit: typecheck
+├── .nvmrc                             # ✅ Node 22
 ├── jest.config.js / jest.setup.js     # ✅
 ├── tsconfig.json                      # alias @/* → ./src/*
 └── CLAUDE.md                          # ← Estás aquí
@@ -342,17 +456,18 @@ mobile-app/
 
 **Definición hecha:** Archivo `(auth)/signup.tsx`
 
-### Tarea 2b: OAuth UI (Google + Apple) ✅ Implementado (vía `useOAuth`, no `OAuthButton.tsx` separado)
+### Tarea 2b: OAuth Google/Apple/Facebook ✅ Implementado (vía `useOAuth`, no `OAuthButton.tsx` separado)
 
-- Botones "Sign in with Google" y "Sign in with Apple"
-- `supabase.auth.signInWithOAuth({ provider: 'google'|'apple' })`
-- Deep link handling en Expo Router
-- Error handling (user cancelled, OAuth error)
-- Device + simulator testing
+- Botones "Continue with Google/Apple/Facebook" en login y signup
+- `lib/auth/oauth.ts` (`signInWithProvider`) — PKCE completo: `signInWithOAuth` +
+  `WebBrowser.openAuthSessionAsync` + `exchangeCodeForSession` (no `setSession` con
+  tokens en la URL, como en el `google-oauth.ts` implicit ya eliminado)
+- Deep link único `mobileapp://auth/callback`
+- Error handling: cancelado (sin mensaje), error mapeado vía `authErrors.ts`
+- Probado en simulador iOS (2026-09-22): Google end-to-end; Facebook y Apple
+  pendientes de configuración externa (ver log 2026-09-22)
 
-**Componentes:** `OAuthButton.tsx` (reutilizable)
-
-**Definición hecha:** Archivo `components/auth/OAuthButton.tsx`, deep link config en `app.json`
+**Definición hecha:** `lib/auth/oauth.ts`, deep link config en `app.json`
 
 ### Tarea 3: Logout UI
 
