@@ -15,7 +15,8 @@
     "invalidCredentials": "Correo o contraseña incorrectos.",
     "emailNotConfirmed": "Confirma tu correo antes de iniciar sesión.",
     "userExists": "Ya existe una cuenta con este correo.",
-    "rateLimit": "Demasiados intentos. Espera un momento e inténtalo de nuevo."
+    "rateLimit": "Demasiados intentos. Espera un momento e inténtalo de nuevo.",
+    "providerDisabled": "Este método de inicio de sesión aún no está disponible."
   },
   "auth": {
     "common": {

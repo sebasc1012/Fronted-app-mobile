@@ -18,5 +18,15 @@ export default function AuthLayout() {
     return <Redirect href="/(auth)/onBoarding" />;
   }
 
+  // Caso simétrico: cerrar sesión desde onBoarding limpia `session`, pero
+  // eso no cambia `isAuthorized` en el root (ya era false por onboarding
+  // incompleto), así que Stack.Protected no remonta nada y nadie más saca
+  // de esta pantalla. Sin esto, onBoarding.tsx necesitaba su propio
+  // router.replace manual, que competía con este guard y producía
+  // "Maximum update depth exceeded" en la segunda vuelta del ciclo.
+  if (!session && pathname === "/onBoarding") {
+    return <Redirect href="/(auth)/login" />;
+  }
+
   return <Stack screenOptions={{ headerShown: false }} />;
 }

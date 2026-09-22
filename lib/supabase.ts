@@ -18,5 +18,9 @@ export const supabase = createClient(supabaseUrl, supabasePublishableKey, {
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: false,
+    // PKCE: el código de retorno del navegador se canjea por sesión con
+    // exchangeCodeForSession (ver lib/auth/oauth.ts). Nunca viajan tokens
+    // en la URL del deep link, a diferencia del flujo implicit anterior.
+    flowType: "pkce",
   },
 });

@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState, ReactNode } from 'react
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
 import { authErrorKey } from '../lib/authErrors';
+import { signInWithProvider, OAuthProvider } from '../lib/auth/oauth';
 type AuthContextType = {
   session: Session | null;
   user: User | null;
@@ -15,8 +16,8 @@ type AuthContextType = {
     password: string,
   ) => Promise<{ error: string | null; needsEmailConfirmation?: boolean }>;
   signInWithOAuth: (
-    provider: 'google' | 'apple' | 'facebook',
-  ) => Promise<{ error: string | null; needsEmailConfirmation?: boolean }>;
+    provider: OAuthProvider,
+  ) => Promise<{ error: string | null; cancelled?: boolean }>;
   signOut: () => Promise<void>;
 };
 
@@ -51,23 +52,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   return { error: error ? authErrorKey(error) : null, needsEmailConfirmation };
 };
 
-  const signInWithOAuth = async (provider: 'google' | 'apple' | 'facebook') => {
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider,
-      options: {
-        redirectTo: `mobileapp://`,
-        skipBrowserRedirect: true,
-      },
-    });
+  const signInWithOAuth = async (provider: OAuthProvider) => {
+    console.log('[DEBUG][AuthContext] signInWithOAuth() called with provider =', provider);
+    const result = await signInWithProvider(provider);
+    console.log('[DEBUG][AuthContext] signInWithProvider() resolved:', result);
 
-    if (error) {
-      return { error: authErrorKey(error) };
+    if (result.status === 'error') {
+      return { error: result.errorKey };
     }
-
-    // OAuth en React Native: esperamos que Supabase devuelva sesión directamente.
-    // Si no hay sesión inmediata, significa que puede necesitar confirmación.
-    const needsEmailConfirmation = !data.flowId;
-    return { error: null, needsEmailConfirmation };
+    if (result.status === 'cancelled') {
+      return { error: null, cancelled: true };
+    }
+    // 'success': exchangeCodeForSession ya dejó la sesión puesta; el listener
+    // onAuthStateChange de arriba la recoge solo y el guard de rutas navega.
+    return { error: null };
   };
 
   const signOut = async () => {

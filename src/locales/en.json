@@ -15,7 +15,8 @@
     "invalidCredentials": "Incorrect email or password.",
     "emailNotConfirmed": "Please confirm your email before signing in.",
     "userExists": "An account with this email already exists.",
-    "rateLimit": "Too many attempts. Please wait a moment and try again."
+    "rateLimit": "Too many attempts. Please wait a moment and try again.",
+    "providerDisabled": "This sign-in method isn't available yet."
   },
   "auth": {
     "common": {
