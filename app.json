@@ -9,9 +9,10 @@
     "userInterfaceStyle": "automatic",
     "ios": {
       "icon": "./assets/expo.icon",
-      "bundleIdentifier": "com.anonymous.mobile-app"
+      "bundleIdentifier": "com.finchoapp.fincho"
     },
     "android": {
+      "package": "com.finchoapp.fincho",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",

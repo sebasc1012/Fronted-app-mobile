@@ -16,7 +16,6 @@ import {
 import { GENDER_OPTIONS } from "@/constants/gender.const";
 import { supabase } from "../../../lib/supabase";
 import { useAuth } from "../../../contexts/AuthContext";
-import { router } from "expo-router";
 import { useTranslation } from "react-i18next";
 
 export default function Onboarding() {
@@ -101,8 +100,9 @@ export default function Onboarding() {
 
   const handleSignOut = async () => {
     try {
+      // Sin navegación manual: (auth)/_layout.tsx saca de /onBoarding solo
+      // cuando session queda en null (ver guard simétrico ahí).
       await signOut();
-      router.replace("/(auth)/login")
     } catch (error) {
       console.error("Error signing out:", error);
     }

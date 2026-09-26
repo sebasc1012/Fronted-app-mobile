@@ -5,6 +5,7 @@ const AUTH_ERROR_KEYS: Record<string, string> = {
   email_not_confirmed: "errors.emailNotConfirmed",
   user_already_exists: "errors.userExists",
   over_email_send_rate_limit: "errors.rateLimit",
+  provider_disabled: "errors.providerDisabled",
 };
 
 // Devuelve una clave i18n. Códigos no mapeados caen en el mensaje genérico.

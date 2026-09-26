@@ -15,8 +15,9 @@ type Profile = {
 
 async function fetchProfile(): Promise<Profile | null> {
   try {
-    const { data } = await api.get<Profile>("/api/users/profile");
-    return data;
+    // El backend responde `{ profile }`, no el perfil plano.
+    const { data } = await api.get<{ profile: Profile }>("/api/users/profile");
+    return data.profile;
   } catch (error: any) {
     // 404 = profile doesn't exist yet (expected during onboarding)
     if (error?.response?.status === 404) return null;
