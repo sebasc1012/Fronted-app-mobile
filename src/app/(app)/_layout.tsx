@@ -21,9 +21,9 @@ export default function AppLayout() {
         <NativeTabs.Trigger.Icon sf="wallet.bifold" md="account_balance_wallet" />
         <NativeTabs.Trigger.Label>{t("nav.finances")}</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="profile">
-        <NativeTabs.Trigger.Icon sf="gearshape" md="settings" />
-        <NativeTabs.Trigger.Label>{t("nav.settings")}</NativeTabs.Trigger.Label>
+      <NativeTabs.Trigger name="account">
+        <NativeTabs.Trigger.Icon sf="person" md="person" />
+        <NativeTabs.Trigger.Label>{t("nav.account")}</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
     </NativeTabs>
   );

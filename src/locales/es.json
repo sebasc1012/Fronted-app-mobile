@@ -69,13 +69,16 @@
     "PREFER_NOT_TO_SAY": "Prefiero no decirlo"
   },
   "home": {
-    "welcome": "¡Bienvenido!",
-    "profile": "Mi perfil"
+    "welcome": "¡Bienvenido!"
   },
   "nav": {
     "home": "Inicio",
     "library": "Biblioteca",
     "finances": "Finanzas",
-    "settings": "Configuración"
+    "account": "Cuenta"
+  },
+  "account": {
+    "theme": "Cambiar tema",
+    "deleteAccount": "Eliminar cuenta"
   }
 }

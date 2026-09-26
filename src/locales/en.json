@@ -69,13 +69,16 @@
     "PREFER_NOT_TO_SAY": "Prefer not to say"
   },
   "home": {
-    "welcome": "Welcome!",
-    "profile": "My profile"
+    "welcome": "Welcome!"
   },
   "nav": {
     "home": "Home",
     "library": "Library",
     "finances": "Finances",
-    "settings": "Settings"
+    "account": "Account"
+  },
+  "account": {
+    "theme": "Change theme",
+    "deleteAccount": "Delete account"
   }
 }
