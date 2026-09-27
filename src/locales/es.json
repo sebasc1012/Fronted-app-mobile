@@ -112,5 +112,9 @@
       "libraryTitle": "Sin acceso a tus fotos",
       "libraryMessage": "Fincho necesita acceso a tus fotos para elegir tu foto de perfil. Actívalo en Ajustes."
     }
+  },
+  "signOut": {
+    "title": "¿Cerrar sesión?",
+    "message": "Tendrás que volver a iniciar sesión para ver tus datos."
   }
 }

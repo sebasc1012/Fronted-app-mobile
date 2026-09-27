@@ -112,5 +112,9 @@
       "libraryTitle": "No photo access",
       "libraryMessage": "Fincho needs access to your photos to choose your profile photo. Turn it on in Settings."
     }
+  },
+  "signOut": {
+    "title": "Sign out?",
+    "message": "You'll need to sign in again to see your data."
   }
 }

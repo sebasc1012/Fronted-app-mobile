@@ -45,6 +45,7 @@ Alias `@/*` → `./src/*`. Tests en `__tests__/` junto al código.
 ## Reglas críticas
 
 - **Gate único:** solo `src/app/_layout.tsx` decide entre `(auth)` y `(app)` (`Stack.Protected`, `isAuthorized = session && onboardingCompleted`). Después de login, logout u onboarding **no navegar a mano** (`router.replace`): cambiar la sesión o invalidar `["profile"]` y dejar que el gate reaccione. Navegar a mano ya causó dos veces "Maximum update depth exceeded".
+- Cerrar sesión solo con `signOut` de `AuthContext` (`scope: "local"`, cierre forzado si falla). La limpieza de datos del usuario va en el evento `SIGNED_OUT`; los datos del dispositivo que deban sobrevivir usan claves `pref.*` en AsyncStorage.
 - El backend responde `{ profile }`; tipar las respuestas de Axios con su forma real.
 - `useProfile`: 404 = sin perfil (onboarding); 401 = sesión inválida (forzar `signOut`); otros errores se lanzan.
 - Supabase JS solo para auth; datos del backend con Axios + TanStack Query (sin `useState`/`useEffect` para fetching).

@@ -1,6 +1,10 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useRef, useState, ReactNode } from 'react';
 import { Session, User } from '@supabase/supabase-js';
-import { supabase } from '../lib/supabase';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
+import { Image } from 'expo-image';
+import { AUTH_STORAGE_KEY, supabase } from '../lib/supabase';
+import { queryClient } from '../lib/queryClient';
 import { authErrorKey } from '../lib/authErrors';
 import { signInWithProvider, OAuthProvider } from '../lib/auth/oauth';
 type AuthContextType = {
@@ -23,6 +27,22 @@ type AuthContextType = {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Borra del teléfono todo dato del usuario: caché de queries, caché de imágenes
+// y AsyncStorage, salvo las preferencias del dispositivo (`pref.*`).
+export async function clearUserData() {
+  queryClient.clear();
+  const results = await Promise.allSettled([
+    Image.clearMemoryCache(),
+    Image.clearDiskCache(),
+    AsyncStorage.getAllKeys().then((keys) =>
+      AsyncStorage.removeMany(keys.filter((key) => !key.startsWith('pref.'))),
+    ),
+  ]);
+  results
+    .filter((result) => result.status === 'rejected')
+    .forEach((result) => console.warn('[auth] clearUserData:', (result as PromiseRejectedResult).reason));
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -34,8 +54,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsLoading(false);
     });
 
-    const { data: subscription } = supabase.auth.onAuthStateChange((_event, session) => {
+    // Todo cierre de sesión (botón, 401 en useProfile, refresh inválido) pasa por
+    // SIGNED_OUT: ahí se limpian los datos para que el siguiente usuario no vea nada.
+    const { data: subscription } = supabase.auth.onAuthStateChange((event, session) => {
       setSession(session);
+      if (event === 'SIGNED_OUT') void clearUserData();
     });
 
     return () => subscription.subscription.unsubscribe();
@@ -68,8 +91,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { error: null };
   };
 
-  const signOut = async () => {
-    await supabase.auth.signOut();
+  // Una sola ejecución a la vez: un doble toque reutiliza la misma promesa.
+  const signingOut = useRef<Promise<void> | null>(null);
+
+  const signOut = () => {
+    signingOut.current ??= (async () => {
+      try {
+        // Solo este dispositivo; los demás conservan su sesión.
+        const { error } = await supabase.auth.signOut({ scope: 'local' });
+        if (!error) return;
+        console.warn('[auth] signOut:', error);
+      } catch (error) {
+        console.warn('[auth] signOut lanzó:', error);
+      }
+      // supabase-js no siempre borra la sesión local cuando falla (p. ej. sin red y
+      // con el token vencido): se fuerza, sin mostrar error al usuario.
+      await SecureStore.deleteItemAsync(AUTH_STORAGE_KEY).catch((error) =>
+        console.warn('[auth] no se pudo borrar la sesión local:', error),
+      );
+      setSession(null);
+      await clearUserData();
+    })().finally(() => {
+      signingOut.current = null;
+    });
+    return signingOut.current;
   };
 
   return (

@@ -2,8 +2,22 @@ import { renderHook, waitFor, act } from "@testing-library/react-native";
 import { AuthProvider, useAuth } from "../AuthContext";
 import { supabase } from "../../lib/supabase";
 import { signInWithProvider } from "../../lib/auth/oauth";
+import { queryClient } from "../../lib/queryClient";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as SecureStore from "expo-secure-store";
+import { Image } from "expo-image";
+
+jest.mock("expo-image", () => ({
+  Image: { clearMemoryCache: jest.fn(async () => true), clearDiskCache: jest.fn(async () => true) },
+}));
+jest.mock("expo-secure-store", () => ({ deleteItemAsync: jest.fn(async () => {}) }));
+jest.mock("@react-native-async-storage/async-storage", () => ({
+  getAllKeys: jest.fn(async () => ["pref.language", "pref.theme", "query-cache", "draft"]),
+  removeMany: jest.fn(async () => {}),
+}));
 
 jest.mock("../../lib/supabase", () => ({
+  AUTH_STORAGE_KEY: "sb-test-auth-token",
   supabase: {
     auth: {
       getSession: jest.fn(),
@@ -152,12 +166,80 @@ describe("AuthProvider", () => {
   });
 
   describe("signOut", () => {
-    it("calls supabase.auth.signOut", async () => {
+    let emit: (event: string, session: any) => void = () => {};
+
+    // Sesión iniciada y captura del listener de Supabase.
+    const signedIn = async () => {
+      mockSupabase.auth.getSession.mockResolvedValue({ data: { session: fakeSession } });
+      mockSupabase.auth.onAuthStateChange.mockImplementation((cb) => {
+        emit = cb;
+        return { data: { subscription: { unsubscribe: jest.fn() } } };
+      });
+      const hook = await setup();
+      await waitFor(() => expect(hook.result.current.session).toBe(fakeSession));
+      return hook;
+    };
+
+    const expectUserDataCleared = () => {
+      expect(queryClient.getQueryData(["profile"])).toBeUndefined();
+      expect(Image.clearMemoryCache).toHaveBeenCalled();
+      expect(Image.clearDiskCache).toHaveBeenCalled();
+      // Las preferencias del dispositivo se conservan.
+      expect(AsyncStorage.removeMany).toHaveBeenCalledWith(["query-cache", "draft"]);
+    };
+
+    beforeEach(() => {
+      jest.spyOn(console, "warn").mockImplementation(() => {});
+      queryClient.setQueryData(["profile"], { fullName: "Usuario A" });
+    });
+    afterAll(() => queryClient.clear());
+
+    it("revokes only this device's session", async () => {
       mockSupabase.auth.signOut.mockResolvedValue({ error: null });
-      const { result } = await setup();
-      await waitFor(() => expect(result.current.isLoading).toBe(false));
+      const { result } = await signedIn();
 
       await act(() => result.current.signOut());
+
+      expect(mockSupabase.auth.signOut).toHaveBeenCalledWith({ scope: "local" });
+      expect(SecureStore.deleteItemAsync).not.toHaveBeenCalled();
+    });
+
+    it("SIGNED_OUT clears the user's data so user B never sees user A", async () => {
+      await signedIn();
+
+      await act(async () => emit("SIGNED_OUT", null));
+
+      expectUserDataCleared();
+    });
+
+    it("forces the local sign-out when Supabase returns an error (offline)", async () => {
+      mockSupabase.auth.signOut.mockResolvedValue({ error: { name: "AuthRetryableFetchError" } });
+      const { result } = await signedIn();
+
+      await act(() => result.current.signOut());
+
+      expect(SecureStore.deleteItemAsync).toHaveBeenCalledWith("sb-test-auth-token");
+      expect(result.current.session).toBeNull();
+      expectUserDataCleared();
+    });
+
+    it("forces the local sign-out and does not throw when Supabase throws", async () => {
+      mockSupabase.auth.signOut.mockRejectedValue(new Error("boom"));
+      const { result } = await signedIn();
+
+      await act(() => result.current.signOut()); // si lanzara, el test falla aquí
+
+      expect(SecureStore.deleteItemAsync).toHaveBeenCalledWith("sb-test-auth-token");
+      expect(result.current.session).toBeNull();
+      expectUserDataCleared();
+    });
+
+    it("a double tap signs out only once", async () => {
+      mockSupabase.auth.signOut.mockResolvedValue({ error: null });
+      const { result } = await signedIn();
+
+      await act(() => Promise.all([result.current.signOut(), result.current.signOut()]));
+
       expect(mockSupabase.auth.signOut).toHaveBeenCalledTimes(1);
     });
   });

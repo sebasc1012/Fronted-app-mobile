@@ -1,5 +1,5 @@
 import { Children, useRef, useState } from "react";
-import { ActivityIndicator, Modal, Platform, View, Text, Pressable, ScrollView, StyleSheet, useColorScheme } from "react-native";
+import { ActivityIndicator, Alert, Modal, Platform, View, Text, Pressable, ScrollView, StyleSheet, useColorScheme } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTranslation } from "react-i18next";
 import Constants from "expo-constants";
@@ -28,9 +28,10 @@ type RowProps = {
   onPress?: () => void;
   danger?: boolean;
   value?: string; // fila de solo lectura: muestra el valor en lugar del chevron
+  busy?: boolean; // acción en curso: spinner y no presionable
 };
 
-function Row({ icon: Icon, label, onPress, danger, value }: RowProps) {
+function Row({ icon: Icon, label, onPress, danger, value, busy }: RowProps) {
   const dark = useColorScheme() === "dark";
   const color = danger ? "#DC2626" : dark ? "#FFFFFF" : "#000000";
   const content = (
@@ -39,6 +40,8 @@ function Row({ icon: Icon, label, onPress, danger, value }: RowProps) {
       <Text className={`flex-1 text-base ${danger ? "text-danger" : "text-black dark:text-white"}`}>{label}</Text>
       {value ? (
         <Text className="text-base text-gray-500 dark:text-gray-400">{value}</Text>
+      ) : busy ? (
+        <ActivityIndicator />
       ) : (
         <ChevronRight size={20} color={dark ? "#9CA3AF" : "#6B7280"} />
       )}
@@ -55,7 +58,14 @@ function Row({ icon: Icon, label, onPress, danger, value }: RowProps) {
   }
   // ponytail: sin onPress hasta que exista la HU de cada fila (tema, idioma, …); tocar no hace nada.
   return (
-    <Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel={label} className={`${className} active:opacity-60`}>
+    <Pressable
+      onPress={onPress}
+      disabled={busy}
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      accessibilityState={{ busy, disabled: busy }}
+      className={`${className} active:opacity-60`}
+    >
       {content}
     </Pressable>
   );
@@ -170,6 +180,21 @@ export default function Account() {
   const { t } = useTranslation();
   const { signOut } = useAuth();
   const { top, bottom } = useSafeAreaInsets();
+  const [signingOut, setSigningOut] = useState(false);
+
+  // Sin navegar a mano: al quedar session en null, el gate del root muestra (auth).
+  const confirmSignOut = () =>
+    Alert.alert(t("signOut.title"), t("signOut.message"), [
+      { text: t("common.cancel"), style: "cancel" },
+      {
+        text: t("common.signOut"),
+        style: "destructive",
+        onPress: () => {
+          setSigningOut(true);
+          signOut().finally(() => setSigningOut(false));
+        },
+      },
+    ]);
 
   return (
     <ScrollView
@@ -195,7 +220,7 @@ export default function Account() {
         <Row icon={Info} label={t("account.version")} value={Constants.expoConfig?.version ?? "—"} />
       </Section>
       <Section title={t("common.signOut")}>
-        <Row icon={LogOut} label={t("common.signOut")} onPress={signOut} />
+        <Row icon={LogOut} label={t("common.signOut")} onPress={confirmSignOut} busy={signingOut} />
       </Section>
     </ScrollView>
   );
