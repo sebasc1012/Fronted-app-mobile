@@ -12,7 +12,10 @@ jest.mock("expo-image", () => ({ Image: (props: any) => require("react").createE
 jest.mock("@/hooks/useProfile", () => ({ useProfile: jest.fn() }));
 const mockChange = jest.fn();
 let mockUploading = false;
-jest.mock("@/hooks/useAvatar", () => ({ useChangeAvatar: () => ({ change: mockChange, isPending: mockUploading }) }));
+const mockRemove = jest.fn();
+jest.mock("@/hooks/useAvatar", () => ({
+  useChangeAvatar: () => ({ change: mockChange, remove: mockRemove, isPending: mockUploading }),
+}));
 jest.mock("../../../../../contexts/AuthContext", () => ({
   useAuth: () => ({ user: { email: "seba@fincho.com" }, signOut: mockSignOut }),
 }));
@@ -145,5 +148,23 @@ describe("Account panel", () => {
     expect(screen.getByTestId("avatar-uploading")).toBeTruthy();
     await fireEvent.press(screen.getByRole("button", { name: "avatar.change" }));
     expect(screen.queryByText("avatar.takePhoto")).toBeNull();
+  });
+
+  it("the menu shows 'Remove photo' only when there is a photo", async () => {
+    mockProfile({ data: { fullName: "Seba", avatarUrl: null } });
+    await render(<Account />);
+    await fireEvent.press(screen.getByRole("button", { name: "avatar.change" }));
+    expect(screen.queryByText("avatar.remove")).toBeNull();
+  });
+
+  it("'Remove photo' closes the menu and starts the removal (Android: right away)", async () => {
+    Platform.OS = "android";
+    mockProfile({ data: { fullName: "Seba", avatarUrl: "https://x/a.jpg" } });
+    await render(<Account />);
+    await fireEvent.press(screen.getByRole("button", { name: "avatar.change" }));
+    await fireEvent.press(screen.getByText("avatar.remove"));
+    expect(screen.queryByText("avatar.takePhoto")).toBeNull();
+    expect(mockRemove).toHaveBeenCalledTimes(1);
+    Platform.OS = "ios";
   });
 });

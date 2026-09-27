@@ -65,4 +65,10 @@ describe("Button", () => {
     expect(screen.root!.props.className).toContain("border");
     expect(screen.root!.props.className).not.toContain("bg-");
   });
+
+  it("renders variant='destructive' in red with white text", async () => {
+    await render(<Button title="Eliminar" onPress={() => {}} variant="destructive" />);
+    expect(screen.root!.props.className).toContain("bg-danger");
+    expect(screen.getByText("Eliminar").props.style).toMatchObject({ color: "#FFFFFF" });
+  });
 });

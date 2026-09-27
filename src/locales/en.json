@@ -111,7 +111,11 @@
       "cameraMessage": "Fincho needs the camera to take your profile photo. Turn it on in Settings.",
       "libraryTitle": "No photo access",
       "libraryMessage": "Fincho needs access to your photos to choose your profile photo. Turn it on in Settings."
-    }
+    },
+    "remove": "Remove photo",
+    "removeConfirmTitle": "Remove your profile photo?",
+    "removeConfirm": "Remove",
+    "removeError": "We couldn't remove your photo. Your photo is kept."
   },
   "signOut": {
     "title": "Sign out?",

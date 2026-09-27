@@ -3,7 +3,7 @@ import * as ImagePicker from "expo-image-picker";
 import { useMutation } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../../contexts/AuthContext";
-import { compressAvatar, uploadAvatar, validateAvatarAsset } from "../../lib/avatar";
+import { compressAvatar, removeAvatar, uploadAvatar, validateAvatarAsset } from "../../lib/avatar";
 
 export type AvatarSource = "camera" | "library";
 
@@ -53,7 +53,7 @@ export function useAvatarPicker() {
   };
 }
 
-// Menú del panel de perfil: elegir, procesar y subir. Si la subida falla, "Reintentar"
+// Menú del panel de perfil: elegir, procesar y subir, o eliminar la foto. Si la subida falla, "Reintentar"
 // vuelve a subir la misma imagen ya procesada sin abrir el selector.
 export function useChangeAvatar() {
   const { t } = useTranslation();
@@ -61,6 +61,10 @@ export function useChangeAvatar() {
   const pickAvatar = useAvatarPicker();
   const { mutate, isPending } = useMutation({
     mutationFn: (uri: string) => uploadAvatar(uri, user!.id),
+  });
+  const removal = useMutation({
+    mutationFn: removeAvatar,
+    onError: () => Alert.alert(t("avatar.removeError")),
   });
 
   const upload = (uri: string) =>
@@ -77,5 +81,11 @@ export function useChangeAvatar() {
     if (uri) upload(uri);
   };
 
-  return { change, isPending };
+  const remove = () =>
+    Alert.alert(t("avatar.removeConfirmTitle"), undefined, [
+      { text: t("common.cancel"), style: "cancel" },
+      { text: t("avatar.removeConfirm"), style: "destructive", onPress: () => removal.mutate() },
+    ]);
+
+  return { change, remove, isPending: isPending || removal.isPending };
 }

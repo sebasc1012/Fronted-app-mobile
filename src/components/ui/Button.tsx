@@ -29,12 +29,14 @@ export function Button({
   const [pressed, setPressed] = useState(false);
 
   const isDisabled = disabled || loading;
-  const textColor = variant === "primary" ? "#FFFFFF" : "#111827";
+  const textColor = variant === "primary" || variant === "destructive" ? "#FFFFFF" : "#111827";
   const background = color
     ? ""
     : variant === "primary"
       ? "bg-primary"
-      : variant === "outline"
+      : variant === "destructive"
+        ? "bg-danger"
+        : variant === "outline"
         ? "border border-gray-300"
         : "bg-gray-200";
   const roundedClass =

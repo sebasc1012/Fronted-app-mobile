@@ -90,17 +90,24 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 }
 
 // Menú inferior propio (no Alert: Android admite máximo 3 botones y HU-03 agrega una opción).
-function AvatarMenu({ visible, onClose, onPick }: { visible: boolean; onClose: () => void; onPick: (source: AvatarSource) => void }) {
+type AvatarMenuProps = {
+  visible: boolean;
+  onClose: () => void;
+  onPick: (source: AvatarSource) => void;
+  onRemove?: () => void; // solo si hay foto
+};
+
+function AvatarMenu({ visible, onClose, onPick, onRemove }: AvatarMenuProps) {
   const { t } = useTranslation();
   const { bottom } = useSafeAreaInsets();
-  // iOS no puede abrir la cámara/galería mientras el Modal se cierra: se espera a onDismiss.
-  const chosen = useRef<AvatarSource | null>(null);
+  // iOS no puede presentar otra vista (cámara, galería, Alert) mientras el Modal se cierra: se espera a onDismiss.
+  const chosen = useRef<(() => void) | null>(null);
   const runChosen = () => {
-    if (chosen.current) onPick(chosen.current);
+    chosen.current?.();
     chosen.current = null;
   };
-  const choose = (source: AvatarSource) => {
-    chosen.current = source;
+  const choose = (action: () => void) => {
+    chosen.current = action;
     onClose();
     if (Platform.OS !== "ios") runChosen();
   };
@@ -116,8 +123,9 @@ function AvatarMenu({ visible, onClose, onPick }: { visible: boolean; onClose: (
           accessibilityLabel={t("common.cancel")}
         />
         <View accessibilityViewIsModal className="gap-3 rounded-t-3xl bg-white p-4 dark:bg-gray-900" style={{ paddingBottom: bottom + 16 }}>
-          <Button title={t("avatar.takePhoto")} variant="secondary" onPress={() => choose("camera")} />
-          <Button title={t("avatar.chooseFromLibrary")} variant="secondary" onPress={() => choose("library")} />
+          <Button title={t("avatar.takePhoto")} variant="secondary" onPress={() => choose(() => onPick("camera"))} />
+          <Button title={t("avatar.chooseFromLibrary")} variant="secondary" onPress={() => choose(() => onPick("library"))} />
+          {onRemove && <Button title={t("avatar.remove")} variant="destructive" onPress={() => choose(onRemove)} />}
           <Button title={t("common.cancel")} variant="outline" onPress={onClose} />
         </View>
       </View>
@@ -129,7 +137,7 @@ function ProfileHeader() {
   const { t } = useTranslation();
   const { user } = useAuth();
   const { data: profile, isLoading, isError, refetch } = useProfile(true);
-  const { change, isPending } = useChangeAvatar();
+  const { change, remove, isPending } = useChangeAvatar();
   const [menuOpen, setMenuOpen] = useState(false);
 
   if (!profile && isLoading) {
@@ -167,7 +175,12 @@ function ProfileHeader() {
           </View>
         )}
       </Pressable>
-      <AvatarMenu visible={menuOpen} onClose={() => setMenuOpen(false)} onPick={change} />
+      <AvatarMenu
+        visible={menuOpen}
+        onClose={() => setMenuOpen(false)}
+        onPick={change}
+        onRemove={profile?.avatarUrl ? remove : undefined}
+      />
       {profile?.fullName && (
         <Text className="mt-4 text-center text-2xl font-bold text-black dark:text-white">{profile.fullName}</Text>
       )}

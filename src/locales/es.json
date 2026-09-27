@@ -111,7 +111,11 @@
       "cameraMessage": "Fincho necesita la cámara para tomar tu foto de perfil. Actívala en Ajustes.",
       "libraryTitle": "Sin acceso a tus fotos",
       "libraryMessage": "Fincho necesita acceso a tus fotos para elegir tu foto de perfil. Actívalo en Ajustes."
-    }
+    },
+    "remove": "Eliminar foto",
+    "removeConfirmTitle": "¿Eliminar tu foto de perfil?",
+    "removeConfirm": "Eliminar",
+    "removeError": "No pudimos eliminar tu foto. Tu foto se mantiene."
   },
   "signOut": {
     "title": "¿Cerrar sesión?",

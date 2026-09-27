@@ -1,4 +1,4 @@
-import { compressAvatar, uploadAvatar, validateAvatarAsset } from "../avatar";
+import { compressAvatar, removeAvatar, uploadAvatar, validateAvatarAsset } from "../avatar";
 import { api } from "../api";
 import { queryClient } from "../queryClient";
 
@@ -122,5 +122,29 @@ describe("uploadAvatar", () => {
     const [path] = mockStorage.upload.mock.calls[0];
     expect(mockStorage.remove).toHaveBeenCalledWith([path]);
     expect(queryClient.getQueryData(["profile"])).toEqual(OLD);
+  });
+});
+
+describe("removeAvatar", () => {
+  const OLD = { avatarUrl: PUBLIC + "avatars/u1/old.jpg" };
+
+  it("PATCHes avatarUrl to null, sets it in ['profile'] and deletes the file", async () => {
+    queryClient.setQueryData(["profile"], OLD);
+    mockPatch.mockImplementation(async (_url, body) => ({ data: { profile: body } }));
+
+    await removeAvatar();
+
+    expect(mockPatch).toHaveBeenCalledWith("/api/users/profile", { avatarUrl: null });
+    expect(queryClient.getQueryData(["profile"])).toEqual({ avatarUrl: null });
+    expect(mockStorage.remove).toHaveBeenCalledWith(["avatars/u1/old.jpg"]);
+  });
+
+  it("keeps the photo and does not delete the file when the PATCH fails", async () => {
+    queryClient.setQueryData(["profile"], OLD);
+    mockPatch.mockRejectedValue(new Error("offline"));
+
+    await expect(removeAvatar()).rejects.toThrow("offline");
+    expect(queryClient.getQueryData(["profile"])).toEqual(OLD);
+    expect(mockStorage.remove).not.toHaveBeenCalled();
   });
 });

@@ -3,7 +3,7 @@ import { act, renderHook, waitFor } from "@testing-library/react-native";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import * as ImagePicker from "expo-image-picker";
 import { useAvatarPicker, useChangeAvatar } from "../useAvatar";
-import { compressAvatar, uploadAvatar, validateAvatarAsset } from "../../../lib/avatar";
+import { compressAvatar, removeAvatar, uploadAvatar, validateAvatarAsset } from "../../../lib/avatar";
 
 jest.mock("react-i18next", () => ({ useTranslation: () => ({ t: (k: string) => k }) }));
 jest.mock("../../../contexts/AuthContext", () => ({ useAuth: () => ({ user: { id: "u1" } }) }));
@@ -17,6 +17,7 @@ jest.mock("../../../lib/avatar", () => ({
   validateAvatarAsset: jest.fn(() => null),
   compressAvatar: jest.fn(async () => "file:///processed.jpg"),
   uploadAvatar: jest.fn(),
+  removeAvatar: jest.fn(),
 }));
 
 const picker = ImagePicker as jest.Mocked<typeof ImagePicker>;
@@ -27,7 +28,7 @@ const ASSET = { uri: "file:///raw.jpg", width: 2000, height: 2000, mimeType: "im
 // Pulsa el botón del último Alert por su texto.
 const pressAlertButton = async (text: string) => {
   const buttons = alert.mock.calls.at(-1)![2]!;
-  await act(async () => buttons.find((b) => b.text === text)!.onPress!());
+  await act(async () => buttons.find((b) => b.text === text)!.onPress?.());
 };
 
 beforeEach(() => {
@@ -96,5 +97,24 @@ describe("useChangeAvatar", () => {
     const { result } = await renderHook(() => useChangeAvatar(), { wrapper });
     await act(() => result.current.change("library"));
     expect(uploadAvatar).not.toHaveBeenCalled();
+  });
+
+  it("remove asks for confirmation and 'Cancel' does not call the service", async () => {
+    const { result } = await renderHook(() => useChangeAvatar(), { wrapper });
+
+    await act(async () => result.current.remove());
+    expect(alert).toHaveBeenCalledWith("avatar.removeConfirmTitle", undefined, expect.any(Array));
+    await pressAlertButton("common.cancel");
+    expect(removeAvatar).not.toHaveBeenCalled();
+  });
+
+  it("confirming removes the photo, and a failure shows the error", async () => {
+    (removeAvatar as jest.Mock).mockRejectedValueOnce(new Error("offline"));
+    const { result } = await renderHook(() => useChangeAvatar(), { wrapper });
+
+    await act(async () => result.current.remove());
+    await pressAlertButton("avatar.removeConfirm");
+    await waitFor(() => expect(alert).toHaveBeenLastCalledWith("avatar.removeError"));
+    expect(removeAvatar).toHaveBeenCalledTimes(1);
   });
 });

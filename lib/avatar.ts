@@ -63,10 +63,19 @@ function storagePath(url?: string | null) {
   return url?.split(`/${BUCKET}/`)[1];
 }
 
+function currentAvatarPath() {
+  return storagePath(queryClient.getQueryData<Profile>(["profile"])?.avatarUrl);
+}
+
+// Best effort: si el borrado falla queda un archivo huérfano, pero el usuario ya ve el resultado correcto.
+function removeFileQuietly(path?: string) {
+  if (path) supabase.storage.from(BUCKET).remove([path]).catch(() => {});
+}
+
 // Sube la foto, la guarda en el perfil y actualiza ['profile'] (todos los avatares leen de ahí).
 // Si el PATCH falla, borra el archivo recién subido: el perfil conserva la foto anterior.
 export async function uploadAvatar(uri: string, userId: string) {
-  const previous = storagePath(queryClient.getQueryData<Profile>(["profile"])?.avatarUrl);
+  const previous = currentAvatarPath();
   const { path, url } = await putAvatarFile(uri, userId);
 
   let profile: Profile;
@@ -78,7 +87,15 @@ export async function uploadAvatar(uri: string, userId: string) {
   }
 
   queryClient.setQueryData(["profile"], profile);
-  // El borrado del archivo anterior es best effort: si falla, el usuario no se entera.
-  if (previous) supabase.storage.from(BUCKET).remove([previous]).catch(() => {});
+  removeFileQuietly(previous);
+  return profile;
+}
+
+// Primero el PATCH a null y después el borrado del archivo: si el PATCH falla, la foto se conserva.
+export async function removeAvatar() {
+  const previous = currentAvatarPath();
+  const { profile } = (await api.patch<{ profile: Profile }>("/api/users/profile", { avatarUrl: null })).data;
+  queryClient.setQueryData(["profile"], profile);
+  removeFileQuietly(previous);
   return profile;
 }
