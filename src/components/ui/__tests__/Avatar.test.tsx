@@ -41,4 +41,15 @@ describe("Avatar", () => {
     expect(screen.queryByTestId("avatar-image")).toBeNull();
     expect(screen.getByText("S")).toBeTruthy();
   });
+
+  it("shows a new photo after a previous one failed to load", async () => {
+    mockProfile({ fullName: "Sebastián", avatarUrl: "https://x/broken.png" });
+    await render(<Avatar />);
+    await fireEvent(screen.getByTestId("avatar-image"), "error");
+    expect(screen.queryByTestId("avatar-image")).toBeNull();
+
+    mockProfile({ fullName: "Sebastián", avatarUrl: "https://x/new.png" });
+    await screen.rerender(<Avatar />);
+    expect(screen.getByTestId("avatar-image").props.source).toBe("https://x/new.png");
+  });
 });

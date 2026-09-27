@@ -32,11 +32,12 @@ Node 22 (`.nvmrc`). Pre-commit (Husky) corre typecheck; CI corre lint, typecheck
 ```
 src/app/            # rutas: _layout.tsx (gate único), (auth)/, (app)/ (NativeTabs; account/ con Stack)
 src/components/ui/  # Input, Button, Select, Avatar, ScreenHeader, GlassPanel, AuthBackground, icons/
-src/hooks/          # useProfile, useUpsertProfile, useOAuth
+src/hooks/          # useProfile, useUpsertProfile, useOAuth, useAvatar (permisos + selector + subida)
 src/squema/         # schemas Zod (mensajes = claves i18n)
 src/locales/        # en.json, es.json
 contexts/           # AuthContext
-lib/                # supabase, api (Axios + Bearer), queryClient, i18n, authErrors, auth/oauth (PKCE)
+lib/                # supabase, api (Axios + Bearer), queryClient, i18n, authErrors, auth/oauth (PKCE), avatar (Storage)
+supabase/           # SQL de RLS (ejecutar a mano en Supabase)
 ```
 
 Alias `@/*` → `./src/*`. Tests en `__tests__/` junto al código.

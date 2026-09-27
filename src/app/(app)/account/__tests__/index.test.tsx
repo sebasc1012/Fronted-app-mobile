@@ -1,3 +1,4 @@
+import { Platform } from "react-native";
 import { render, screen, fireEvent } from "@testing-library/react-native";
 import Account from "../index";
 import { useProfile } from "@/hooks/useProfile";
@@ -9,6 +10,9 @@ jest.mock("lucide-react-native", () => new Proxy({}, { get: () => () => null }))
 jest.mock("expo-constants", () => ({ expoConfig: { version: "1.2.3" } }));
 jest.mock("expo-image", () => ({ Image: (props: any) => require("react").createElement("Image", props) }));
 jest.mock("@/hooks/useProfile", () => ({ useProfile: jest.fn() }));
+const mockChange = jest.fn();
+let mockUploading = false;
+jest.mock("@/hooks/useAvatar", () => ({ useChangeAvatar: () => ({ change: mockChange, isPending: mockUploading }) }));
 jest.mock("../../../../../contexts/AuthContext", () => ({
   useAuth: () => ({ user: { email: "seba@fincho.com" }, signOut: mockSignOut }),
 }));
@@ -17,7 +21,10 @@ const refetch = jest.fn();
 const mockProfile = (state: object) =>
   (useProfile as jest.Mock).mockReturnValue({ data: undefined, isLoading: false, isError: false, refetch, ...state });
 
-beforeEach(() => jest.clearAllMocks());
+beforeEach(() => {
+  jest.clearAllMocks();
+  mockUploading = false;
+});
 
 describe("Account panel", () => {
   it("renders the header with photo, name and email", async () => {
@@ -79,5 +86,35 @@ describe("Account panel", () => {
     expect(screen.queryByRole("button", { name: "account.version" })).toBeNull();
     // filas sin HU todavía: presionables y no fallan
     await fireEvent.press(screen.getByRole("button", { name: "account.theme" }));
+  });
+
+  it("tapping the photo opens the menu with take photo, library and cancel", async () => {
+    mockProfile({ data: { fullName: "Seba", avatarUrl: null } });
+    await render(<Account />);
+    expect(screen.queryByText("avatar.takePhoto")).toBeNull();
+    await fireEvent.press(screen.getByRole("button", { name: "avatar.change" }));
+    expect(screen.getByText("avatar.takePhoto")).toBeTruthy();
+    expect(screen.getByText("avatar.chooseFromLibrary")).toBeTruthy();
+    expect(screen.getAllByRole("button", { name: "common.cancel" }).length).toBeGreaterThan(0);
+  });
+
+  it("choosing an option closes the menu and starts the change (Android: right away)", async () => {
+    Platform.OS = "android";
+    mockProfile({ data: { fullName: "Seba", avatarUrl: null } });
+    await render(<Account />);
+    await fireEvent.press(screen.getByRole("button", { name: "avatar.change" }));
+    await fireEvent.press(screen.getByText("avatar.chooseFromLibrary"));
+    expect(screen.queryByText("avatar.takePhoto")).toBeNull();
+    expect(mockChange).toHaveBeenCalledWith("library");
+    Platform.OS = "ios";
+  });
+
+  it("shows a spinner over the avatar and blocks the menu while uploading", async () => {
+    mockUploading = true;
+    mockProfile({ data: { fullName: "Seba", avatarUrl: null } });
+    await render(<Account />);
+    expect(screen.getByTestId("avatar-uploading")).toBeTruthy();
+    await fireEvent.press(screen.getByRole("button", { name: "avatar.change" }));
+    expect(screen.queryByText("avatar.takePhoto")).toBeNull();
   });
 });

@@ -95,5 +95,22 @@
       "privacy": "Privacidad",
       "about": "Acerca de"
     }
+  },
+  "avatar": {
+    "change": "Cambiar foto de perfil",
+    "takePhoto": "Tomar foto",
+    "chooseFromLibrary": "Elegir de la galería",
+    "openSettings": "Ir a Ajustes",
+    "uploadError": "No pudimos actualizar tu foto. Tu foto anterior se mantiene.",
+    "invalid": {
+      "format": "Formato no válido. Usa una imagen JPG, PNG o HEIC.",
+      "size": "La imagen supera los 10 MB. Elige una más pequeña."
+    },
+    "permission": {
+      "cameraTitle": "Sin acceso a la cámara",
+      "cameraMessage": "Fincho necesita la cámara para tomar tu foto de perfil. Actívala en Ajustes.",
+      "libraryTitle": "Sin acceso a tus fotos",
+      "libraryMessage": "Fincho necesita acceso a tus fotos para elegir tu foto de perfil. Actívalo en Ajustes."
+    }
   }
 }

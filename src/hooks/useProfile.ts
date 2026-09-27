@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { api } from "../../lib/api";
 import { supabase } from "../../lib/supabase";
 
-type Profile = {
+export type Profile = {
   id: string;
   fullName: string | null;
   gender: string | null;

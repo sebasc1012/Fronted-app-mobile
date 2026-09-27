@@ -44,6 +44,8 @@ export function Button({
     <Pressable
       onPress={onPress}
       disabled={isDisabled}
+      accessibilityRole="button"
+      accessibilityState={{ disabled: isDisabled, busy: loading }}
       onPressIn={() => setPressed(true)}
       onPressOut={() => setPressed(false)}
       className={`h-[52px] flex-row items-center justify-center overflow-hidden ${roundedClass} ${background} ${isDisabled ? "opacity-50" : ""}`}

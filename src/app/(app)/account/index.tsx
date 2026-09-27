@@ -1,5 +1,5 @@
-import { Children } from "react";
-import { View, Text, Pressable, ScrollView, useColorScheme } from "react-native";
+import { Children, useRef, useState } from "react";
+import { ActivityIndicator, Modal, Platform, View, Text, Pressable, ScrollView, StyleSheet, useColorScheme } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTranslation } from "react-i18next";
 import Constants from "expo-constants";
@@ -18,6 +18,7 @@ import {
 } from "lucide-react-native";
 import { useAuth } from "../../../../contexts/AuthContext";
 import { useProfile } from "@/hooks/useProfile";
+import { useChangeAvatar, type AvatarSource } from "@/hooks/useAvatar";
 import { Avatar } from "../../../components/ui/Avatar";
 import { Button } from "../../../components/ui/Button";
 
@@ -78,10 +79,48 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
+// Menú inferior propio (no Alert: Android admite máximo 3 botones y HU-03 agrega una opción).
+function AvatarMenu({ visible, onClose, onPick }: { visible: boolean; onClose: () => void; onPick: (source: AvatarSource) => void }) {
+  const { t } = useTranslation();
+  const { bottom } = useSafeAreaInsets();
+  // iOS no puede abrir la cámara/galería mientras el Modal se cierra: se espera a onDismiss.
+  const chosen = useRef<AvatarSource | null>(null);
+  const runChosen = () => {
+    if (chosen.current) onPick(chosen.current);
+    chosen.current = null;
+  };
+  const choose = (source: AvatarSource) => {
+    chosen.current = source;
+    onClose();
+    if (Platform.OS !== "ios") runChosen();
+  };
+
+  return (
+    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose} onDismiss={runChosen}>
+      <View className="flex-1 justify-end">
+        <Pressable
+          style={StyleSheet.absoluteFill}
+          className="bg-black/40"
+          onPress={onClose}
+          accessibilityRole="button"
+          accessibilityLabel={t("common.cancel")}
+        />
+        <View accessibilityViewIsModal className="gap-3 rounded-t-3xl bg-white p-4 dark:bg-gray-900" style={{ paddingBottom: bottom + 16 }}>
+          <Button title={t("avatar.takePhoto")} variant="secondary" onPress={() => choose("camera")} />
+          <Button title={t("avatar.chooseFromLibrary")} variant="secondary" onPress={() => choose("library")} />
+          <Button title={t("common.cancel")} variant="outline" onPress={onClose} />
+        </View>
+      </View>
+    </Modal>
+  );
+}
+
 function ProfileHeader() {
   const { t } = useTranslation();
   const { user } = useAuth();
   const { data: profile, isLoading, isError, refetch } = useProfile(true);
+  const { change, isPending } = useChangeAvatar();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   if (!profile && isLoading) {
     return (
@@ -104,7 +143,21 @@ function ProfileHeader() {
 
   return (
     <View className="items-center">
-      <Avatar size={112} />
+      <Pressable
+        onPress={() => setMenuOpen(true)}
+        disabled={isPending}
+        accessibilityRole="button"
+        accessibilityLabel={t("avatar.change")}
+        accessibilityState={{ busy: isPending, disabled: isPending }}
+      >
+        <Avatar size={112} />
+        {isPending && (
+          <View testID="avatar-uploading" className="absolute inset-0 items-center justify-center rounded-full bg-black/40">
+            <ActivityIndicator color="#FFFFFF" />
+          </View>
+        )}
+      </Pressable>
+      <AvatarMenu visible={menuOpen} onClose={() => setMenuOpen(false)} onPick={change} />
       {profile?.fullName && (
         <Text className="mt-4 text-center text-2xl font-bold text-black dark:text-white">{profile.fullName}</Text>
       )}

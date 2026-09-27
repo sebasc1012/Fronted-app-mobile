@@ -17,7 +17,9 @@ export function Avatar({ size = 44 }: { size?: number }) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const { data: profile } = useProfile(true);
-  const [failed, setFailed] = useState(false);
+  // Se guarda la URL que falló (no un booleano): una foto nueva vuelve a intentarse.
+  const [failedUrl, setFailedUrl] = useState<string | null>(null);
+  const url = profile?.avatarUrl;
 
   return (
     <View
@@ -27,13 +29,13 @@ export function Avatar({ size = 44 }: { size?: number }) {
       className="items-center justify-center overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700"
       style={{ width: size, height: size }}
     >
-      {profile?.avatarUrl && !failed ? (
+      {url && url !== failedUrl ? (
         <Image
           testID="avatar-image"
-          source={profile.avatarUrl}
+          source={url}
           style={{ width: size, height: size }}
           contentFit="cover"
-          onError={() => setFailed(true)}
+          onError={() => setFailedUrl(url)}
         />
       ) : (
         <Text className="font-semibold text-gray-700 dark:text-gray-200" style={{ fontSize: size * 0.4 }}>

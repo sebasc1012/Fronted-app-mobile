@@ -95,5 +95,22 @@
       "privacy": "Privacy",
       "about": "About"
     }
+  },
+  "avatar": {
+    "change": "Change profile photo",
+    "takePhoto": "Take photo",
+    "chooseFromLibrary": "Choose from library",
+    "openSettings": "Open Settings",
+    "uploadError": "We couldn't update your photo. Your previous photo is kept.",
+    "invalid": {
+      "format": "Invalid format. Use a JPG, PNG or HEIC image.",
+      "size": "The image is larger than 10 MB. Choose a smaller one."
+    },
+    "permission": {
+      "cameraTitle": "No camera access",
+      "cameraMessage": "Fincho needs the camera to take your profile photo. Turn it on in Settings.",
+      "libraryTitle": "No photo access",
+      "libraryMessage": "Fincho needs access to your photos to choose your profile photo. Turn it on in Settings."
+    }
   }
 }
