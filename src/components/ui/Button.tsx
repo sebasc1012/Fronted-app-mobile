@@ -1,5 +1,6 @@
 import React, { useState, type ReactNode } from "react";
-import { Pressable, Text, ActivityIndicator } from "react-native";
+import { Pressable, ActivityIndicator } from "react-native";
+import { AppText } from "@/components/ui/AppText";
 import { useColors } from "../../constants/colors";
 
 type ButtonVariant = "primary" | "secondary" | "destructive" | "ghost" | "outline";
@@ -53,7 +54,7 @@ export function Button({
       accessibilityState={{ disabled: isDisabled, busy: loading }}
       onPressIn={() => setPressed(true)}
       onPressOut={() => setPressed(false)}
-      className={`h-[52px] flex-row items-center justify-center overflow-hidden ${roundedClass} ${background} ${isDisabled ? "opacity-50" : ""}`}
+      className={`min-h-[52px] flex-row items-center px-4 py-3 justify-center overflow-hidden ${roundedClass} ${background} ${isDisabled ? "opacity-50" : ""}`}
       style={{
         transform: [{ scale: pressed && !isDisabled ? 0.98 : 1 }],
         ...(color ? { backgroundColor: color } : {}),
@@ -66,12 +67,12 @@ export function Button({
         <>
           {icon}
 
-          <Text
-            className={`text-base font-semibold ${icon ? "ml-2" : ""}`}
+          <AppText
+            className={`shrink text-center text-base font-semibold ${icon ? "ml-2" : ""}`}
             style={{ color: textColor }}
           >
             {title}
-          </Text>
+          </AppText>
         </>
       )}
     </Pressable>

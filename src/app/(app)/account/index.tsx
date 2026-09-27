@@ -1,5 +1,6 @@
 import { Children, useRef, useState } from "react";
-import { ActivityIndicator, Alert, Modal, Platform, View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
+import { ActivityIndicator, Alert, Modal, Platform, View, Pressable, ScrollView, StyleSheet } from "react-native";
+import { AppText } from "@/components/ui/AppText";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTranslation } from "react-i18next";
 import Constants from "expo-constants";
@@ -39,9 +40,9 @@ function Row({ icon: Icon, label, onPress, danger, value, busy }: RowProps) {
   const content = (
     <>
       <Icon size={22} color={color} />
-      <Text className={`flex-1 text-base ${danger ? "text-danger" : "text-text"}`}>{label}</Text>
+      <AppText className={`flex-1 text-base ${danger ? "text-danger" : "text-text"}`}>{label}</AppText>
       {value ? (
-        <Text className="text-base text-text-muted">{value}</Text>
+        <AppText className="text-base text-text-muted">{value}</AppText>
       ) : busy ? (
         <ActivityIndicator />
       ) : (
@@ -76,9 +77,9 @@ function Row({ icon: Icon, label, onPress, danger, value, busy }: RowProps) {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <View className="mt-6">
-      <Text accessibilityRole="header" className="mb-2 px-4 text-sm font-semibold uppercase text-text-muted">
+      <AppText accessibilityRole="header" className="mb-2 px-4 text-sm font-semibold uppercase text-text-muted">
         {title}
-      </Text>
+      </AppText>
       <View className="overflow-hidden rounded-2xl bg-surface">
         {Children.toArray(children).map((child, i) => (
           <View key={i}>
@@ -156,7 +157,7 @@ function ProfileHeader() {
   if (!profile && isError) {
     return (
       <View className="items-center gap-3">
-        <Text className="text-center text-base text-text">{t("account.loadError")}</Text>
+        <AppText className="text-center text-base text-text">{t("account.loadError")}</AppText>
         <Button title={t("common.retry")} onPress={() => refetch()} />
       </View>
     );
@@ -185,9 +186,9 @@ function ProfileHeader() {
         onRemove={profile?.avatarUrl ? remove : undefined}
       />
       {profile?.fullName && (
-        <Text className="mt-4 text-center text-2xl font-bold text-text">{profile.fullName}</Text>
+        <AppText className="mt-4 text-center text-2xl font-bold text-text">{profile.fullName}</AppText>
       )}
-      <Text className="mt-1 text-center text-base text-text-muted">{user?.email}</Text>
+      <AppText className="mt-1 text-center text-base text-text-muted">{user?.email}</AppText>
     </View>
   );
 }
@@ -225,7 +226,7 @@ export default function Account() {
         <Row icon={Bell} label={t("account.notifications")} />
       </Section>
       <Section title={t("account.sections.accessibility")}>
-        <Row icon={ALargeSmall} label={t("account.textSize")} />
+        <Row icon={ALargeSmall} label={t("account.textSize")} onPress={() => router.push("/account/text-size")} />
       </Section>
       <Section title={t("account.sections.privacy")}>
         <Row icon={ShieldCheck} label={t("account.privacyPolicy")} />

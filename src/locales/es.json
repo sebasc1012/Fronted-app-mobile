@@ -131,5 +131,14 @@
     "light": "Claro",
     "dark": "Oscuro",
     "system": "Sistema"
+  },
+  "textSize": {
+    "small": "Pequeño",
+    "normal": "Normal",
+    "large": "Grande",
+    "xlarge": "Muy grande",
+    "previewTitle": "Vista previa",
+    "previewBody": "Así se verán los textos de Fincho: tus compromisos, vencimientos y recordatorios.",
+    "reset": "Restablecer"
   }
 }

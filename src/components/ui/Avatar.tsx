@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { View, Text } from "react-native";
+import { View } from "react-native";
+import { AppText } from "@/components/ui/AppText";
 import { Image } from "expo-image";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../../../contexts/AuthContext";
@@ -38,9 +39,9 @@ export function Avatar({ size = 44 }: { size?: number }) {
           onError={() => setFailedUrl(url)}
         />
       ) : (
-        <Text className="font-semibold text-text-muted" style={{ fontSize: size * 0.4 }}>
+        <AppText allowFontScaling={false} className="font-semibold text-text-muted" style={{ fontSize: size * 0.4 }}>
           {getInitials(profile?.fullName, user?.email)}
-        </Text>
+        </AppText>
       )}
     </View>
   );

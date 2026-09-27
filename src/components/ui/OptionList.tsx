@@ -1,4 +1,5 @@
-import { Pressable, Text, View } from "react-native";
+import { Pressable, View } from "react-native";
+import { AppText } from "@/components/ui/AppText";
 import { Check } from "lucide-react-native";
 import { useColors } from "../../constants/colors";
 
@@ -24,7 +25,7 @@ export function OptionList<T extends string>({ options, selected, onSelect }: Op
             accessibilityState={{ checked: selected === value }}
             className="min-h-12 flex-row items-center px-4 py-3 active:opacity-60"
           >
-            <Text className="flex-1 text-base text-text">{label}</Text>
+            <AppText className="flex-1 text-base text-text">{label}</AppText>
             {selected === value && <Check size={20} color={colors.primary} />}
           </Pressable>
         </View>

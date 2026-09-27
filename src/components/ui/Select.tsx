@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Modal, Pressable, Text, View } from "react-native";
+import { Modal, Pressable, View } from "react-native";
+import { AppText } from "@/components/ui/AppText";
 import { useTranslation } from "react-i18next";
 
 export type SelectOption<T extends string> = {
@@ -39,28 +40,28 @@ export function Select<T extends string>({
   return (
     <View className="mb-4">
       {label && (
-        <Text className="mb-2 text-sm font-medium text-brand-ink">
+        <AppText className="mb-2 text-sm font-medium text-brand-ink">
           {label}
-        </Text>
+        </AppText>
       )}
 
       <Pressable
         onPress={() => setOpen(true)}
         disabled={disabled}
-        className={`h-[52px] flex-row items-center rounded-[5px] border bg-background px-4 ${
+        className={`min-h-[52px] flex-row items-center py-3 rounded-[5px] border bg-background px-4 ${
           error ? "border-danger" : "border-transparent"
         } ${disabled ? "opacity-50" : ""}`}
       >
-        <Text
+        <AppText
           className={`text-base ${
             selectedOption ? "text-brand-ink" : "text-text-muted"
           }`}
         >
           {selectedOption?.label ?? placeholder ?? t("common.selectOption")}
-        </Text>
+        </AppText>
       </Pressable>
 
-      {error && <Text className="mt-1.5 text-xs text-danger">{error}</Text>}
+      {error && <AppText className="mt-1.5 text-xs text-danger">{error}</AppText>}
 
       <Modal
         visible={open}
@@ -76,9 +77,9 @@ export function Select<T extends string>({
             className="rounded-t-2xl bg-background px-6 pb-8 pt-5"
             onPress={(event) => event.stopPropagation()}
           >
-            <Text className="mb-4 text-lg font-semibold text-text">
+            <AppText className="mb-4 text-lg font-semibold text-text">
               {label}
-            </Text>
+            </AppText>
 
             {options.map((option) => {
               const selected = option.value === value;
@@ -91,13 +92,13 @@ export function Select<T extends string>({
                     selected ? "bg-surface" : ""
                   }`}
                 >
-                  <Text
+                  <AppText
                     className={`text-base ${
                       selected ? "font-semibold text-text" : "text-text-muted"
                     }`}
                   >
                     {option.label}
-                  </Text>
+                  </AppText>
                 </Pressable>
               );
             })}
@@ -106,7 +107,7 @@ export function Select<T extends string>({
               onPress={() => setOpen(false)}
               className="mt-3 items-center rounded-lg bg-surface-strong py-3"
             >
-              <Text className="font-semibold text-text">{t("common.cancel")}</Text>
+              <AppText className="font-semibold text-text">{t("common.cancel")}</AppText>
             </Pressable>
           </Pressable>
         </Pressable>

@@ -1,6 +1,7 @@
 import { Alert, Platform } from "react-native";
 import { act, render, screen, fireEvent } from "@testing-library/react-native";
 import Account from "../index";
+import { setFontScaleLevel } from "../../../../../lib/fontScale";
 import { router } from "expo-router";
 import { useProfile } from "@/hooks/useProfile";
 
@@ -175,5 +176,13 @@ describe("Account panel", () => {
     await render(<Account />);
     await fireEvent.press(screen.getByRole("button", { name: "account.language" }));
     expect(router.push).toHaveBeenCalledWith("/account/language");
+  });
+
+  it("renders at 'Extra large' text size without errors (snapshot)", async () => {
+    await setFontScaleLevel("xlarge");
+    mockProfile({ data: { fullName: "Sebastián Castro López", avatarUrl: null } });
+    await render(<Account />);
+    expect(screen.toJSON()).toMatchSnapshot();
+    await setFontScaleLevel("normal");
   });
 });

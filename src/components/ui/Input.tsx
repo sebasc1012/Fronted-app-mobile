@@ -1,5 +1,6 @@
 import React, { forwardRef, useState } from "react";
-import { TextInput, TextInputProps, View, Text } from "react-native";
+import { View, type TextInput, type TextInputProps } from "react-native";
+import { AppText, AppTextInput } from "@/components/ui/AppText";
 import type { LucideIcon } from "lucide-react-native";
 import { useColors } from "../../constants/colors";
 
@@ -23,13 +24,13 @@ export const Input = forwardRef<TextInput, InputProps>(
     return (
       <View className="mb-4">
         {label && (
-          <Text className="mb-2 text-sm font-medium text-brand-ink">
+          <AppText className="mb-2 text-sm font-medium text-brand-ink">
             {label}
-          </Text>
+          </AppText>
         )}
 
         <View
-          className={`h-[52px] flex-row items-center rounded-[5px] border bg-background px-4 ${borderStyle}`}
+          className={`min-h-[52px] flex-row items-center rounded-[5px] border bg-background px-4 ${borderStyle}`}
         >
           {Icon && (
             <Icon
@@ -38,9 +39,9 @@ export const Input = forwardRef<TextInput, InputProps>(
             />
           )}
 
-          <TextInput
+          <AppTextInput
             ref={ref}
-            className={`flex-1 text-base leading-[16px] text-brand-ink ${Icon ? "ml-3" : ""}`}
+            className={`flex-1 py-3 text-base text-brand-ink ${Icon ? "ml-3" : ""}`}
             textAlignVertical="center"
             placeholderTextColor={colors["text-muted"]}
             onFocus={(event) => {
@@ -55,7 +56,7 @@ export const Input = forwardRef<TextInput, InputProps>(
           />
         </View>
 
-        {error && <Text className="mt-1.5 text-xs text-danger">{error}</Text>}
+        {error && <AppText className="mt-1.5 text-xs text-danger">{error}</AppText>}
       </View>
     );
   },

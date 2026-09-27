@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { View, Text, ScrollView } from "react-native";
+import { View, ScrollView } from "react-native";
+import { AppText } from "@/components/ui/AppText";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "../../components/ui/Input";
@@ -97,10 +98,10 @@ export default function Onboarding() {
         keyboardShouldPersistTaps="handled"
       >
         <GlassPanel>
-          <Text className="mb-2 text-2xl font-bold">{t("onboarding.title")}</Text>
-          <Text className="mb-6 text-base text-text-muted">
+          <AppText className="mb-2 text-2xl font-bold">{t("onboarding.title")}</AppText>
+          <AppText className="mb-6 text-base text-text-muted">
             {t("onboarding.subtitle")}
-          </Text>
+          </AppText>
 
           <Controller
             control={control}
@@ -172,15 +173,15 @@ export default function Onboarding() {
           />
 
           {avatarUri && (
-            <Text className="mt-2 text-sm text-text-muted">
+            <AppText className="mt-2 text-sm text-text-muted">
               {t("onboarding.photoSelected")}
-            </Text>
+            </AppText>
           )}
 
           {serverError && (
-            <Text className="mb-4 mt-4 text-center text-sm text-danger">
+            <AppText className="mb-4 mt-4 text-center text-sm text-danger">
               {t(serverError)}
-            </Text>
+            </AppText>
           )}
 
           <Button

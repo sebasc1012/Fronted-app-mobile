@@ -1,6 +1,7 @@
 import "../../global.css";
 import { applyStoredLanguage } from "../../lib/i18n";
 import { applyStoredTheme } from "../../lib/theme";
+import { applyStoredFontScale } from "../../lib/fontScale";
 import { StatusBar } from "expo-status-bar";
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
@@ -16,12 +17,12 @@ SplashScreen.preventAutoHideAsync();
 function RootNavigation() {
   const { session, isLoading: authLoading } = useAuth();
   const { data: profile, isLoading: profileLoading } = useProfile(!!session);
-  // Idioma y tema guardados se aplican antes de ocultar el splash: sin parpadeo.
+  // Idioma, tema y tamaño de texto guardados se aplican antes de ocultar el splash: sin parpadeo.
   const [prefsReady, setPrefsReady] = useState(false);
   const isReady = !authLoading && !profileLoading && prefsReady;
 
   useEffect(() => {
-    Promise.all([applyStoredLanguage(), applyStoredTheme()]).finally(() => setPrefsReady(true));
+    Promise.all([applyStoredLanguage(), applyStoredTheme(), applyStoredFontScale()]).finally(() => setPrefsReady(true));
   }, []);
 
   useEffect(() => {

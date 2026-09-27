@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { View, Text } from "react-native";
+import { View, ScrollView } from "react-native";
+import { AppText } from "@/components/ui/AppText";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
@@ -60,11 +61,15 @@ export default function Signup() {
   return (
     <View className="flex-1">
       <AuthBackground />
-      <View className="flex-1 justify-center px-4">
+      <ScrollView
+        className="flex-1 px-4"
+        contentContainerStyle={{ flexGrow: 1, justifyContent: "center", paddingVertical: 40 }}
+        keyboardShouldPersistTaps="handled"
+      >
         <GlassPanel>
-          <Text className="mb-8 text-2xl font-bold text-brand-ink">
+          <AppText className="mb-8 text-2xl font-bold text-brand-ink">
             {t("auth.signup.title")}
-          </Text>
+          </AppText>
 
           <Controller
             control={control}
@@ -116,9 +121,9 @@ export default function Signup() {
           />
 
           {(serverError || oauthError) && (
-            <Text className="mb-3 text-sm text-danger">
+            <AppText className="mb-3 text-sm text-danger">
               {t(serverError ?? oauthError!)}
-            </Text>
+            </AppText>
           )}
 
           <Button
@@ -132,7 +137,7 @@ export default function Signup() {
 
           <View className="my-6 flex-row items-center">
             <View className="h-px flex-1 bg-border/40" />
-            <Text className="mx-3 text-sm text-text-muted">{t("auth.common.or")}</Text>
+            <AppText className="mx-3 text-sm text-text-muted">{t("auth.common.or")}</AppText>
             <View className="h-px flex-1 bg-border/40" />
           </View>
 
@@ -167,15 +172,15 @@ export default function Signup() {
               disabled={loading || !!loadingProvider}
             />
           </View>
-          <Text className="mt-6 w-full text-center text-sm text-primary">
+          <AppText className="mt-6 w-full text-center text-sm text-primary">
             <Link
               href="/(auth)/login"
             >
               {t("auth.signup.hasAccount")}
             </Link>
-          </Text>
+          </AppText>
         </GlassPanel>
-      </View>
+      </ScrollView>
     </View>
   );
 }
