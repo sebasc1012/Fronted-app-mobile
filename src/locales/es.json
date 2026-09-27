@@ -2,7 +2,8 @@
   "common": {
     "cancel": "Cancelar",
     "selectOption": "Selecciona una opción",
-    "signOut": "Cerrar sesión"
+    "signOut": "Cerrar sesión",
+    "retry": "Reintentar"
   },
   "errors": {
     "emailInvalid": "Correo inválido",
@@ -75,10 +76,24 @@
     "home": "Inicio",
     "library": "Biblioteca",
     "finances": "Finanzas",
-    "account": "Cuenta"
+    "account": "Perfil"
   },
   "account": {
-    "theme": "Cambiar tema",
-    "deleteAccount": "Eliminar cuenta"
+    "theme": "Tema",
+    "deleteAccount": "Eliminar cuenta",
+    "avatar": "Foto de perfil",
+    "loadError": "No pudimos cargar tu perfil.",
+    "language": "Idioma",
+    "notifications": "Notificaciones",
+    "textSize": "Tamaño de texto",
+    "privacyPolicy": "Política de privacidad",
+    "terms": "Términos y condiciones",
+    "version": "Versión de la app",
+    "sections": {
+      "preferences": "Preferencias",
+      "accessibility": "Accesibilidad",
+      "privacy": "Privacidad",
+      "about": "Acerca de"
+    }
   }
 }

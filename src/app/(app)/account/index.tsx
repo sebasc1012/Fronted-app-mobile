@@ -1,49 +1,149 @@
-import { View, Text, Pressable, useColorScheme } from "react-native";
+import { Children } from "react";
+import { View, Text, Pressable, ScrollView, useColorScheme } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTranslation } from "react-i18next";
-import { router } from "expo-router";
-import { LogOut, SunMoon, Trash2, type LucideIcon } from "lucide-react-native";
-import { ScreenHeader } from "../../../components/ui/ScreenHeader";
+import Constants from "expo-constants";
+import {
+  ALargeSmall,
+  Bell,
+  ChevronRight,
+  FileText,
+  Info,
+  Languages,
+  LogOut,
+  ShieldCheck,
+  SunMoon,
+  Trash2,
+  type LucideIcon,
+} from "lucide-react-native";
 import { useAuth } from "../../../../contexts/AuthContext";
 import { useProfile } from "@/hooks/useProfile";
+import { Avatar } from "../../../components/ui/Avatar";
+import { Button } from "../../../components/ui/Button";
 
-type OptionProps = {
+type RowProps = {
   icon: LucideIcon;
   label: string;
   onPress?: () => void;
   danger?: boolean;
+  value?: string; // fila de solo lectura: muestra el valor en lugar del chevron
 };
 
-function Option({ icon: Icon, label, onPress, danger }: OptionProps) {
+function Row({ icon: Icon, label, onPress, danger, value }: RowProps) {
   const dark = useColorScheme() === "dark";
   const color = danger ? "#DC2626" : dark ? "#FFFFFF" : "#000000";
+  const content = (
+    <>
+      <Icon size={22} color={color} />
+      <Text className={`flex-1 text-base ${danger ? "text-danger" : "text-black dark:text-white"}`}>{label}</Text>
+      {value ? (
+        <Text className="text-base text-gray-500 dark:text-gray-400">{value}</Text>
+      ) : (
+        <ChevronRight size={20} color={dark ? "#9CA3AF" : "#6B7280"} />
+      )}
+    </>
+  );
+  const className = "min-h-12 flex-row items-center gap-4 px-4 py-3";
+
+  if (value) {
+    return (
+      <View accessible accessibilityLabel={`${label}, ${value}`} className={className}>
+        {content}
+      </View>
+    );
+  }
+  // ponytail: sin onPress hasta que exista la HU de cada fila (tema, idioma, …); tocar no hace nada.
+  return (
+    <Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel={label} className={`${className} active:opacity-60`}>
+      {content}
+    </Pressable>
+  );
+}
+
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <View className="mt-6">
+      <Text accessibilityRole="header" className="mb-2 px-4 text-sm font-semibold uppercase text-gray-500 dark:text-gray-400">
+        {title}
+      </Text>
+      <View className="overflow-hidden rounded-2xl bg-gray-100 dark:bg-gray-900">
+        {Children.toArray(children).map((child, i) => (
+          <View key={i}>
+            {i > 0 && <View className="mx-4 h-px bg-gray-200 dark:bg-gray-800" />}
+            {child}
+          </View>
+        ))}
+      </View>
+    </View>
+  );
+}
+
+function ProfileHeader() {
+  const { t } = useTranslation();
+  const { user } = useAuth();
+  const { data: profile, isLoading, isError, refetch } = useProfile(true);
+
+  if (!profile && isLoading) {
+    return (
+      <View testID="profile-skeleton" className="items-center gap-3">
+        <View className="h-28 w-28 animate-pulse rounded-full bg-gray-200 dark:bg-gray-800" />
+        <View className="h-6 w-40 animate-pulse rounded-md bg-gray-200 dark:bg-gray-800" />
+        <View className="h-4 w-52 animate-pulse rounded-md bg-gray-200 dark:bg-gray-800" />
+      </View>
+    );
+  }
+
+  if (!profile && isError) {
+    return (
+      <View className="items-center gap-3">
+        <Text className="text-center text-base text-black dark:text-white">{t("account.loadError")}</Text>
+        <Button title={t("common.retry")} onPress={() => refetch()} />
+      </View>
+    );
+  }
 
   return (
-    <Pressable onPress={onPress} accessibilityRole="button" className="flex-row items-center gap-4 px-4 py-4 active:opacity-60">
-      <Icon size={22} color={color} />
-      <Text className={`text-base ${danger ? "text-danger" : "text-black dark:text-white"}`}>{label}</Text>
-    </Pressable>
+    <View className="items-center">
+      <Avatar size={112} />
+      {profile?.fullName && (
+        <Text className="mt-4 text-center text-2xl font-bold text-black dark:text-white">{profile.fullName}</Text>
+      )}
+      <Text className="mt-1 text-center text-base text-gray-600 dark:text-gray-400">{user?.email}</Text>
+    </View>
   );
 }
 
 export default function Account() {
   const { t } = useTranslation();
-  const { user, signOut } = useAuth();
-  const { data: profile } = useProfile(true);
+  const { signOut } = useAuth();
+  const { top, bottom } = useSafeAreaInsets();
 
   return (
-    <View className="flex-1 bg-white px-6 dark:bg-black">
-      <ScreenHeader
-        title={profile?.fullName || user?.email || t("nav.account")}
-        onAvatarPress={() => router.push("/account/details")}
-      />
-      <View className="mt-8 overflow-hidden rounded-2xl bg-gray-100 dark:bg-gray-900">
-        {/* ponytail: tema y eliminar cuenta sin lógica todavía (eliminar debe pedir confirmación). */}
-        <Option icon={SunMoon} label={t("account.theme")} />
-        <View className="mx-4 h-px bg-gray-200 dark:bg-gray-800" />
-        <Option icon={LogOut} label={t("common.signOut")} onPress={signOut} />
-        <View className="mx-4 h-px bg-gray-200 dark:bg-gray-800" />
-        <Option icon={Trash2} label={t("account.deleteAccount")} danger />
-      </View>
-    </View>
+    <ScrollView
+      className="flex-1 bg-white dark:bg-black"
+      contentContainerClassName="px-6"
+      contentContainerStyle={{ paddingTop: top + 16, paddingBottom: bottom + 96 }}
+    >
+      <ProfileHeader />
+      <Section title={t("account.sections.preferences")}>
+        <Row icon={SunMoon} label={t("account.theme")} />
+        <Row icon={Languages} label={t("account.language")} />
+        <Row icon={Bell} label={t("account.notifications")} />
+      </Section>
+      <Section title={t("account.sections.accessibility")}>
+        <Row icon={ALargeSmall} label={t("account.textSize")} />
+      </Section>
+      <Section title={t("account.sections.privacy")}>
+        <Row icon={ShieldCheck} label={t("account.privacyPolicy")} />
+        <Row icon={Trash2} label={t("account.deleteAccount")} danger />
+      </Section>
+      <Section title={t("account.sections.about")}>
+        <Row icon={FileText} label={t("account.terms")} />
+        <Row icon={Info} label={t("account.version")} value={Constants.expoConfig?.version ?? "—"} />
+      </Section>
+      <Section title={t("common.signOut")}>
+        <Row icon={LogOut} label={t("common.signOut")} onPress={signOut} />
+      </Section>
+    </ScrollView>
   );
 }
