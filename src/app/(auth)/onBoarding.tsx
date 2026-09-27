@@ -98,7 +98,7 @@ export default function Onboarding() {
       >
         <GlassPanel>
           <Text className="mb-2 text-2xl font-bold">{t("onboarding.title")}</Text>
-          <Text className="mb-6 text-base text-gray-500">
+          <Text className="mb-6 text-base text-text-muted">
             {t("onboarding.subtitle")}
           </Text>
 
@@ -172,13 +172,13 @@ export default function Onboarding() {
           />
 
           {avatarUri && (
-            <Text className="mt-2 text-sm text-gray-500">
+            <Text className="mt-2 text-sm text-text-muted">
               {t("onboarding.photoSelected")}
             </Text>
           )}
 
           {serverError && (
-            <Text className="mb-4 mt-4 text-center text-sm text-red-500">
+            <Text className="mb-4 mt-4 text-center text-sm text-danger">
               {t(serverError)}
             </Text>
           )}

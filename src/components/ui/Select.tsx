@@ -39,7 +39,7 @@ export function Select<T extends string>({
   return (
     <View className="mb-4">
       {label && (
-        <Text className="mb-2 text-sm font-medium text-[#2E2A28]">
+        <Text className="mb-2 text-sm font-medium text-brand-ink">
           {label}
         </Text>
       )}
@@ -47,13 +47,13 @@ export function Select<T extends string>({
       <Pressable
         onPress={() => setOpen(true)}
         disabled={disabled}
-        className={`h-[52px] flex-row items-center rounded-[5px] border bg-white px-4 ${
+        className={`h-[52px] flex-row items-center rounded-[5px] border bg-background px-4 ${
           error ? "border-danger" : "border-transparent"
         } ${disabled ? "opacity-50" : ""}`}
       >
         <Text
           className={`text-base ${
-            selectedOption ? "text-[#2E2A28]" : "text-[#9CA3AF]"
+            selectedOption ? "text-brand-ink" : "text-text-muted"
           }`}
         >
           {selectedOption?.label ?? placeholder ?? t("common.selectOption")}
@@ -69,14 +69,14 @@ export function Select<T extends string>({
         onRequestClose={() => setOpen(false)}
       >
         <Pressable
-          className="flex-1 justify-end bg-black/40"
+          className="flex-1 justify-end bg-overlay/40"
           onPress={() => setOpen(false)}
         >
           <Pressable
-            className="rounded-t-2xl bg-white px-6 pb-8 pt-5"
+            className="rounded-t-2xl bg-background px-6 pb-8 pt-5"
             onPress={(event) => event.stopPropagation()}
           >
-            <Text className="mb-4 text-lg font-semibold text-gray-900">
+            <Text className="mb-4 text-lg font-semibold text-text">
               {label}
             </Text>
 
@@ -88,12 +88,12 @@ export function Select<T extends string>({
                   key={option.value}
                   onPress={() => handleSelect(option.value)}
                   className={`rounded-lg px-4 py-4 ${
-                    selected ? "bg-gray-100" : ""
+                    selected ? "bg-surface" : ""
                   }`}
                 >
                   <Text
                     className={`text-base ${
-                      selected ? "font-semibold text-gray-900" : "text-gray-700"
+                      selected ? "font-semibold text-text" : "text-text-muted"
                     }`}
                   >
                     {option.label}
@@ -104,9 +104,9 @@ export function Select<T extends string>({
 
             <Pressable
               onPress={() => setOpen(false)}
-              className="mt-3 items-center rounded-lg bg-gray-200 py-3"
+              className="mt-3 items-center rounded-lg bg-surface-strong py-3"
             >
-              <Text className="font-semibold text-gray-900">{t("common.cancel")}</Text>
+              <Text className="font-semibold text-text">{t("common.cancel")}</Text>
             </Pressable>
           </Pressable>
         </Pressable>

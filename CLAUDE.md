@@ -33,6 +33,7 @@ Node 22 (`.nvmrc`). Pre-commit (Husky) corre typecheck; CI corre lint, typecheck
 src/app/            # rutas: _layout.tsx (gate único), (auth)/, (app)/ (NativeTabs; account/ con Stack)
 src/components/ui/  # Input, Button, Select, Avatar, ScreenHeader, GlassPanel, AuthBackground, OptionList, icons/
 src/hooks/          # useProfile, useUpsertProfile, useOAuth, useAvatar (permisos + selector + subida)
+src/constants/      # colors.json (tokens) + colors.tsx (useColors, contrastRatio, ForceLightScheme)
 src/squema/         # schemas Zod (mensajes = claves i18n)
 src/locales/        # en.json, es.json
 contexts/           # AuthContext
@@ -50,6 +51,7 @@ Alias `@/*` → `./src/*`. Tests en `__tests__/` junto al código.
 - `useProfile`: 404 = sin perfil (onboarding); 401 = sesión inválida (forzar `signOut`); otros errores se lanzan.
 - Supabase JS solo para auth; datos del backend con Axios + TanStack Query (sin `useState`/`useEffect` para fetching).
 - OAuth solo por `lib/auth/oauth.ts` (PKCE, deep link `mobileapp://auth/callback`).
+- Colores solo desde los tokens de `src/constants/colors.json`: clases `bg-surface`, `text-text-muted`… (sin `dark:` ni `gray-*`) y `useColors()` para valores crudos. Hay test de contraste y un test que falla con colores sueltos.
 - Ningún texto hardcodeado: todo por `t()` con claves en `en.json` y `es.json` (misma estructura; hay test de paridad).
 - Cada tab de `NativeTabs` es una ruta; íconos SF Symbols (iOS) / Material (Android).
 - Con `typedRoutes`, una ruta nueva no tipa hasta levantar Metro.

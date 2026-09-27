@@ -7,10 +7,10 @@ export default function Home() {
   const { t } = useTranslation();
 
   return (
-    <View className="flex-1 bg-white px-6 dark:bg-black">
+    <View className="flex-1 bg-background px-6">
       <ScreenHeader title={t("app.name")} onAvatarPress={() => router.push("/account")} />
       <View className="flex-1 items-center justify-center">
-        <Text className="text-xl font-semibold text-black dark:text-white">{t("home.welcome")}</Text>
+        <Text className="text-xl font-semibold text-text">{t("home.welcome")}</Text>
       </View>
     </View>
   );

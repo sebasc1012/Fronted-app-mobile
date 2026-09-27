@@ -13,7 +13,7 @@ export default function VerifyEmail() {
       <AuthBackground />
       <View className="flex-1 items-center justify-center px-6">
         <Text className="mb-2 text-xl font-semibold">{t("auth.verifyEmail.title")}</Text>
-        <Text className="mb-6 text-center text-gray-600">
+        <Text className="mb-6 text-center text-text-muted">
           {email
             ? t("auth.verifyEmail.message", { email })
             : t("auth.verifyEmail.messageNoEmail")}

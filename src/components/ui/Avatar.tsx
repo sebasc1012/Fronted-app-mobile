@@ -26,7 +26,7 @@ export function Avatar({ size = 44 }: { size?: number }) {
       accessible
       accessibilityRole="image"
       accessibilityLabel={t("account.avatar")}
-      className="items-center justify-center overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700"
+      className="items-center justify-center overflow-hidden rounded-full bg-surface-strong"
       style={{ width: size, height: size }}
     >
       {url && url !== failedUrl ? (
@@ -38,7 +38,7 @@ export function Avatar({ size = 44 }: { size?: number }) {
           onError={() => setFailedUrl(url)}
         />
       ) : (
-        <Text className="font-semibold text-gray-700 dark:text-gray-200" style={{ fontSize: size * 0.4 }}>
+        <Text className="font-semibold text-text-muted" style={{ fontSize: size * 0.4 }}>
           {getInitials(profile?.fullName, user?.email)}
         </Text>
       )}

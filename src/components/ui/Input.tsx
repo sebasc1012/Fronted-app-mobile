@@ -1,6 +1,7 @@
 import React, { forwardRef, useState } from "react";
 import { TextInput, TextInputProps, View, Text } from "react-native";
 import type { LucideIcon } from "lucide-react-native";
+import { useColors } from "../../constants/colors";
 
 type InputProps = TextInputProps & {
   label?: string;
@@ -11,6 +12,7 @@ type InputProps = TextInputProps & {
 export const Input = forwardRef<TextInput, InputProps>(
   ({ label, error, icon: Icon, ...props }, ref) => {
     const [isFocused, setIsFocused] = useState(false);
+    const colors = useColors();
 
     const borderStyle = error
       ? "border-danger"
@@ -21,26 +23,26 @@ export const Input = forwardRef<TextInput, InputProps>(
     return (
       <View className="mb-4">
         {label && (
-          <Text className="mb-2 text-sm font-medium text-[#2E2A28]">
+          <Text className="mb-2 text-sm font-medium text-brand-ink">
             {label}
           </Text>
         )}
 
         <View
-          className={`h-[52px] flex-row items-center rounded-[5px] border bg-white px-4 ${borderStyle}`}
+          className={`h-[52px] flex-row items-center rounded-[5px] border bg-background px-4 ${borderStyle}`}
         >
           {Icon && (
             <Icon
               size={20}
-              color={error ? "#DC2626" : isFocused ? "#4F46E5" : "#6B7280"}
+              color={error ? colors.danger : isFocused ? colors.primary : colors["text-muted"]}
             />
           )}
 
           <TextInput
             ref={ref}
-            className={`flex-1 text-base leading-[16px] text-[#2E2A28] ${Icon ? "ml-3" : ""}`}
+            className={`flex-1 text-base leading-[16px] text-brand-ink ${Icon ? "ml-3" : ""}`}
             textAlignVertical="center"
-            placeholderTextColor="#9CA3AF"
+            placeholderTextColor={colors["text-muted"]}
             onFocus={(event) => {
               setIsFocused(true);
               props.onFocus?.(event);

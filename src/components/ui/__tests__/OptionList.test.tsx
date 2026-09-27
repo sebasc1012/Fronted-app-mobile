@@ -1,5 +1,6 @@
 import { render, screen } from "@testing-library/react-native";
 import { OptionList } from "../OptionList";
+import { palettes } from "../../../constants/colors";
 
 let mockScheme = "light";
 jest.mock("react-native/Libraries/Utilities/useColorScheme", () => ({ __esModule: true, default: () => mockScheme }));
@@ -14,10 +15,10 @@ describe("OptionList", () => {
   it("follows the resolved color scheme (light → dark)", async () => {
     mockScheme = "light";
     await render(list());
-    expect(screen.getByTestId("check").props.color).toBe("#4F46E5");
+    expect(screen.getByTestId("check").props.color).toBe(palettes.light.primary);
 
     mockScheme = "dark"; // el sistema cambia a oscuro
     await screen.rerender(list());
-    expect(screen.getByTestId("check").props.color).toBe("#818CF8");
+    expect(screen.getByTestId("check").props.color).toBe(palettes.dark.primary);
   });
 });

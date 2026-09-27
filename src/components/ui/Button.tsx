@@ -1,5 +1,6 @@
 import React, { useState, type ReactNode } from "react";
 import { Pressable, Text, ActivityIndicator } from "react-native";
+import { useColors } from "../../constants/colors";
 
 type ButtonVariant = "primary" | "secondary" | "destructive" | "ghost" | "outline";
 
@@ -27,9 +28,11 @@ export function Button({
   radius,
 }: ButtonProps) {
   const [pressed, setPressed] = useState(false);
+  const colors = useColors();
 
   const isDisabled = disabled || loading;
-  const textColor = variant === "primary" || variant === "destructive" ? "#FFFFFF" : "#111827";
+  const textColor =
+    variant === "primary" ? colors["on-primary"] : variant === "destructive" ? colors["on-danger"] : colors.text;
   const background = color
     ? ""
     : variant === "primary"
@@ -37,8 +40,8 @@ export function Button({
       : variant === "destructive"
         ? "bg-danger"
         : variant === "outline"
-        ? "border border-gray-300"
-        : "bg-gray-200";
+        ? "border border-border"
+        : "bg-surface-strong";
   const roundedClass =
     radius === undefined ? (pill ? "rounded-full" : "rounded-2xl") : "";
 

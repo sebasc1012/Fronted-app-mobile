@@ -1,5 +1,5 @@
 import { Children, useRef, useState } from "react";
-import { ActivityIndicator, Alert, Modal, Platform, View, Text, Pressable, ScrollView, StyleSheet, useColorScheme } from "react-native";
+import { ActivityIndicator, Alert, Modal, Platform, View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTranslation } from "react-i18next";
 import Constants from "expo-constants";
@@ -22,6 +22,7 @@ import { useProfile } from "@/hooks/useProfile";
 import { useChangeAvatar, type AvatarSource } from "@/hooks/useAvatar";
 import { Avatar } from "../../../components/ui/Avatar";
 import { Button } from "../../../components/ui/Button";
+import { useColors } from "../../../constants/colors";
 
 type RowProps = {
   icon: LucideIcon;
@@ -33,18 +34,18 @@ type RowProps = {
 };
 
 function Row({ icon: Icon, label, onPress, danger, value, busy }: RowProps) {
-  const dark = useColorScheme() === "dark";
-  const color = danger ? "#DC2626" : dark ? "#FFFFFF" : "#000000";
+  const colors = useColors();
+  const color = danger ? colors.danger : colors.text;
   const content = (
     <>
       <Icon size={22} color={color} />
-      <Text className={`flex-1 text-base ${danger ? "text-danger" : "text-black dark:text-white"}`}>{label}</Text>
+      <Text className={`flex-1 text-base ${danger ? "text-danger" : "text-text"}`}>{label}</Text>
       {value ? (
-        <Text className="text-base text-gray-500 dark:text-gray-400">{value}</Text>
+        <Text className="text-base text-text-muted">{value}</Text>
       ) : busy ? (
         <ActivityIndicator />
       ) : (
-        <ChevronRight size={20} color={dark ? "#9CA3AF" : "#6B7280"} />
+        <ChevronRight size={20} color={colors["text-muted"]} />
       )}
     </>
   );
@@ -75,13 +76,13 @@ function Row({ icon: Icon, label, onPress, danger, value, busy }: RowProps) {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <View className="mt-6">
-      <Text accessibilityRole="header" className="mb-2 px-4 text-sm font-semibold uppercase text-gray-500 dark:text-gray-400">
+      <Text accessibilityRole="header" className="mb-2 px-4 text-sm font-semibold uppercase text-text-muted">
         {title}
       </Text>
-      <View className="overflow-hidden rounded-2xl bg-gray-100 dark:bg-gray-900">
+      <View className="overflow-hidden rounded-2xl bg-surface">
         {Children.toArray(children).map((child, i) => (
           <View key={i}>
-            {i > 0 && <View className="mx-4 h-px bg-gray-200 dark:bg-gray-800" />}
+            {i > 0 && <View className="mx-4 h-px bg-surface-strong" />}
             {child}
           </View>
         ))}
@@ -118,12 +119,12 @@ function AvatarMenu({ visible, onClose, onPick, onRemove }: AvatarMenuProps) {
       <View className="flex-1 justify-end">
         <Pressable
           style={StyleSheet.absoluteFill}
-          className="bg-black/40"
+          className="bg-overlay/40"
           onPress={onClose}
           accessibilityRole="button"
           accessibilityLabel={t("common.cancel")}
         />
-        <View accessibilityViewIsModal className="gap-3 rounded-t-3xl bg-white p-4 dark:bg-gray-900" style={{ paddingBottom: bottom + 16 }}>
+        <View accessibilityViewIsModal className="gap-3 rounded-t-3xl bg-surface p-4" style={{ paddingBottom: bottom + 16 }}>
           <Button title={t("avatar.takePhoto")} variant="secondary" onPress={() => choose(() => onPick("camera"))} />
           <Button title={t("avatar.chooseFromLibrary")} variant="secondary" onPress={() => choose(() => onPick("library"))} />
           {onRemove && <Button title={t("avatar.remove")} variant="destructive" onPress={() => choose(onRemove)} />}
@@ -138,15 +139,16 @@ function ProfileHeader() {
   const { t } = useTranslation();
   const { user } = useAuth();
   const { data: profile, isLoading, isError, refetch } = useProfile(true);
+  const colors = useColors();
   const { change, remove, isPending } = useChangeAvatar();
   const [menuOpen, setMenuOpen] = useState(false);
 
   if (!profile && isLoading) {
     return (
       <View testID="profile-skeleton" className="items-center gap-3">
-        <View className="h-28 w-28 animate-pulse rounded-full bg-gray-200 dark:bg-gray-800" />
-        <View className="h-6 w-40 animate-pulse rounded-md bg-gray-200 dark:bg-gray-800" />
-        <View className="h-4 w-52 animate-pulse rounded-md bg-gray-200 dark:bg-gray-800" />
+        <View className="h-28 w-28 animate-pulse rounded-full bg-surface-strong" />
+        <View className="h-6 w-40 animate-pulse rounded-md bg-surface-strong" />
+        <View className="h-4 w-52 animate-pulse rounded-md bg-surface-strong" />
       </View>
     );
   }
@@ -154,7 +156,7 @@ function ProfileHeader() {
   if (!profile && isError) {
     return (
       <View className="items-center gap-3">
-        <Text className="text-center text-base text-black dark:text-white">{t("account.loadError")}</Text>
+        <Text className="text-center text-base text-text">{t("account.loadError")}</Text>
         <Button title={t("common.retry")} onPress={() => refetch()} />
       </View>
     );
@@ -171,8 +173,8 @@ function ProfileHeader() {
       >
         <Avatar size={112} />
         {isPending && (
-          <View testID="avatar-uploading" className="absolute inset-0 items-center justify-center rounded-full bg-black/40">
-            <ActivityIndicator color="#FFFFFF" />
+          <View testID="avatar-uploading" className="absolute inset-0 items-center justify-center rounded-full bg-overlay/40">
+            <ActivityIndicator color={colors["on-overlay"]} />
           </View>
         )}
       </Pressable>
@@ -183,9 +185,9 @@ function ProfileHeader() {
         onRemove={profile?.avatarUrl ? remove : undefined}
       />
       {profile?.fullName && (
-        <Text className="mt-4 text-center text-2xl font-bold text-black dark:text-white">{profile.fullName}</Text>
+        <Text className="mt-4 text-center text-2xl font-bold text-text">{profile.fullName}</Text>
       )}
-      <Text className="mt-1 text-center text-base text-gray-600 dark:text-gray-400">{user?.email}</Text>
+      <Text className="mt-1 text-center text-base text-text-muted">{user?.email}</Text>
     </View>
   );
 }
@@ -212,7 +214,7 @@ export default function Account() {
 
   return (
     <ScrollView
-      className="flex-1 bg-white dark:bg-black"
+      className="flex-1 bg-background"
       contentContainerClassName="px-6"
       contentContainerStyle={{ paddingTop: top + 16, paddingBottom: bottom + 96 }}
     >

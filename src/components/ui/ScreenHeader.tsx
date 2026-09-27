@@ -15,7 +15,7 @@ export function ScreenHeader({ title, onAvatarPress }: ScreenHeaderProps) {
 
   return (
     <View className="flex-row items-center justify-between gap-4" style={{ paddingTop: top + 8 }}>
-      <Text className="flex-1 text-4xl font-bold text-black dark:text-white" numberOfLines={1}>
+      <Text className="flex-1 text-4xl font-bold text-text" numberOfLines={1}>
         {title}
       </Text>
       <Pressable onPress={onAvatarPress} accessibilityRole="button" accessibilityLabel={t("nav.account")}>

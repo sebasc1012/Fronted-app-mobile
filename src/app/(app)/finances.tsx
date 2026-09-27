@@ -6,8 +6,8 @@ export default function Finances() {
   const { t } = useTranslation();
 
   return (
-    <View className="flex-1 items-center justify-center bg-white dark:bg-black">
-      <Text className="text-2xl font-bold text-black dark:text-white">{t("nav.finances")}</Text>
+    <View className="flex-1 items-center justify-center bg-background">
+      <Text className="text-2xl font-bold text-text">{t("nav.finances")}</Text>
     </View>
   );
 }

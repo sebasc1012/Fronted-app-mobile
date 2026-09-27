@@ -6,8 +6,8 @@ export default function Library() {
   const { t } = useTranslation();
 
   return (
-    <View className="flex-1 items-center justify-center bg-white dark:bg-black">
-      <Text className="text-2xl font-bold text-black dark:text-white">{t("nav.library")}</Text>
+    <View className="flex-1 items-center justify-center bg-background">
+      <Text className="text-2xl font-bold text-text">{t("nav.library")}</Text>
     </View>
   );
 }

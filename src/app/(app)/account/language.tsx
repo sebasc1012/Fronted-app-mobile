@@ -18,7 +18,7 @@ export default function LanguageScreen() {
   };
 
   return (
-    <ScrollView className="flex-1 bg-white dark:bg-black" contentContainerClassName="px-6 pb-24" contentInsetAdjustmentBehavior="automatic">
+    <ScrollView className="flex-1 bg-background" contentContainerClassName="px-6 pb-24" contentInsetAdjustmentBehavior="automatic">
       <Stack.Screen options={{ headerShown: true, title: t("account.language") }} />
       <OptionList
         options={[

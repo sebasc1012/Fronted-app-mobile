@@ -1,5 +1,6 @@
-import { Pressable, Text, View, useColorScheme } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { Check } from "lucide-react-native";
+import { useColors } from "../../constants/colors";
 
 type OptionListProps<T extends string> = {
   options: { value: T; label: string }[];
@@ -9,13 +10,13 @@ type OptionListProps<T extends string> = {
 
 // Lista de opciones excluyentes (idioma, tema…): la activa lleva ✓ y se anuncia como marcada.
 export function OptionList<T extends string>({ options, selected, onSelect }: OptionListProps<T>) {
-  const dark = useColorScheme() === "dark";
+  const colors = useColors();
 
   return (
-    <View accessibilityRole="radiogroup" className="mt-4 overflow-hidden rounded-2xl bg-gray-100 dark:bg-gray-900">
+    <View accessibilityRole="radiogroup" className="mt-4 overflow-hidden rounded-2xl bg-surface">
       {options.map(({ value, label }, i) => (
         <View key={value}>
-          {i > 0 && <View className="mx-4 h-px bg-gray-200 dark:bg-gray-800" />}
+          {i > 0 && <View className="mx-4 h-px bg-surface-strong" />}
           <Pressable
             onPress={() => onSelect(value)}
             accessibilityRole="radio"
@@ -23,8 +24,8 @@ export function OptionList<T extends string>({ options, selected, onSelect }: Op
             accessibilityState={{ checked: selected === value }}
             className="min-h-12 flex-row items-center px-4 py-3 active:opacity-60"
           >
-            <Text className="flex-1 text-base text-black dark:text-white">{label}</Text>
-            {selected === value && <Check size={20} color={dark ? "#818CF8" : "#4F46E5"} />}
+            <Text className="flex-1 text-base text-text">{label}</Text>
+            {selected === value && <Check size={20} color={colors.primary} />}
           </Pressable>
         </View>
       ))}

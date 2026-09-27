@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 import { router, Link } from "expo-router";
 import { Input } from "../../components/ui/Input";
 import { Button } from "../../components/ui/Button";
+import { palettes } from "../../constants/colors";
 import { AuthBackground } from "../../components/ui/AuthBackground";
 import { GlassPanel } from "../../components/ui/GlassPanel";
 import { AppleIcon } from "../../components/ui/icons/AppleIcon";
@@ -61,7 +62,7 @@ export default function Signup() {
       <AuthBackground />
       <View className="flex-1 justify-center px-4">
         <GlassPanel>
-          <Text className="mb-8 text-2xl font-bold text-[#2E2A28]">
+          <Text className="mb-8 text-2xl font-bold text-brand-ink">
             {t("auth.signup.title")}
           </Text>
 
@@ -125,14 +126,14 @@ export default function Signup() {
             onPress={handleSubmit(onSubmit)}
             loading={loading}
             disabled={!!loadingProvider}
-            color="#8A6F56"
+            color={palettes.light["brand-accent"]}
             radius={10}
           />
 
           <View className="my-6 flex-row items-center">
-            <View className="h-px flex-1 bg-gray-300" />
-            <Text className="mx-3 text-sm text-gray-500">{t("auth.common.or")}</Text>
-            <View className="h-px flex-1 bg-gray-300" />
+            <View className="h-px flex-1 bg-border/40" />
+            <Text className="mx-3 text-sm text-text-muted">{t("auth.common.or")}</Text>
+            <View className="h-px flex-1 bg-border/40" />
           </View>
 
           <View className="gap-3">

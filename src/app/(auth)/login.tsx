@@ -6,6 +6,7 @@ import { Link } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { Input } from "../../components/ui/Input";
 import { Button } from "../../components/ui/Button";
+import { palettes } from "../../constants/colors";
 import { AuthBackground } from "../../components/ui/AuthBackground";
 import { GlassPanel } from "../../components/ui/GlassPanel";
 import { AppleIcon } from "../../components/ui/icons/AppleIcon";
@@ -85,7 +86,7 @@ export default function Login() {
             </Text>
           )}
 
-          <Text className="mb-6 text-right text-sm text-[#2E2A28]">
+          <Text className="mb-6 text-right text-sm text-brand-ink">
             {t("auth.login.forgotPassword")}
           </Text>
 
@@ -94,16 +95,16 @@ export default function Login() {
             onPress={handleSubmit(onSubmit)}
             loading={loading}
             disabled={!!loadingProvider}
-            color="#8A6F56"
+            color={palettes.light["brand-accent"]}
             radius={10}
           />
 
           <View className="my-6 flex-row items-center">
-            <View className="h-px flex-1 bg-gray-300" />
-            <Text className="mx-3 text-sm text-gray-500">
+            <View className="h-px flex-1 bg-border/40" />
+            <Text className="mx-3 text-sm text-text-muted">
               {t("auth.common.or")}
             </Text>
-            <View className="h-px flex-1 bg-gray-300" />
+            <View className="h-px flex-1 bg-border/40" />
           </View>
 
           <View className="gap-3">
