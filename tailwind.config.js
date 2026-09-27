@@ -1,6 +1,7 @@
 /** @type {import('tailwindcss').Config} */
-// Colores: única fuente en src/constants/colors.json (HU-05b). Los tokens semánticos son
-// variables CSS con valor claro y oscuro; los `brand-*` son fijos (diseño de auth).
+// Colores: única fuente en src/constants/colors.json (HU-05b). Cada token es una variable
+// CSS: claro en :root y oscuro con prefers-color-scheme. Las paletas de alto contraste
+// (HU-07) se aplican en tiempo de ejecución con vars() (ver ColorScope en colors.tsx).
 const tokens = require("./src/constants/colors.json");
 
 const channels = (hex) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)).join(" ");
@@ -16,12 +17,9 @@ module.exports = {
 
   theme: {
     extend: {
-      colors: {
-        ...Object.fromEntries(
-          Object.keys(tokens.light).map((name) => [name, `rgb(var(--color-${name}) / <alpha-value>)`]),
-        ),
-        ...tokens.brand,
-      },
+      colors: Object.fromEntries(
+        Object.keys(tokens.light).map((name) => [name, `rgb(var(--color-${name}) / <alpha-value>)`]),
+      ),
     },
   },
 

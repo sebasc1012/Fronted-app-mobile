@@ -1,6 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { act, renderHook } from "@testing-library/react-native";
-import { applyStoredFontScale, scaleFontStyle, setFontScaleLevel, useFontScale } from "../fontScale";
+import { applyStoredPreferences, scaleFontStyle, setFontScaleLevel, setHighContrast, useFontScale, usePreferences } from "../preferences";
 
 beforeEach(async () => {
   await setFontScaleLevel("normal");
@@ -24,7 +24,7 @@ describe("scaleFontStyle", () => {
 
 describe("text size level", () => {
   it("defaults to Normal (1.0) when nothing is saved", async () => {
-    await applyStoredFontScale();
+    await applyStoredPreferences();
     const { result } = await renderHook(() => useFontScale());
     expect(result.current).toEqual({ level: "normal", multiplier: 1 });
   });
@@ -42,8 +42,25 @@ describe("text size level", () => {
 
   it("applies the saved level at startup", async () => {
     (AsyncStorage.getItem as jest.Mock).mockResolvedValueOnce("large");
-    await applyStoredFontScale();
+    await applyStoredPreferences();
     const { result } = await renderHook(() => useFontScale());
     expect(result.current.level).toBe("large");
+  });
+});
+
+describe("high contrast", () => {
+  it("is off by default, saves changes and is applied at startup", async () => {
+    const { result } = await renderHook(() => usePreferences());
+    expect(result.current.highContrast).toBe(false);
+
+    await act(() => setHighContrast(true));
+    expect(result.current.highContrast).toBe(true);
+    expect(AsyncStorage.setItem).toHaveBeenCalledWith("pref.highContrast", "true");
+
+    await act(() => setHighContrast(false));
+    (AsyncStorage.getItem as jest.Mock).mockImplementation(async (key: string) => (key === "pref.highContrast" ? "true" : null));
+    await act(() => applyStoredPreferences());
+    expect(result.current.highContrast).toBe(true);
+    await act(() => setHighContrast(false));
   });
 });

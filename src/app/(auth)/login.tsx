@@ -7,7 +7,7 @@ import { Link } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { Input } from "../../components/ui/Input";
 import { Button } from "../../components/ui/Button";
-import { palettes } from "../../constants/colors";
+import { useColors } from "../../constants/colors";
 import { AuthBackground } from "../../components/ui/AuthBackground";
 import { GlassPanel } from "../../components/ui/GlassPanel";
 import { AppleIcon } from "../../components/ui/icons/AppleIcon";
@@ -22,6 +22,7 @@ import { loginSchema, LoginForm } from "@/squema/auth.schema";
 
 export default function Login() {
   const { t } = useTranslation();
+  const colors = useColors();
   const { signIn } = useAuth();
   const { handleOAuth, loadingProvider, oauthError } = useOAuth();
   const [serverError, setServerError] = useState<string | null>(null);
@@ -100,7 +101,7 @@ export default function Login() {
             onPress={handleSubmit(onSubmit)}
             loading={loading}
             disabled={!!loadingProvider}
-            color={palettes.light["brand-accent"]}
+            color={colors["brand-accent"]}
             radius={10}
           />
 

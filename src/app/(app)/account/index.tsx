@@ -1,5 +1,5 @@
 import { Children, useRef, useState } from "react";
-import { ActivityIndicator, Alert, Modal, Platform, View, Pressable, ScrollView, StyleSheet } from "react-native";
+import { ActivityIndicator, Alert, Modal, Platform, Switch, View, Pressable, ScrollView, StyleSheet } from "react-native";
 import { AppText } from "@/components/ui/AppText";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTranslation } from "react-i18next";
@@ -9,6 +9,7 @@ import {
   ALargeSmall,
   Bell,
   ChevronRight,
+  Contrast,
   FileText,
   Info,
   Languages,
@@ -23,7 +24,8 @@ import { useProfile } from "@/hooks/useProfile";
 import { useChangeAvatar, type AvatarSource } from "@/hooks/useAvatar";
 import { Avatar } from "../../../components/ui/Avatar";
 import { Button } from "../../../components/ui/Button";
-import { useColors } from "../../../constants/colors";
+import { useColors, useHighContrastBorder } from "../../../constants/colors";
+import { setHighContrast, usePreferences } from "../../../../lib/preferences";
 
 type RowProps = {
   icon: LucideIcon;
@@ -74,13 +76,48 @@ function Row({ icon: Icon, label, onPress, danger, value, busy }: RowProps) {
   );
 }
 
+// Fila con interruptor: toda la fila es un único elemento "switch" para el lector de pantalla.
+function SwitchRow({ icon: Icon, label, description, value, onValueChange }: {
+  icon: LucideIcon;
+  label: string;
+  description: string;
+  value: boolean;
+  onValueChange: (value: boolean) => void;
+}) {
+  const colors = useColors();
+  return (
+    <Pressable
+      onPress={() => onValueChange(!value)}
+      accessibilityRole="switch"
+      accessibilityLabel={label}
+      accessibilityHint={description}
+      accessibilityState={{ checked: value }}
+      className="min-h-12 flex-row items-center gap-4 px-4 py-3"
+    >
+      <Icon size={22} color={colors.text} />
+      <View className="flex-1">
+        <AppText className="text-base text-text">{label}</AppText>
+        <AppText className="text-sm text-text-muted">{description}</AppText>
+      </View>
+      <Switch
+        value={value}
+        onValueChange={onValueChange}
+        trackColor={{ true: colors.primary, false: colors["surface-strong"] }}
+        accessibilityElementsHidden
+        importantForAccessibility="no-hide-descendants"
+      />
+    </Pressable>
+  );
+}
+
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  const hcBorder = useHighContrastBorder();
   return (
     <View className="mt-6">
       <AppText accessibilityRole="header" className="mb-2 px-4 text-sm font-semibold uppercase text-text-muted">
         {title}
       </AppText>
-      <View className="overflow-hidden rounded-2xl bg-surface">
+      <View className={`overflow-hidden rounded-2xl bg-surface ${hcBorder}`}>
         {Children.toArray(children).map((child, i) => (
           <View key={i}>
             {i > 0 && <View className="mx-4 h-px bg-surface-strong" />}
@@ -102,6 +139,7 @@ type AvatarMenuProps = {
 
 function AvatarMenu({ visible, onClose, onPick, onRemove }: AvatarMenuProps) {
   const { t } = useTranslation();
+  const colors = useColors();
   const { bottom } = useSafeAreaInsets();
   // iOS no puede presentar otra vista (cámara, galería, Alert) mientras el Modal se cierra: se espera a onDismiss.
   const chosen = useRef<(() => void) | null>(null);
@@ -128,7 +166,14 @@ function AvatarMenu({ visible, onClose, onPick, onRemove }: AvatarMenuProps) {
         <View accessibilityViewIsModal className="gap-3 rounded-t-3xl bg-surface p-4" style={{ paddingBottom: bottom + 16 }}>
           <Button title={t("avatar.takePhoto")} variant="secondary" onPress={() => choose(() => onPick("camera"))} />
           <Button title={t("avatar.chooseFromLibrary")} variant="secondary" onPress={() => choose(() => onPick("library"))} />
-          {onRemove && <Button title={t("avatar.remove")} variant="destructive" onPress={() => choose(onRemove)} />}
+          {onRemove && (
+            <Button
+              title={t("avatar.remove")}
+              variant="destructive"
+              icon={<Trash2 size={18} color={colors["on-danger"]} />}
+              onPress={() => choose(onRemove)}
+            />
+          )}
           <Button title={t("common.cancel")} variant="outline" onPress={onClose} />
         </View>
       </View>
@@ -198,6 +243,7 @@ export default function Account() {
   const { signOut } = useAuth();
   const { top, bottom } = useSafeAreaInsets();
   const [signingOut, setSigningOut] = useState(false);
+  const { highContrast } = usePreferences();
 
   // Sin navegar a mano: al quedar session en null, el gate del root muestra (auth).
   const confirmSignOut = () =>
@@ -227,6 +273,13 @@ export default function Account() {
       </Section>
       <Section title={t("account.sections.accessibility")}>
         <Row icon={ALargeSmall} label={t("account.textSize")} onPress={() => router.push("/account/text-size")} />
+        <SwitchRow
+          icon={Contrast}
+          label={t("account.highContrast")}
+          description={t("account.highContrastHint")}
+          value={highContrast}
+          onValueChange={setHighContrast}
+        />
       </Section>
       <Section title={t("account.sections.privacy")}>
         <Row icon={ShieldCheck} label={t("account.privacyPolicy")} />

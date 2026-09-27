@@ -1,7 +1,7 @@
 import "../../global.css";
 import { applyStoredLanguage } from "../../lib/i18n";
 import { applyStoredTheme } from "../../lib/theme";
-import { applyStoredFontScale } from "../../lib/fontScale";
+import { applyStoredPreferences } from "../../lib/preferences";
 import { StatusBar } from "expo-status-bar";
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
@@ -10,6 +10,7 @@ import { AuthProvider, useAuth } from "../../contexts/AuthContext";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "../../lib/queryClient";
 import { useProfile } from "../hooks/useProfile";
+import { ColorScope } from "../constants/colors";
 import { useEffect, useState } from "react";
 
 SplashScreen.preventAutoHideAsync();
@@ -22,7 +23,7 @@ function RootNavigation() {
   const isReady = !authLoading && !profileLoading && prefsReady;
 
   useEffect(() => {
-    Promise.all([applyStoredLanguage(), applyStoredTheme(), applyStoredFontScale()]).finally(() => setPrefsReady(true));
+    Promise.all([applyStoredLanguage(), applyStoredTheme(), applyStoredPreferences()]).finally(() => setPrefsReady(true));
   }, []);
 
   useEffect(() => {
@@ -55,7 +56,9 @@ export default function Root() {
           value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
         >
           <StatusBar style="auto" />
-          <RootNavigation />
+          <ColorScope>
+            <RootNavigation />
+          </ColorScope>
         </ThemeProvider>
       </AuthProvider>
     </QueryClientProvider>

@@ -1,7 +1,7 @@
 import React, { useState, type ReactNode } from "react";
 import { Pressable, ActivityIndicator } from "react-native";
 import { AppText } from "@/components/ui/AppText";
-import { useColors } from "../../constants/colors";
+import { useColors, useHighContrastBorder } from "../../constants/colors";
 
 type ButtonVariant = "primary" | "secondary" | "destructive" | "ghost" | "outline";
 
@@ -30,6 +30,7 @@ export function Button({
 }: ButtonProps) {
   const [pressed, setPressed] = useState(false);
   const colors = useColors();
+  const hcBorder = useHighContrastBorder();
 
   const isDisabled = disabled || loading;
   const textColor =
@@ -54,7 +55,7 @@ export function Button({
       accessibilityState={{ disabled: isDisabled, busy: loading }}
       onPressIn={() => setPressed(true)}
       onPressOut={() => setPressed(false)}
-      className={`min-h-[52px] flex-row items-center px-4 py-3 justify-center overflow-hidden ${roundedClass} ${background} ${isDisabled ? "opacity-50" : ""}`}
+      className={`min-h-[52px] flex-row items-center px-4 py-3 justify-center overflow-hidden ${roundedClass} ${background} ${hcBorder} ${isDisabled ? "opacity-50" : ""}`}
       style={{
         transform: [{ scale: pressed && !isDisabled ? 0.98 : 1 }],
         ...(color ? { backgroundColor: color } : {}),

@@ -1,7 +1,8 @@
 import { Alert, Platform } from "react-native";
 import { act, render, screen, fireEvent } from "@testing-library/react-native";
 import Account from "../index";
-import { setFontScaleLevel } from "../../../../../lib/fontScale";
+import { setFontScaleLevel, setHighContrast, getFontScaleLevel } from "../../../../../lib/preferences";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import { useProfile } from "@/hooks/useProfile";
 
@@ -62,7 +63,7 @@ describe("Account panel", () => {
     const texts = screen.getAllByText(/^(account|common)\./).map((n) => n.props.children);
     expect(texts).toEqual([
       "account.sections.preferences", "account.theme", "account.language", "account.notifications",
-      "account.sections.accessibility", "account.textSize",
+      "account.sections.accessibility", "account.textSize", "account.highContrast", "account.highContrastHint",
       "account.sections.privacy", "account.privacyPolicy", "account.deleteAccount",
       "account.sections.about", "account.terms", "account.version",
       "common.signOut", "common.signOut",
@@ -184,5 +185,20 @@ describe("Account panel", () => {
     await render(<Account />);
     expect(screen.toJSON()).toMatchSnapshot();
     await setFontScaleLevel("normal");
+  });
+
+  it("the High contrast switch reflects the preference and toggles it", async () => {
+    await setHighContrast(false);
+    mockProfile({ data: { fullName: "Seba", avatarUrl: null } });
+    await render(<Account />);
+    const row = screen.getByRole("switch", { name: "account.highContrast" });
+    expect(row.props.accessibilityState.checked).toBe(false);
+
+    await fireEvent.press(row);
+
+    expect(screen.getByRole("switch", { name: "account.highContrast" }).props.accessibilityState.checked).toBe(true);
+    expect(AsyncStorage.setItem).toHaveBeenCalledWith("pref.highContrast", "true");
+    await setHighContrast(false);
+    expect(getFontScaleLevel()).toBe("normal");
   });
 });

@@ -1,8 +1,8 @@
 import React, { forwardRef, useState } from "react";
 import { View, type TextInput, type TextInputProps } from "react-native";
 import { AppText, AppTextInput } from "@/components/ui/AppText";
-import type { LucideIcon } from "lucide-react-native";
-import { useColors } from "../../constants/colors";
+import { CircleAlert, type LucideIcon } from "lucide-react-native";
+import { useColors, useHighContrastBorder } from "../../constants/colors";
 
 type InputProps = TextInputProps & {
   label?: string;
@@ -14,12 +14,15 @@ export const Input = forwardRef<TextInput, InputProps>(
   ({ label, error, icon: Icon, ...props }, ref) => {
     const [isFocused, setIsFocused] = useState(false);
     const colors = useColors();
+    const highContrast = useHighContrastBorder() !== "";
 
     const borderStyle = error
       ? "border-danger"
       : isFocused
         ? "border-primary"
-        : "border-transparent";
+        : highContrast
+          ? "border-border"
+          : "border-transparent";
 
     return (
       <View className="mb-4">
@@ -30,7 +33,7 @@ export const Input = forwardRef<TextInput, InputProps>(
         )}
 
         <View
-          className={`min-h-[52px] flex-row items-center rounded-[5px] border bg-background px-4 ${borderStyle}`}
+          className={`min-h-[52px] flex-row items-center rounded-[5px] ${highContrast ? "border-2" : "border"} bg-background px-4 ${borderStyle}`}
         >
           {Icon && (
             <Icon
@@ -56,10 +59,21 @@ export const Input = forwardRef<TextInput, InputProps>(
           />
         </View>
 
-        {error && <AppText className="mt-1.5 text-xs text-danger">{error}</AppText>}
+        {error && <FieldError message={error} />}
       </View>
     );
   },
 );
 
 Input.displayName = "Input";
+
+// Error de un campo: texto + ícono, no solo el color (HU-07).
+export function FieldError({ message }: { message: string }) {
+  const colors = useColors();
+  return (
+    <View className="mt-1.5 flex-row items-center gap-1">
+      <CircleAlert size={14} color={colors.danger} accessibilityElementsHidden importantForAccessibility="no-hide-descendants" />
+      <AppText className="shrink text-xs text-danger">{message}</AppText>
+    </View>
+  );
+}

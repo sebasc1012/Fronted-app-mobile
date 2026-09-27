@@ -97,7 +97,9 @@
       "accessibility": "Accesibilidad",
       "privacy": "Privacidad",
       "about": "Acerca de"
-    }
+    },
+    "highContrast": "Alto contraste",
+    "highContrastHint": "Aumenta el contraste de textos, botones y bordes"
   },
   "avatar": {
     "change": "Cambiar foto de perfil",

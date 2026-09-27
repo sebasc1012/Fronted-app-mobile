@@ -1,6 +1,7 @@
-import { contrastRatio, palettes, type Palette } from "../colors";
+import { contrastRatio, palettes, resolvePalette, type Palette } from "../colors";
 
 jest.mock("nativewind", () => ({ vars: (v: object) => v }));
+jest.mock("../../../lib/preferences", () => ({ usePreferences: () => ({ highContrast: false }) }));
 
 type Pair = [foreground: keyof Palette, background: keyof Palette];
 
@@ -25,7 +26,8 @@ const AUTH_TEXT_PAIRS: Pair[] = [
 ];
 const AUTH_UI_PAIRS: Pair[] = [["border", "brand-sand"], ["primary", "background"], ["danger", "background"]];
 
-const cases = (pairs: Pair[], schemes: (keyof typeof palettes)[]) =>
+type PaletteName = keyof typeof palettes;
+const cases = (pairs: Pair[], schemes: PaletteName[]) =>
   schemes.flatMap((scheme) => pairs.map(([fg, bg]) => [`${fg} / ${bg} (${scheme})`, palettes[scheme][fg], palettes[scheme][bg]]));
 
 describe("contrastRatio", () => {
@@ -34,6 +36,27 @@ describe("contrastRatio", () => {
     expect(contrastRatio("#FFFFFF", "#000000")).toBeCloseTo(21);
     expect(contrastRatio("#4F46E5", "#4F46E5")).toBe(1);
   });
+});
+
+describe("resolvePalette", () => {
+  it("returns the right palette for the 4 combinations", () => {
+    expect(resolvePalette("light", false)).toBe(palettes.light);
+    expect(resolvePalette("dark", false)).toBe(palettes.dark);
+    expect(resolvePalette("light", true)).toBe(palettes.lightHC);
+    expect(resolvePalette("dark", true)).toBe(palettes.darkHC);
+  });
+});
+
+describe("high contrast (HU-07, WCAG AAA)", () => {
+  it.each(cases(TEXT_PAIRS, ["lightHC", "darkHC"]).concat(cases(AUTH_TEXT_PAIRS, ["lightHC"])))(
+    "text %s ≥ 7:1",
+    (_name, fg, bg) => expect(contrastRatio(fg, bg)).toBeGreaterThanOrEqual(7),
+  );
+
+  it.each(cases(UI_PAIRS, ["lightHC", "darkHC"]).concat(cases(AUTH_UI_PAIRS, ["lightHC"])))(
+    "icon/border %s ≥ 4.5:1",
+    (_name, fg, bg) => expect(contrastRatio(fg, bg)).toBeGreaterThanOrEqual(4.5),
+  );
 });
 
 describe("token contrast", () => {

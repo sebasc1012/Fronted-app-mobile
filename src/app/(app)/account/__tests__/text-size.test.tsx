@@ -1,7 +1,7 @@
 import { StyleSheet } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { render, screen, fireEvent, within } from "@testing-library/react-native";
-import { setFontScaleLevel } from "../../../../../lib/fontScale";
+import { setFontScaleLevel } from "../../../../../lib/preferences";
 import TextSizeScreen from "../text-size";
 
 jest.mock("react-i18next", () => ({ useTranslation: () => ({ t: (k: string) => k }) }));

@@ -1,19 +1,23 @@
 import { createContext, useContext, type ReactNode } from "react";
 import { View, useColorScheme } from "react-native";
 import { vars } from "nativewind";
+import { usePreferences } from "../../lib/preferences";
 import tokens from "./colors.json";
 
-// Única fuente de color de la app (HU-05b): colors.json. Las clases (`bg-surface`,
-// `text-text-muted`…) la leen vía tailwind.config.js; este archivo da los valores crudos
-// para lo que no acepta clases (íconos, tintColor, SVG).
+// Única fuente de color de la app (HU-05b): colors.json, con 4 paletas (claro, oscuro y
+// sus versiones de alto contraste, HU-07). Las clases (`bg-surface`, `text-text-muted`…)
+// leen variables CSS; este archivo da los valores crudos (íconos, tintColor, SVG) y
+// aplica la paleta activa a las variables con <ColorScope>.
 
 export type ColorScheme = "light" | "dark";
-export type Palette = typeof tokens.light & typeof tokens.brand;
+export type Palette = typeof tokens.light;
 
-export const palettes: Record<ColorScheme, Palette> = {
-  light: { ...tokens.light, ...tokens.brand },
-  dark: { ...tokens.dark, ...tokens.brand },
-};
+export const palettes = tokens;
+
+export function resolvePalette(scheme: ColorScheme, highContrast: boolean): Palette {
+  if (highContrast) return scheme === "dark" ? tokens.darkHC : tokens.lightHC;
+  return scheme === "dark" ? tokens.dark : tokens.light;
+}
 
 // Luminancia relativa y relación de contraste de WCAG 2.x (de 1 a 21).
 function luminance(hex: string) {
@@ -29,29 +33,41 @@ export function contrastRatio(a: string, b: string) {
   return (light + 0.05) / (dark + 0.05);
 }
 
-// Las pantallas de auth tienen diseño claro fijo: dentro de <ForceLightScheme> las
-// clases y useColors() resuelven siempre los valores claros, aunque el tema sea oscuro.
-const ForcedScheme = createContext<ColorScheme | null>(null);
+const toVars = (palette: Palette) =>
+  vars(
+    Object.fromEntries(
+      Object.entries(palette).map(([name, hex]) => [
+        `--color-${name}`,
+        [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)).join(" "),
+      ]),
+    ),
+  );
 
-const lightVars = vars(
-  Object.fromEntries(
-    Object.entries(tokens.light).map(([name, hex]) => [
-      `--color-${name}`,
-      [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)).join(" "),
-    ]),
-  ),
-);
+const ScopeScheme = createContext<ColorScheme | null>(null);
 
-export function ForceLightScheme({ children }: { children: ReactNode }) {
+// Aplica a su subárbol la paleta activa (tema × alto contraste) como variables CSS.
+// `forceScheme="light"`: las pantallas de auth tienen diseño claro fijo en ambos temas.
+export function ColorScope({ forceScheme, children }: { forceScheme?: ColorScheme; children: ReactNode }) {
+  const system = useColorScheme();
+  const parent = useContext(ScopeScheme);
+  const { highContrast } = usePreferences();
+  const scheme = forceScheme ?? parent ?? (system === "dark" ? "dark" : "light");
+
   return (
-    <ForcedScheme.Provider value="light">
-      <View style={[{ flex: 1 }, lightVars]}>{children}</View>
-    </ForcedScheme.Provider>
+    <ScopeScheme.Provider value={scheme}>
+      <View style={[{ flex: 1 }, toVars(resolvePalette(scheme, highContrast))]}>{children}</View>
+    </ScopeScheme.Provider>
   );
 }
 
 export function useColors(): Palette {
   const system = useColorScheme();
-  const scheme = useContext(ForcedScheme) ?? (system === "dark" ? "dark" : "light");
-  return palettes[scheme];
+  const scoped = useContext(ScopeScheme);
+  const { highContrast } = usePreferences();
+  return resolvePalette(scoped ?? (system === "dark" ? "dark" : "light"), highContrast);
+}
+
+// HU-07: con alto contraste, botones, campos, selectores y grupos de filas llevan borde visible.
+export function useHighContrastBorder() {
+  return usePreferences().highContrast ? "border-2 border-border" : "";
 }

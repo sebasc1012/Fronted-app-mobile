@@ -7,7 +7,7 @@ import { useTranslation } from "react-i18next";
 import { router, Link } from "expo-router";
 import { Input } from "../../components/ui/Input";
 import { Button } from "../../components/ui/Button";
-import { palettes } from "../../constants/colors";
+import { useColors } from "../../constants/colors";
 import { AuthBackground } from "../../components/ui/AuthBackground";
 import { GlassPanel } from "../../components/ui/GlassPanel";
 import { AppleIcon } from "../../components/ui/icons/AppleIcon";
@@ -21,6 +21,7 @@ import { signupSchema, SignupForm } from "@/squema/auth.schema";
 
 export default function Signup() {
   const { t } = useTranslation();
+  const colors = useColors();
   const { signUp } = useAuth();
   const { handleOAuth, loadingProvider, oauthError } = useOAuth();
   const [serverError, setServerError] = useState<string | null>(null);
@@ -131,7 +132,7 @@ export default function Signup() {
             onPress={handleSubmit(onSubmit)}
             loading={loading}
             disabled={!!loadingProvider}
-            color={palettes.light["brand-accent"]}
+            color={colors["brand-accent"]}
             radius={10}
           />
 

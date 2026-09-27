@@ -1,6 +1,6 @@
 import { StyleSheet, type TextStyle } from "react-native";
 import { act, render, screen } from "@testing-library/react-native";
-import { setFontScaleLevel } from "../../../../lib/fontScale";
+import { setFontScaleLevel } from "../../../../lib/preferences";
 import { AppText, AppTextInput } from "../AppText";
 import { Input } from "../Input";
 

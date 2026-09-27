@@ -2,7 +2,7 @@ import { forwardRef } from "react";
 // eslint-disable-next-line @typescript-eslint/no-restricted-imports -- único punto donde se usan Text y TextInput de RN
 import { Text, TextInput, type TextInputProps, type TextProps } from "react-native";
 import { cssInterop } from "nativewind";
-import { scaleFontStyle, useFontScale } from "../../../lib/fontScale";
+import { scaleFontStyle, useFontScale } from "../../../lib/preferences";
 
 // Texto de la app (HU-06): aplica el nivel de tamaño elegido encima del tamaño del
 // sistema, con tope total MAX_TOTAL_SCALE. `allowFontScaling={false}` lo deja fijo.

@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Modal, Pressable, View } from "react-native";
 import { AppText } from "@/components/ui/AppText";
 import { useTranslation } from "react-i18next";
+import { useHighContrastBorder } from "../../constants/colors";
+import { FieldError } from "./Input";
 
 export type SelectOption<T extends string> = {
   label: string;
@@ -29,6 +31,8 @@ export function Select<T extends string>({
 }: SelectProps<T>) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
+  const highContrast = useHighContrastBorder() !== "";
+  const borderStyle = error ? "border-danger" : highContrast ? "border-border" : "border-transparent";
 
   const selectedOption = options.find((option) => option.value === value);
 
@@ -48,9 +52,7 @@ export function Select<T extends string>({
       <Pressable
         onPress={() => setOpen(true)}
         disabled={disabled}
-        className={`min-h-[52px] flex-row items-center py-3 rounded-[5px] border bg-background px-4 ${
-          error ? "border-danger" : "border-transparent"
-        } ${disabled ? "opacity-50" : ""}`}
+        className={`min-h-[52px] flex-row items-center py-3 rounded-[5px] ${highContrast ? "border-2" : "border"} bg-background px-4 ${borderStyle} ${disabled ? "opacity-50" : ""}`}
       >
         <AppText
           className={`text-base ${
@@ -61,7 +63,7 @@ export function Select<T extends string>({
         </AppText>
       </Pressable>
 
-      {error && <AppText className="mt-1.5 text-xs text-danger">{error}</AppText>}
+      {error && <FieldError message={error} />}
 
       <Modal
         visible={open}

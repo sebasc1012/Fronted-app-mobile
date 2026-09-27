@@ -21,4 +21,10 @@ describe("OptionList", () => {
     await screen.rerender(list());
     expect(screen.getByTestId("check").props.color).toBe(palettes.dark.primary);
   });
+
+  it("marks the active option with ✓ and a selected state, not only a color", async () => {
+    await render(list());
+    expect(screen.getByRole("radio", { name: "A" }).props.accessibilityState).toMatchObject({ selected: true, checked: true });
+    expect(screen.getByTestId("check")).toBeTruthy();
+  });
 });

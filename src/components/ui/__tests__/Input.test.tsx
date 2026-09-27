@@ -1,5 +1,7 @@
 import { render, screen, fireEvent } from "@testing-library/react-native";
 import { Input } from "../Input";
+import { Button } from "../Button";
+import { setHighContrast } from "../../../../lib/preferences";
 
 describe("Input", () => {
   it("renders the label", async () => {
@@ -37,5 +39,27 @@ describe("Input", () => {
 
     await fireEvent(field, "blur");
     expect(onBlur).toHaveBeenCalled();
+  });
+
+  it("shows the error with an alert icon, not only the red color", async () => {
+    await render(<Input label="Email" error="Required" />);
+    expect(screen.getByText("Required")).toBeTruthy();
+    expect(screen.getByTestId("icon-CircleAlert", { includeHiddenElements: true })).toBeTruthy(); // decorativo: oculto al lector
+  });
+});
+
+describe("high contrast borders", () => {
+  afterEach(() => setHighContrast(false));
+
+  it("Input and Button get a visible border only with high contrast on", async () => {
+    await render(<><Input placeholder="Correo" /><Button title="Seguir" onPress={() => {}} /></>);
+    const field = () => screen.getByPlaceholderText("Correo").parent!;
+    expect(field().props.className).not.toContain("border-2");
+    expect(screen.getByRole("button", { name: "Seguir" }).props.className).not.toContain("border-2");
+
+    await setHighContrast(true);
+    await screen.rerender(<><Input placeholder="Correo" /><Button title="Seguir" onPress={() => {}} /></>);
+    expect(field().props.className).toContain("border-2 bg-background px-4 border-border");
+    expect(screen.getByRole("button", { name: "Seguir" }).props.className).toContain("border-2 border-border");
   });
 });

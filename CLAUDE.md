@@ -33,7 +33,7 @@ Node 22 (`.nvmrc`). Pre-commit (Husky) corre typecheck; CI corre lint, typecheck
 src/app/            # rutas: _layout.tsx (gate único), (auth)/, (app)/ (NativeTabs; account/ con Stack)
 src/components/ui/  # AppText, Input, Button, Select, Avatar, ScreenHeader, GlassPanel, AuthBackground, OptionList, icons/
 src/hooks/          # useProfile, useUpsertProfile, useOAuth, useAvatar (permisos + selector + subida)
-src/constants/      # colors.json (tokens) + colors.tsx (useColors, contrastRatio, ForceLightScheme)
+src/constants/      # colors.json (4 paletas) + colors.tsx (useColors, ColorScope, resolvePalette, contrastRatio)
 src/squema/         # schemas Zod (mensajes = claves i18n)
 src/locales/        # en.json, es.json
 contexts/           # AuthContext

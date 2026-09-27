@@ -117,7 +117,7 @@ exports[`Account panel renders at 'Extra large' text size without errors (snapsh
         account.sections.preferences
       </Text>
       <View
-        className="overflow-hidden rounded-2xl bg-surface"
+        className="overflow-hidden rounded-2xl bg-surface "
       >
         <View>
           <View
@@ -295,7 +295,7 @@ exports[`Account panel renders at 'Extra large' text size without errors (snapsh
         account.sections.accessibility
       </Text>
       <View
-        className="overflow-hidden rounded-2xl bg-surface"
+        className="overflow-hidden rounded-2xl bg-surface "
       >
         <View>
           <View
@@ -347,6 +347,93 @@ exports[`Account panel renders at 'Extra large' text size without errors (snapsh
             </Text>
           </View>
         </View>
+        <View>
+          <View
+            className="mx-4 h-px bg-surface-strong"
+          />
+          <View
+            accessibilityHint="account.highContrastHint"
+            accessibilityLabel="account.highContrast"
+            accessibilityRole="switch"
+            accessibilityState={
+              {
+                "busy": undefined,
+                "checked": false,
+                "disabled": undefined,
+                "expanded": undefined,
+                "selected": undefined,
+              }
+            }
+            accessibilityValue={
+              {
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
+              }
+            }
+            accessible={true}
+            className="min-h-12 flex-row items-center gap-4 px-4 py-3"
+            collapsable={false}
+            focusable={true}
+            onBlur={[Function]}
+            onClick={[Function]}
+            onFocus={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+          >
+            <View
+              className="flex-1"
+            >
+              <Text
+                maxFontSizeMultiplier={1.5384615384615383}
+                style={
+                  [
+                    undefined,
+                    {
+                      "fontSize": 18.2,
+                    },
+                  ]
+                }
+              >
+                account.highContrast
+              </Text>
+              <Text
+                maxFontSizeMultiplier={1.5384615384615383}
+                style={
+                  [
+                    undefined,
+                    {
+                      "fontSize": 18.2,
+                    },
+                  ]
+                }
+              >
+                account.highContrastHint
+              </Text>
+            </View>
+            <RCTSwitch
+              accessibilityElementsHidden={true}
+              accessibilityRole="switch"
+              importantForAccessibility="no-hide-descendants"
+              onChange={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              onTintColor="#4338CA"
+              style={
+                {
+                  "alignSelf": "flex-start",
+                }
+              }
+              tintColor="#E5E7EB"
+              value={false}
+            />
+          </View>
+        </View>
       </View>
     </View>
     <View
@@ -367,7 +454,7 @@ exports[`Account panel renders at 'Extra large' text size without errors (snapsh
         account.sections.privacy
       </Text>
       <View
-        className="overflow-hidden rounded-2xl bg-surface"
+        className="overflow-hidden rounded-2xl bg-surface "
       >
         <View>
           <View
@@ -492,7 +579,7 @@ exports[`Account panel renders at 'Extra large' text size without errors (snapsh
         account.sections.about
       </Text>
       <View
-        className="overflow-hidden rounded-2xl bg-surface"
+        className="overflow-hidden rounded-2xl bg-surface "
       >
         <View>
           <View
@@ -601,7 +688,7 @@ exports[`Account panel renders at 'Extra large' text size without errors (snapsh
         common.signOut
       </Text>
       <View
-        className="overflow-hidden rounded-2xl bg-surface"
+        className="overflow-hidden rounded-2xl bg-surface "
       >
         <View>
           <View

@@ -2,12 +2,12 @@ import { act, render } from "@testing-library/react-native";
 import * as SplashScreen from "expo-splash-screen";
 import { applyStoredLanguage } from "../../../lib/i18n";
 import { applyStoredTheme } from "../../../lib/theme";
-import { applyStoredFontScale } from "../../../lib/fontScale";
+import { applyStoredPreferences } from "../../../lib/preferences";
 import Root from "../_layout";
 
 let finishLanguage: () => void = () => {};
 let finishTheme: () => void = () => {};
-let finishFontScale: () => void = () => {};
+let finishPreferences: () => void = () => {};
 jest.mock("../../../global.css", () => ({}));
 jest.mock("../../../lib/i18n", () => ({
   applyStoredLanguage: jest.fn(() => new Promise<void>((resolve) => (finishLanguage = resolve))),
@@ -15,8 +15,9 @@ jest.mock("../../../lib/i18n", () => ({
 jest.mock("../../../lib/theme", () => ({
   applyStoredTheme: jest.fn(() => new Promise<void>((resolve) => (finishTheme = resolve))),
 }));
-jest.mock("../../../lib/fontScale", () => ({
-  applyStoredFontScale: jest.fn(() => new Promise<void>((resolve) => (finishFontScale = resolve))),
+jest.mock("../../../lib/preferences", () => ({
+  applyStoredPreferences: jest.fn(() => new Promise<void>((resolve) => (finishPreferences = resolve))),
+  usePreferences: () => ({ fontScale: "normal", highContrast: false }),
 }));
 jest.mock("expo-status-bar", () => ({ StatusBar: () => null }));
 jest.mock("expo-splash-screen", () => ({ preventAutoHideAsync: jest.fn(), hideAsync: jest.fn() }));
@@ -35,7 +36,7 @@ describe("root layout", () => {
     await render(<Root />);
     expect(applyStoredLanguage).toHaveBeenCalledTimes(1);
     expect(applyStoredTheme).toHaveBeenCalledTimes(1);
-    expect(applyStoredFontScale).toHaveBeenCalledTimes(1);
+    expect(applyStoredPreferences).toHaveBeenCalledTimes(1);
 
     await act(async () => finishLanguage());
     expect(SplashScreen.hideAsync).not.toHaveBeenCalled(); // falta el tema
@@ -43,7 +44,7 @@ describe("root layout", () => {
     await act(async () => finishTheme());
     expect(SplashScreen.hideAsync).not.toHaveBeenCalled(); // falta el tamaño de texto
 
-    await act(async () => finishFontScale());
+    await act(async () => finishPreferences());
     expect(SplashScreen.hideAsync).toHaveBeenCalled();
   });
 });
