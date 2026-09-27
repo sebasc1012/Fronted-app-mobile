@@ -21,7 +21,7 @@ import { loginSchema, LoginForm } from "@/squema/auth.schema";
 export default function Login() {
   const { t } = useTranslation();
   const { signIn } = useAuth();
-  const { handleOAuth, oauthLoading, oauthError } = useOAuth();
+  const { handleOAuth, loadingProvider, oauthError } = useOAuth();
   const [serverError, setServerError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -93,6 +93,7 @@ export default function Login() {
             title={t("auth.common.next")}
             onPress={handleSubmit(onSubmit)}
             loading={loading}
+            disabled={!!loadingProvider}
             color="#8A6F56"
             radius={10}
           />
@@ -112,8 +113,8 @@ export default function Login() {
               pill
               icon={<AppleIcon />}
               onPress={() => handleOAuth("apple")}
-              loading={oauthLoading}
-              disabled={loading}
+              loading={loadingProvider === "apple"}
+              disabled={loading || !!loadingProvider}
             />
 
             <Button
@@ -122,8 +123,8 @@ export default function Login() {
               pill
               icon={<GoogleIcon />}
               onPress={() => handleOAuth("google")}
-              loading={oauthLoading}
-              disabled={loading}
+              loading={loadingProvider === "google"}
+              disabled={loading || !!loadingProvider}
             />
 
             <Button
@@ -132,8 +133,8 @@ export default function Login() {
               pill
               icon={<FacebookIcon />}
               onPress={() => handleOAuth("facebook")}
-              loading={oauthLoading}
-              disabled={loading}
+              loading={loadingProvider === "facebook"}
+              disabled={loading || !!loadingProvider}
             />
           </View>
           <Text className="mt-6 w-full text-center text-sm text-primary">
