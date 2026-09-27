@@ -1,4 +1,7 @@
 {
+  "app": {
+    "name": "Fincho"
+  },
   "common": {
     "cancel": "Cancelar",
     "selectOption": "Selecciona una opción",
@@ -120,5 +123,8 @@
   "signOut": {
     "title": "¿Cerrar sesión?",
     "message": "Tendrás que volver a iniciar sesión para ver tus datos."
+  },
+  "language": {
+    "system": "Usar idioma del dispositivo"
   }
 }

@@ -1,12 +1,14 @@
 import { Alert, Platform } from "react-native";
 import { act, render, screen, fireEvent } from "@testing-library/react-native";
 import Account from "../index";
+import { router } from "expo-router";
 import { useProfile } from "@/hooks/useProfile";
 
 const mockSignOut = jest.fn();
 jest.mock("react-i18next", () => ({ useTranslation: () => ({ t: (k: string) => k }) }));
 jest.mock("react-native-safe-area-context", () => ({ useSafeAreaInsets: () => ({ top: 0, bottom: 0 }) }));
 jest.mock("lucide-react-native", () => new Proxy({}, { get: () => () => null }));
+jest.mock("expo-router", () => ({ router: { push: jest.fn() } }));
 jest.mock("expo-constants", () => ({ expoConfig: { version: "1.2.3" } }));
 jest.mock("expo-image", () => ({ Image: (props: any) => require("react").createElement("Image", props) }));
 jest.mock("@/hooks/useProfile", () => ({ useProfile: jest.fn() }));
@@ -166,5 +168,12 @@ describe("Account panel", () => {
     expect(screen.queryByText("avatar.takePhoto")).toBeNull();
     expect(mockRemove).toHaveBeenCalledTimes(1);
     Platform.OS = "ios";
+  });
+
+  it("the Language row opens the language screen", async () => {
+    mockProfile({ data: { fullName: "Seba", avatarUrl: null } });
+    await render(<Account />);
+    await fireEvent.press(screen.getByRole("button", { name: "account.language" }));
+    expect(router.push).toHaveBeenCalledWith("/account/language");
   });
 });

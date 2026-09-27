@@ -3,6 +3,7 @@ import { ActivityIndicator, Alert, Modal, Platform, View, Text, Pressable, Scrol
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTranslation } from "react-i18next";
 import Constants from "expo-constants";
+import { router } from "expo-router";
 import {
   ALargeSmall,
   Bell,
@@ -218,7 +219,7 @@ export default function Account() {
       <ProfileHeader />
       <Section title={t("account.sections.preferences")}>
         <Row icon={SunMoon} label={t("account.theme")} />
-        <Row icon={Languages} label={t("account.language")} />
+        <Row icon={Languages} label={t("account.language")} onPress={() => router.push("/account/language")} />
         <Row icon={Bell} label={t("account.notifications")} />
       </Section>
       <Section title={t("account.sections.accessibility")}>

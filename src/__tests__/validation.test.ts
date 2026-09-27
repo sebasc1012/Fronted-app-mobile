@@ -42,6 +42,14 @@ describe("locales", () => {
     expect(keys(es).sort()).toEqual(keys(en).sort());
   });
 
+  it("no translation is empty", () => {
+    const valueAt = (obj: object, key: string) =>
+      key.split(".").reduce<any>((node, part) => node[part], obj);
+    for (const locale of [es, en]) {
+      keys(locale).forEach((key) => expect(String(valueAt(locale, key)).trim()).not.toBe(""));
+    }
+  });
+
   it("every schema message key exists", () => {
     const all = keys(en);
     ["errors.emailInvalid", "errors.passwordMin", "errors.passwordsMismatch", "errors.nameMax",

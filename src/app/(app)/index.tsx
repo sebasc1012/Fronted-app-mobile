@@ -8,7 +8,7 @@ export default function Home() {
 
   return (
     <View className="flex-1 bg-white px-6 dark:bg-black">
-      <ScreenHeader title="Fincho" onAvatarPress={() => router.push("/account")} />
+      <ScreenHeader title={t("app.name")} onAvatarPress={() => router.push("/account")} />
       <View className="flex-1 items-center justify-center">
         <Text className="text-xl font-semibold text-black dark:text-white">{t("home.welcome")}</Text>
       </View>
