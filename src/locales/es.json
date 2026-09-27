@@ -126,5 +126,10 @@
   },
   "language": {
     "system": "Usar idioma del dispositivo"
+  },
+  "theme": {
+    "light": "Claro",
+    "dark": "Oscuro",
+    "system": "Sistema"
   }
 }

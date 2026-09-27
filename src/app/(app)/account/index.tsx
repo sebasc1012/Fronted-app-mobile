@@ -218,7 +218,7 @@ export default function Account() {
     >
       <ProfileHeader />
       <Section title={t("account.sections.preferences")}>
-        <Row icon={SunMoon} label={t("account.theme")} />
+        <Row icon={SunMoon} label={t("account.theme")} onPress={() => router.push("/account/theme")} />
         <Row icon={Languages} label={t("account.language")} onPress={() => router.push("/account/language")} />
         <Row icon={Bell} label={t("account.notifications")} />
       </Section>

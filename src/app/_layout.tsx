@@ -1,5 +1,7 @@
 import "../../global.css";
 import { applyStoredLanguage } from "../../lib/i18n";
+import { applyStoredTheme } from "../../lib/theme";
+import { StatusBar } from "expo-status-bar";
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useColorScheme } from "react-native";
@@ -14,12 +16,12 @@ SplashScreen.preventAutoHideAsync();
 function RootNavigation() {
   const { session, isLoading: authLoading } = useAuth();
   const { data: profile, isLoading: profileLoading } = useProfile(!!session);
-  // El idioma guardado se aplica antes de ocultar el splash: nunca se ve el otro idioma.
-  const [languageReady, setLanguageReady] = useState(false);
-  const isReady = !authLoading && !profileLoading && languageReady;
+  // Idioma y tema guardados se aplican antes de ocultar el splash: sin parpadeo.
+  const [prefsReady, setPrefsReady] = useState(false);
+  const isReady = !authLoading && !profileLoading && prefsReady;
 
   useEffect(() => {
-    applyStoredLanguage().finally(() => setLanguageReady(true));
+    Promise.all([applyStoredLanguage(), applyStoredTheme()]).finally(() => setPrefsReady(true));
   }, []);
 
   useEffect(() => {
@@ -51,6 +53,7 @@ export default function Root() {
         <ThemeProvider
           value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
         >
+          <StatusBar style="auto" />
           <RootNavigation />
         </ThemeProvider>
       </AuthProvider>

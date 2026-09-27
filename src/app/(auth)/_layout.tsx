@@ -1,4 +1,5 @@
 import { Redirect, Stack, usePathname } from "expo-router";
+import { StatusBar } from "expo-status-bar";
 import { useAuth } from "../../../contexts/AuthContext";
 
 // Sin esto, expo-router no sabe qué pantalla mostrar cuando el guard
@@ -28,5 +29,12 @@ export default function AuthLayout() {
     return <Redirect href="/(auth)/login" />;
   }
 
-  return <Stack screenOptions={{ headerShown: false }} />;
+  // Las pantallas de auth tienen fondo claro fijo (beige + glass): barra de estado oscura
+  // aunque el tema sea oscuro. Sobrescribe el `style="auto"` del root mientras está montado.
+  return (
+    <>
+      <StatusBar style="dark" />
+      <Stack screenOptions={{ headerShown: false }} />
+    </>
+  );
 }

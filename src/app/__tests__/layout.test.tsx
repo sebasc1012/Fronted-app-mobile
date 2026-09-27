@@ -1,13 +1,19 @@
 import { act, render } from "@testing-library/react-native";
 import * as SplashScreen from "expo-splash-screen";
 import { applyStoredLanguage } from "../../../lib/i18n";
+import { applyStoredTheme } from "../../../lib/theme";
 import Root from "../_layout";
 
 let finishLanguage: () => void = () => {};
+let finishTheme: () => void = () => {};
 jest.mock("../../../global.css", () => ({}));
 jest.mock("../../../lib/i18n", () => ({
   applyStoredLanguage: jest.fn(() => new Promise<void>((resolve) => (finishLanguage = resolve))),
 }));
+jest.mock("../../../lib/theme", () => ({
+  applyStoredTheme: jest.fn(() => new Promise<void>((resolve) => (finishTheme = resolve))),
+}));
+jest.mock("expo-status-bar", () => ({ StatusBar: () => null }));
 jest.mock("expo-splash-screen", () => ({ preventAutoHideAsync: jest.fn(), hideAsync: jest.fn() }));
 jest.mock("expo-router", () => {
   const Stack = Object.assign(() => null, { Protected: () => null, Screen: () => null });
@@ -20,12 +26,15 @@ jest.mock("../../../contexts/AuthContext", () => ({
 jest.mock("../../hooks/useProfile", () => ({ useProfile: () => ({ data: undefined, isLoading: false }) }));
 
 describe("root layout", () => {
-  it("applies the saved language before hiding the splash", async () => {
+  it("applies the saved language and theme before hiding the splash", async () => {
     await render(<Root />);
     expect(applyStoredLanguage).toHaveBeenCalledTimes(1);
-    expect(SplashScreen.hideAsync).not.toHaveBeenCalled();
+    expect(applyStoredTheme).toHaveBeenCalledTimes(1);
 
     await act(async () => finishLanguage());
+    expect(SplashScreen.hideAsync).not.toHaveBeenCalled(); // falta el tema
+
+    await act(async () => finishTheme());
     expect(SplashScreen.hideAsync).toHaveBeenCalled();
   });
 });
