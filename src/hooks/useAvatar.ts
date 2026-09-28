@@ -4,6 +4,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../../contexts/AuthContext";
 import { compressAvatar, removeAvatar, uploadAvatar, validateAvatarAsset } from "../../lib/avatar";
+import { announce } from "./useAnnounce";
 
 export type AvatarSource = "camera" | "library";
 
@@ -61,9 +62,12 @@ export function useChangeAvatar() {
   const pickAvatar = useAvatarPicker();
   const { mutate, isPending } = useMutation({
     mutationFn: (uri: string) => uploadAvatar(uri, user!.id),
+    onSuccess: () => announce(t("avatar.uploaded")),
   });
   const removal = useMutation({
     mutationFn: removeAvatar,
+    onSuccess: () => announce(t("avatar.removed")),
+    // Los errores van en Alert: VoiceOver y TalkBack lo leen solos al aparecer.
     onError: () => Alert.alert(t("avatar.removeError")),
   });
 

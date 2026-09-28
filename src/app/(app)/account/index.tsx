@@ -26,6 +26,7 @@ import { Avatar } from "../../../components/ui/Avatar";
 import { Button } from "../../../components/ui/Button";
 import { useColors, useHighContrastBorder } from "../../../constants/colors";
 import { setHighContrast, usePreferences } from "../../../../lib/preferences";
+import { restoreFocus, useAnnounce } from "@/hooks/useAnnounce";
 
 type RowProps = {
   icon: LucideIcon;
@@ -135,9 +136,10 @@ type AvatarMenuProps = {
   onClose: () => void;
   onPick: (source: AvatarSource) => void;
   onRemove?: () => void; // solo si hay foto
+  onDismissed: () => void; // el modal terminó de cerrarse: devolver el foco al origen
 };
 
-function AvatarMenu({ visible, onClose, onPick, onRemove }: AvatarMenuProps) {
+function AvatarMenu({ visible, onClose, onPick, onRemove, onDismissed }: AvatarMenuProps) {
   const { t } = useTranslation();
   const colors = useColors();
   const { bottom } = useSafeAreaInsets();
@@ -147,19 +149,32 @@ function AvatarMenu({ visible, onClose, onPick, onRemove }: AvatarMenuProps) {
     chosen.current?.();
     chosen.current = null;
   };
+  const close = () => {
+    onClose();
+    if (Platform.OS !== "ios") onDismissed(); // en iOS espera a onDismiss
+  };
   const choose = (action: () => void) => {
     chosen.current = action;
-    onClose();
+    close();
     if (Platform.OS !== "ios") runChosen();
   };
 
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose} onDismiss={runChosen}>
+    <Modal
+      visible={visible}
+      transparent
+      animationType="slide"
+      onRequestClose={close}
+      onDismiss={() => {
+        runChosen();
+        onDismissed();
+      }}
+    >
       <View className="flex-1 justify-end">
         <Pressable
           style={StyleSheet.absoluteFill}
           className="bg-overlay/40"
-          onPress={onClose}
+          onPress={close}
           accessibilityRole="button"
           accessibilityLabel={t("common.cancel")}
         />
@@ -174,7 +189,7 @@ function AvatarMenu({ visible, onClose, onPick, onRemove }: AvatarMenuProps) {
               onPress={() => choose(onRemove)}
             />
           )}
-          <Button title={t("common.cancel")} variant="outline" onPress={onClose} />
+          <Button title={t("common.cancel")} variant="outline" onPress={close} />
         </View>
       </View>
     </Modal>
@@ -188,6 +203,8 @@ function ProfileHeader() {
   const colors = useColors();
   const { change, remove, isPending } = useChangeAvatar();
   const [menuOpen, setMenuOpen] = useState(false);
+  const avatarRef = useRef<View>(null);
+  useAnnounce(!profile && isError ? t("account.loadError") : null);
 
   if (!profile && isLoading) {
     return (
@@ -210,11 +227,14 @@ function ProfileHeader() {
 
   return (
     <View className="items-center">
+      {/* Un solo elemento: "Foto de perfil", imagen y botón; Avatar (y sus iniciales) queda dentro. */}
       <Pressable
+        ref={avatarRef}
         onPress={() => setMenuOpen(true)}
         disabled={isPending}
-        accessibilityRole="button"
-        accessibilityLabel={t("avatar.change")}
+        accessibilityRole="imagebutton"
+        accessibilityLabel={t("account.avatar")}
+        accessibilityHint={t("avatar.changeHint")}
         accessibilityState={{ busy: isPending, disabled: isPending }}
       >
         <Avatar size={112} />
@@ -229,6 +249,7 @@ function ProfileHeader() {
         onClose={() => setMenuOpen(false)}
         onPick={change}
         onRemove={profile?.avatarUrl ? remove : undefined}
+        onDismissed={() => restoreFocus(avatarRef)}
       />
       {profile?.fullName && (
         <AppText className="mt-4 text-center text-2xl font-bold text-text">{profile.fullName}</AppText>

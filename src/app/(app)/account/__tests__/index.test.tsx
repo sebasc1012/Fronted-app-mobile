@@ -1,4 +1,6 @@
-import { Alert, Platform } from "react-native";
+import { AccessibilityInfo, Alert, Platform, StyleSheet } from "react-native";
+import en from "@/locales/en.json";
+import es from "@/locales/es.json";
 import { act, render, screen, fireEvent } from "@testing-library/react-native";
 import Account from "../index";
 import { setFontScaleLevel, setHighContrast, getFontScaleLevel } from "../../../../../lib/preferences";
@@ -9,7 +11,6 @@ import { useProfile } from "@/hooks/useProfile";
 const mockSignOut = jest.fn();
 jest.mock("react-i18next", () => ({ useTranslation: () => ({ t: (k: string) => k }) }));
 jest.mock("react-native-safe-area-context", () => ({ useSafeAreaInsets: () => ({ top: 0, bottom: 0 }) }));
-jest.mock("lucide-react-native", () => new Proxy({}, { get: () => () => null }));
 jest.mock("expo-router", () => ({ router: { push: jest.fn() } }));
 jest.mock("expo-constants", () => ({ expoConfig: { version: "1.2.3" } }));
 jest.mock("expo-image", () => ({ Image: (props: any) => require("react").createElement("Image", props) }));
@@ -44,7 +45,7 @@ describe("Account panel", () => {
   it("renders the header with photo, name and email", async () => {
     mockProfile({ data: { fullName: "Sebastián Castro", avatarUrl: "https://x/a.png" } });
     await render(<Account />);
-    expect(screen.getByTestId("avatar-image")).toBeTruthy();
+    expect(screen.getByTestId("avatar-image", { includeHiddenElements: true })).toBeTruthy();
     expect(screen.getByText("Sebastián Castro")).toBeTruthy();
     expect(screen.getByText("seba@fincho.com")).toBeTruthy();
   });
@@ -52,7 +53,7 @@ describe("Account panel", () => {
   it("does not render the name line when fullName is null", async () => {
     mockProfile({ data: { fullName: null, avatarUrl: null } });
     await render(<Account />);
-    expect(screen.getByText("S")).toBeTruthy(); // inicial del correo
+    expect(screen.getByText("S", { includeHiddenElements: true })).toBeTruthy(); // inicial del correo
     expect(screen.getByText("seba@fincho.com")).toBeTruthy();
     expect(JSON.stringify(screen.toJSON())).not.toContain("text-2xl"); // la línea del nombre
   });
@@ -128,7 +129,7 @@ describe("Account panel", () => {
     mockProfile({ data: { fullName: "Seba", avatarUrl: null } });
     await render(<Account />);
     expect(screen.queryByText("avatar.takePhoto")).toBeNull();
-    await fireEvent.press(screen.getByRole("button", { name: "avatar.change" }));
+    await fireEvent.press(screen.getByRole("imagebutton", { name: "account.avatar" }));
     expect(screen.getByText("avatar.takePhoto")).toBeTruthy();
     expect(screen.getByText("avatar.chooseFromLibrary")).toBeTruthy();
     expect(screen.getAllByRole("button", { name: "common.cancel" }).length).toBeGreaterThan(0);
@@ -138,7 +139,7 @@ describe("Account panel", () => {
     Platform.OS = "android";
     mockProfile({ data: { fullName: "Seba", avatarUrl: null } });
     await render(<Account />);
-    await fireEvent.press(screen.getByRole("button", { name: "avatar.change" }));
+    await fireEvent.press(screen.getByRole("imagebutton", { name: "account.avatar" }));
     await fireEvent.press(screen.getByText("avatar.chooseFromLibrary"));
     expect(screen.queryByText("avatar.takePhoto")).toBeNull();
     expect(mockChange).toHaveBeenCalledWith("library");
@@ -150,14 +151,14 @@ describe("Account panel", () => {
     mockProfile({ data: { fullName: "Seba", avatarUrl: null } });
     await render(<Account />);
     expect(screen.getByTestId("avatar-uploading")).toBeTruthy();
-    await fireEvent.press(screen.getByRole("button", { name: "avatar.change" }));
+    await fireEvent.press(screen.getByRole("imagebutton", { name: "account.avatar" }));
     expect(screen.queryByText("avatar.takePhoto")).toBeNull();
   });
 
   it("the menu shows 'Remove photo' only when there is a photo", async () => {
     mockProfile({ data: { fullName: "Seba", avatarUrl: null } });
     await render(<Account />);
-    await fireEvent.press(screen.getByRole("button", { name: "avatar.change" }));
+    await fireEvent.press(screen.getByRole("imagebutton", { name: "account.avatar" }));
     expect(screen.queryByText("avatar.remove")).toBeNull();
   });
 
@@ -165,7 +166,7 @@ describe("Account panel", () => {
     Platform.OS = "android";
     mockProfile({ data: { fullName: "Seba", avatarUrl: "https://x/a.jpg" } });
     await render(<Account />);
-    await fireEvent.press(screen.getByRole("button", { name: "avatar.change" }));
+    await fireEvent.press(screen.getByRole("imagebutton", { name: "account.avatar" }));
     await fireEvent.press(screen.getByText("avatar.remove"));
     expect(screen.queryByText("avatar.takePhoto")).toBeNull();
     expect(mockRemove).toHaveBeenCalledTimes(1);
@@ -200,5 +201,99 @@ describe("Account panel", () => {
     expect(AsyncStorage.setItem).toHaveBeenCalledWith("pref.highContrast", "true");
     await setHighContrast(false);
     expect(getFontScaleLevel()).toBe("normal");
+  });
+});
+
+describe("Account panel — screen readers (HU-08)", () => {
+  const renderPanel = async (avatarUrl: string | null = null) => {
+    mockProfile({ data: { fullName: "Seba", avatarUrl } });
+    await render(<Account />);
+  };
+
+  it("every row, button and switch is found by role and name", async () => {
+    await renderPanel();
+    const expected: [string, string][] = [
+      ["imagebutton", "account.avatar"],
+      ["button", "account.theme"], ["button", "account.language"], ["button", "account.notifications"],
+      ["button", "account.textSize"], ["switch", "account.highContrast"],
+      ["button", "account.privacyPolicy"], ["button", "account.deleteAccount"],
+      ["button", "account.terms"], ["button", "common.signOut"],
+    ];
+    for (const [role, name] of expected) expect(screen.getByRole(role as never, { name })).toBeTruthy();
+  });
+
+  it.each([null, "https://x/a.jpg"])("the photo is 'Profile photo' with a hint, and hides the initials (avatarUrl=%s)", async (url) => {
+    await renderPanel(url);
+    const photo = screen.getByRole("imagebutton", { name: "account.avatar" });
+    expect(photo.props.accessibilityHint).toBe("avatar.changeHint");
+    expect(screen.queryByText("S")).toBeNull(); // las iniciales no se leen sueltas
+  });
+
+  it("section titles are headers, in order", async () => {
+    await renderPanel();
+    expect(screen.getAllByRole("header").map((h) => h.props.children)).toEqual([
+      "account.sections.preferences", "account.sections.accessibility", "account.sections.privacy",
+      "account.sections.about", "common.signOut",
+    ]);
+  });
+
+  it("announces the profile load error", async () => {
+    const announce = jest.spyOn(AccessibilityInfo, "announceForAccessibility");
+    mockProfile({ isError: true });
+    await render(<Account />);
+    expect(announce).toHaveBeenCalledWith("account.loadError");
+  });
+
+  it("closing the photo menu gives focus back to the photo (Android: right away)", async () => {
+    const sendEvent = jest.spyOn(AccessibilityInfo, "sendAccessibilityEvent").mockImplementation(() => {});
+    Platform.OS = "android";
+    await renderPanel();
+    await fireEvent.press(screen.getByRole("imagebutton", { name: "account.avatar" }));
+    const cancel = screen.getAllByRole("button", { name: "common.cancel" }).at(-1)!;
+    await fireEvent.press(cancel);
+    expect(sendEvent).toHaveBeenCalledWith(expect.anything(), "focus");
+    Platform.OS = "ios";
+  });
+
+  it("decorative icons are inside a grouped element or hidden from the reader", async () => {
+    await renderPanel();
+    const icons = screen.getAllByTestId(/^icon-/, { includeHiddenElements: true });
+    expect(icons.length).toBeGreaterThan(0);
+    for (const icon of icons) {
+      let node: typeof icon | null = icon;
+      let covered = false;
+      while (node && !covered) {
+        covered = node.props.accessible === true || node.props.accessibilityElementsHidden === true;
+        node = node.parent;
+      }
+      expect({ icon: icon.props.testID, covered }).toEqual({ icon: icon.props.testID, covered: true });
+    }
+  });
+
+  it("every touch target is at least 48×48", async () => {
+    await renderPanel();
+    const MIN_HEIGHT: Record<string, number> = { "min-h-12": 48, "min-h-[52px]": 52 };
+    const targets = screen.getAllByRole(/^(button|switch|imagebutton)$/);
+    for (const target of targets) {
+      const fromClass = Math.max(0, ...String(target.props.className ?? "").split(" ").map((c) => MIN_HEIGHT[c] ?? 0));
+      const child = target.children[0];
+      const fromSize = typeof child === "object" ? (StyleSheet.flatten(child.props.style)?.height as number) ?? 0 : 0;
+      // Las filas y botones ocupan todo el ancho; la foto mide 112×112.
+      expect({ name: target.props.accessibilityLabel, ok: Math.max(fromClass, fromSize) >= 48 }).toEqual({
+        name: target.props.accessibilityLabel,
+        ok: true,
+      });
+    }
+  });
+
+  it("all accessible names and hints come from i18n and exist in en and es", async () => {
+    await renderPanel();
+    const valueAt = (obj: object, key: string) => key.split(".").reduce<any>((node, part) => node?.[part], obj);
+    const labelled = screen.getAllByRole(/^(button|switch|imagebutton|header)$/);
+    for (const el of labelled) {
+      for (const key of [el.props.accessibilityLabel ?? el.props.children, el.props.accessibilityHint].filter(Boolean)) {
+        expect([key, typeof valueAt(en, key), typeof valueAt(es, key)]).toEqual([key, "string", "string"]);
+      }
+    }
   });
 });

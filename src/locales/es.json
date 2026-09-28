@@ -102,7 +102,6 @@
     "highContrastHint": "Aumenta el contraste de textos, botones y bordes"
   },
   "avatar": {
-    "change": "Cambiar foto de perfil",
     "takePhoto": "Tomar foto",
     "chooseFromLibrary": "Elegir de la galería",
     "openSettings": "Ir a Ajustes",
@@ -120,7 +119,10 @@
     "remove": "Eliminar foto",
     "removeConfirmTitle": "¿Eliminar tu foto de perfil?",
     "removeConfirm": "Eliminar",
-    "removeError": "No pudimos eliminar tu foto. Tu foto se mantiene."
+    "removeError": "No pudimos eliminar tu foto. Tu foto se mantiene.",
+    "changeHint": "Toca dos veces para cambiarla",
+    "uploaded": "Foto actualizada",
+    "removed": "Foto eliminada"
   },
   "signOut": {
     "title": "¿Cerrar sesión?",

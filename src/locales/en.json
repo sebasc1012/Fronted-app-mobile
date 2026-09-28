@@ -102,7 +102,6 @@
     "highContrastHint": "Increases the contrast of text, buttons and borders"
   },
   "avatar": {
-    "change": "Change profile photo",
     "takePhoto": "Take photo",
     "chooseFromLibrary": "Choose from library",
     "openSettings": "Open Settings",
@@ -120,7 +119,10 @@
     "remove": "Remove photo",
     "removeConfirmTitle": "Remove your profile photo?",
     "removeConfirm": "Remove",
-    "removeError": "We couldn't remove your photo. Your photo is kept."
+    "removeError": "We couldn't remove your photo. Your photo is kept.",
+    "changeHint": "Double-tap to change it",
+    "uploaded": "Photo updated",
+    "removed": "Photo removed"
   },
   "signOut": {
     "title": "Sign out?",

@@ -32,7 +32,7 @@ Node 22 (`.nvmrc`). Pre-commit (Husky) corre typecheck; CI corre lint, typecheck
 ```
 src/app/            # rutas: _layout.tsx (gate único), (auth)/, (app)/ (NativeTabs; account/ con Stack)
 src/components/ui/  # AppText, Input, Button, Select, Avatar, ScreenHeader, GlassPanel, AuthBackground, OptionList, icons/
-src/hooks/          # useProfile, useUpsertProfile, useOAuth, useAvatar (permisos + selector + subida)
+src/hooks/          # useProfile, useUpsertProfile, useOAuth, useAvatar (permisos + selector + subida), useAnnounce (lector de pantalla)
 src/constants/      # colors.json (4 paletas) + colors.tsx (useColors, ColorScope, resolvePalette, contrastRatio)
 src/squema/         # schemas Zod (mensajes = claves i18n)
 src/locales/        # en.json, es.json
@@ -53,6 +53,7 @@ Alias `@/*` → `./src/*`. Tests en `__tests__/` junto al código.
 - OAuth solo por `lib/auth/oauth.ts` (PKCE, deep link `mobileapp://auth/callback`).
 - Colores solo desde los tokens de `src/constants/colors.json`: clases `bg-surface`, `text-text-muted`… (sin `dark:` ni `gray-*`) y `useColors()` para valores crudos. Hay test de contraste y un test que falla con colores sueltos.
 - Textos con `AppText` / `AppTextInput` (`@/components/ui/AppText`), nunca `Text`/`TextInput` de `react-native` (regla ESLint): respetan el tamaño de texto elegido (HU-06).
+- Errores y confirmaciones que no van en `Alert` se anuncian con `announce`/`useAnnounce` (`@/hooks/useAnnounce`); al cerrar un modal propio, `restoreFocus` al elemento que lo abrió (HU-08).
 - Ningún texto hardcodeado: todo por `t()` con claves en `en.json` y `es.json` (misma estructura; hay test de paridad).
 - Cada tab de `NativeTabs` es una ruta; íconos SF Symbols (iOS) / Material (Android).
 - Con `typedRoutes`, una ruta nueva no tipa hasta levantar Metro.

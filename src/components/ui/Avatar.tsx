@@ -2,7 +2,6 @@ import { useState } from "react";
 import { View } from "react-native";
 import { AppText } from "@/components/ui/AppText";
 import { Image } from "expo-image";
-import { useTranslation } from "react-i18next";
 import { useAuth } from "../../../contexts/AuthContext";
 import { useProfile } from "@/hooks/useProfile";
 
@@ -15,7 +14,6 @@ export function getInitials(fullName?: string | null, email?: string | null) {
 
 // Avatar del usuario actual: foto del perfil o, si no hay o falla la carga, sus iniciales.
 export function Avatar({ size = 44 }: { size?: number }) {
-  const { t } = useTranslation();
   const { user } = useAuth();
   const { data: profile } = useProfile(true);
   // Se guarda la URL que falló (no un booleano): una foto nueva vuelve a intentarse.
@@ -23,10 +21,11 @@ export function Avatar({ size = 44 }: { size?: number }) {
   const url = profile?.avatarUrl;
 
   return (
+    // Decorativo: siempre va dentro de un botón que lleva la etiqueta ("Foto de perfil",
+    // "Perfil"); así el lector no enfoca el avatar aparte ni lee las iniciales sueltas.
     <View
-      accessible
-      accessibilityRole="image"
-      accessibilityLabel={t("account.avatar")}
+      accessibilityElementsHidden
+      importantForAccessibility="no-hide-descendants"
       className="items-center justify-center overflow-hidden rounded-full bg-surface-strong"
       style={{ width: size, height: size }}
     >

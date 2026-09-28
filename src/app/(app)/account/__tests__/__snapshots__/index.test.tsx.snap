@@ -16,8 +16,9 @@ exports[`Account panel renders at 'Extra large' text size without errors (snapsh
       className="items-center"
     >
       <View
-        accessibilityLabel="avatar.change"
-        accessibilityRole="button"
+        accessibilityHint="avatar.changeHint"
+        accessibilityLabel="account.avatar"
+        accessibilityRole="imagebutton"
         accessibilityState={
           {
             "busy": false,
@@ -49,10 +50,9 @@ exports[`Account panel renders at 'Extra large' text size without errors (snapsh
         onStartShouldSetResponder={[Function]}
       >
         <View
-          accessibilityLabel="account.avatar"
-          accessibilityRole="image"
-          accessible={true}
+          accessibilityElementsHidden={true}
           className="items-center justify-center overflow-hidden rounded-full bg-surface-strong"
+          importantForAccessibility="no-hide-descendants"
           style={
             {
               "height": 112,
@@ -154,6 +154,11 @@ exports[`Account panel renders at 'Extra large' text size without errors (snapsh
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
           >
+            <View
+              color="#000000"
+              size={22}
+              testID="icon-SunMoon"
+            />
             <Text
               maxFontSizeMultiplier={1.5384615384615383}
               style={
@@ -167,6 +172,11 @@ exports[`Account panel renders at 'Extra large' text size without errors (snapsh
             >
               account.theme
             </Text>
+            <View
+              color="#4B5563"
+              size={20}
+              testID="icon-ChevronRight"
+            />
           </View>
         </View>
         <View>
@@ -207,6 +217,11 @@ exports[`Account panel renders at 'Extra large' text size without errors (snapsh
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
           >
+            <View
+              color="#000000"
+              size={22}
+              testID="icon-Languages"
+            />
             <Text
               maxFontSizeMultiplier={1.5384615384615383}
               style={
@@ -220,6 +235,11 @@ exports[`Account panel renders at 'Extra large' text size without errors (snapsh
             >
               account.language
             </Text>
+            <View
+              color="#4B5563"
+              size={20}
+              testID="icon-ChevronRight"
+            />
           </View>
         </View>
         <View>
@@ -260,6 +280,11 @@ exports[`Account panel renders at 'Extra large' text size without errors (snapsh
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
           >
+            <View
+              color="#000000"
+              size={22}
+              testID="icon-Bell"
+            />
             <Text
               maxFontSizeMultiplier={1.5384615384615383}
               style={
@@ -273,6 +298,11 @@ exports[`Account panel renders at 'Extra large' text size without errors (snapsh
             >
               account.notifications
             </Text>
+            <View
+              color="#4B5563"
+              size={20}
+              testID="icon-ChevronRight"
+            />
           </View>
         </View>
       </View>
@@ -332,6 +362,11 @@ exports[`Account panel renders at 'Extra large' text size without errors (snapsh
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
           >
+            <View
+              color="#000000"
+              size={22}
+              testID="icon-ALargeSmall"
+            />
             <Text
               maxFontSizeMultiplier={1.5384615384615383}
               style={
@@ -345,6 +380,11 @@ exports[`Account panel renders at 'Extra large' text size without errors (snapsh
             >
               account.textSize
             </Text>
+            <View
+              color="#4B5563"
+              size={20}
+              testID="icon-ChevronRight"
+            />
           </View>
         </View>
         <View>
@@ -386,6 +426,11 @@ exports[`Account panel renders at 'Extra large' text size without errors (snapsh
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
           >
+            <View
+              color="#000000"
+              size={22}
+              testID="icon-Contrast"
+            />
             <View
               className="flex-1"
             >
@@ -491,6 +536,11 @@ exports[`Account panel renders at 'Extra large' text size without errors (snapsh
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
           >
+            <View
+              color="#000000"
+              size={22}
+              testID="icon-ShieldCheck"
+            />
             <Text
               maxFontSizeMultiplier={1.5384615384615383}
               style={
@@ -504,6 +554,11 @@ exports[`Account panel renders at 'Extra large' text size without errors (snapsh
             >
               account.privacyPolicy
             </Text>
+            <View
+              color="#4B5563"
+              size={20}
+              testID="icon-ChevronRight"
+            />
           </View>
         </View>
         <View>
@@ -544,6 +599,11 @@ exports[`Account panel renders at 'Extra large' text size without errors (snapsh
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
           >
+            <View
+              color="#991B1B"
+              size={22}
+              testID="icon-Trash2"
+            />
             <Text
               maxFontSizeMultiplier={1.5384615384615383}
               style={
@@ -557,6 +617,11 @@ exports[`Account panel renders at 'Extra large' text size without errors (snapsh
             >
               account.deleteAccount
             </Text>
+            <View
+              color="#4B5563"
+              size={20}
+              testID="icon-ChevronRight"
+            />
           </View>
         </View>
       </View>
@@ -616,6 +681,11 @@ exports[`Account panel renders at 'Extra large' text size without errors (snapsh
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
           >
+            <View
+              color="#000000"
+              size={22}
+              testID="icon-FileText"
+            />
             <Text
               maxFontSizeMultiplier={1.5384615384615383}
               style={
@@ -629,6 +699,11 @@ exports[`Account panel renders at 'Extra large' text size without errors (snapsh
             >
               account.terms
             </Text>
+            <View
+              color="#4B5563"
+              size={20}
+              testID="icon-ChevronRight"
+            />
           </View>
         </View>
         <View>
@@ -640,6 +715,11 @@ exports[`Account panel renders at 'Extra large' text size without errors (snapsh
             accessible={true}
             className="min-h-12 flex-row items-center gap-4 px-4 py-3"
           >
+            <View
+              color="#000000"
+              size={22}
+              testID="icon-Info"
+            />
             <Text
               maxFontSizeMultiplier={1.5384615384615383}
               style={
@@ -725,6 +805,11 @@ exports[`Account panel renders at 'Extra large' text size without errors (snapsh
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
           >
+            <View
+              color="#000000"
+              size={22}
+              testID="icon-LogOut"
+            />
             <Text
               maxFontSizeMultiplier={1.5384615384615383}
               style={
@@ -738,6 +823,11 @@ exports[`Account panel renders at 'Extra large' text size without errors (snapsh
             >
               common.signOut
             </Text>
+            <View
+              color="#4B5563"
+              size={20}
+              testID="icon-ChevronRight"
+            />
           </View>
         </View>
       </View>

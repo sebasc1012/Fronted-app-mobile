@@ -1,4 +1,4 @@
-import { Alert, Linking } from "react-native";
+import { AccessibilityInfo, Alert, Linking } from "react-native";
 import { act, renderHook, waitFor } from "@testing-library/react-native";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import * as ImagePicker from "expo-image-picker";
@@ -23,6 +23,7 @@ jest.mock("../../../lib/avatar", () => ({
 const picker = ImagePicker as jest.Mocked<typeof ImagePicker>;
 const alert = jest.spyOn(Alert, "alert").mockImplementation(() => {});
 const openSettings = jest.spyOn(Linking, "openSettings").mockResolvedValue();
+const announce = jest.spyOn(AccessibilityInfo, "announceForAccessibility").mockImplementation(() => {});
 const ASSET = { uri: "file:///raw.jpg", width: 2000, height: 2000, mimeType: "image/jpeg", fileSize: 1000 };
 
 // Pulsa el botón del último Alert por su texto.
@@ -116,5 +117,18 @@ describe("useChangeAvatar", () => {
     await pressAlertButton("avatar.removeConfirm");
     await waitFor(() => expect(alert).toHaveBeenLastCalledWith("avatar.removeError"));
     expect(removeAvatar).toHaveBeenCalledTimes(1);
+  });
+
+  it("announces 'Photo updated' and 'Photo removed' to screen readers", async () => {
+    (uploadAvatar as jest.Mock).mockResolvedValueOnce({});
+    (removeAvatar as jest.Mock).mockResolvedValueOnce({});
+    const { result } = await renderHook(() => useChangeAvatar(), { wrapper });
+
+    await act(() => result.current.change("library"));
+    await waitFor(() => expect(announce).toHaveBeenCalledWith("avatar.uploaded"));
+
+    await act(async () => result.current.remove());
+    await pressAlertButton("avatar.removeConfirm");
+    await waitFor(() => expect(announce).toHaveBeenCalledWith("avatar.removed"));
   });
 });
