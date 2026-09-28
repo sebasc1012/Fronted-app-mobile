@@ -31,12 +31,14 @@ Node 22 (`.nvmrc`). Pre-commit (Husky) corre typecheck; CI corre lint, typecheck
 
 ```
 src/app/            # rutas: _layout.tsx (gate único), (auth)/, (app)/ (NativeTabs; account/ con Stack)
-src/components/ui/  # Input, Button, Select, Avatar, ScreenHeader, GlassPanel, AuthBackground, icons/
-src/hooks/          # useProfile, useUpsertProfile, useOAuth
+src/components/ui/  # AppText, Input, Button, Select, Avatar, ScreenHeader, GlassPanel, AuthBackground, OptionList, icons/
+src/hooks/          # useProfile, useUpsertProfile, useOAuth, useAvatar (permisos + selector + subida), useAnnounce (lector de pantalla)
+src/constants/      # colors.json (4 paletas) + colors.tsx (useColors, ColorScope, resolvePalette, contrastRatio)
 src/squema/         # schemas Zod (mensajes = claves i18n)
 src/locales/        # en.json, es.json
 contexts/           # AuthContext
-lib/                # supabase, api (Axios + Bearer), queryClient, i18n, authErrors, auth/oauth (PKCE)
+lib/                # supabase, api (Axios + Bearer), queryClient, i18n, authErrors, auth/oauth (PKCE), avatar (Storage)
+supabase/           # SQL de RLS (ejecutar a mano en Supabase)
 ```
 
 Alias `@/*` → `./src/*`. Tests en `__tests__/` junto al código.
@@ -44,10 +46,14 @@ Alias `@/*` → `./src/*`. Tests en `__tests__/` junto al código.
 ## Reglas críticas
 
 - **Gate único:** solo `src/app/_layout.tsx` decide entre `(auth)` y `(app)` (`Stack.Protected`, `isAuthorized = session && onboardingCompleted`). Después de login, logout u onboarding **no navegar a mano** (`router.replace`): cambiar la sesión o invalidar `["profile"]` y dejar que el gate reaccione. Navegar a mano ya causó dos veces "Maximum update depth exceeded".
+- Cerrar sesión solo con `signOut` de `AuthContext` (`scope: "local"`, cierre forzado si falla). La limpieza de datos del usuario va en el evento `SIGNED_OUT`; los datos del dispositivo que deban sobrevivir usan claves `pref.*` en AsyncStorage.
 - El backend responde `{ profile }`; tipar las respuestas de Axios con su forma real.
 - `useProfile`: 404 = sin perfil (onboarding); 401 = sesión inválida (forzar `signOut`); otros errores se lanzan.
 - Supabase JS solo para auth; datos del backend con Axios + TanStack Query (sin `useState`/`useEffect` para fetching).
 - OAuth solo por `lib/auth/oauth.ts` (PKCE, deep link `mobileapp://auth/callback`).
+- Colores solo desde los tokens de `src/constants/colors.json`: clases `bg-surface`, `text-text-muted`… (sin `dark:` ni `gray-*`) y `useColors()` para valores crudos. Hay test de contraste y un test que falla con colores sueltos.
+- Textos con `AppText` / `AppTextInput` (`@/components/ui/AppText`), nunca `Text`/`TextInput` de `react-native` (regla ESLint): respetan el tamaño de texto elegido (HU-06).
+- Errores y confirmaciones que no van en `Alert` se anuncian con `announce`/`useAnnounce` (`@/hooks/useAnnounce`); al cerrar un modal propio, `restoreFocus` al elemento que lo abrió (HU-08).
 - Ningún texto hardcodeado: todo por `t()` con claves en `en.json` y `es.json` (misma estructura; hay test de paridad).
 - Cada tab de `NativeTabs` es una ruta; íconos SF Symbols (iOS) / Material (Android).
 - Con `typedRoutes`, una ruta nueva no tipa hasta levantar Metro.

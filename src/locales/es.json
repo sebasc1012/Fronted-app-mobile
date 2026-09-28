@@ -1,8 +1,12 @@
 {
+  "app": {
+    "name": "Fincho"
+  },
   "common": {
     "cancel": "Cancelar",
     "selectOption": "Selecciona una opción",
-    "signOut": "Cerrar sesión"
+    "signOut": "Cerrar sesión",
+    "retry": "Reintentar"
   },
   "errors": {
     "emailInvalid": "Correo inválido",
@@ -75,10 +79,70 @@
     "home": "Inicio",
     "library": "Biblioteca",
     "finances": "Finanzas",
-    "account": "Cuenta"
+    "account": "Perfil"
   },
   "account": {
-    "theme": "Cambiar tema",
-    "deleteAccount": "Eliminar cuenta"
+    "theme": "Tema",
+    "deleteAccount": "Eliminar cuenta",
+    "avatar": "Foto de perfil",
+    "loadError": "No pudimos cargar tu perfil.",
+    "language": "Idioma",
+    "notifications": "Notificaciones",
+    "textSize": "Tamaño de texto",
+    "privacyPolicy": "Política de privacidad",
+    "terms": "Términos y condiciones",
+    "version": "Versión de la app",
+    "sections": {
+      "preferences": "Preferencias",
+      "accessibility": "Accesibilidad",
+      "privacy": "Privacidad",
+      "about": "Acerca de"
+    },
+    "highContrast": "Alto contraste",
+    "highContrastHint": "Aumenta el contraste de textos, botones y bordes"
+  },
+  "avatar": {
+    "takePhoto": "Tomar foto",
+    "chooseFromLibrary": "Elegir de la galería",
+    "openSettings": "Ir a Ajustes",
+    "uploadError": "No pudimos actualizar tu foto. Tu foto anterior se mantiene.",
+    "invalid": {
+      "format": "Formato no válido. Usa una imagen JPG, PNG o HEIC.",
+      "size": "La imagen supera los 10 MB. Elige una más pequeña."
+    },
+    "permission": {
+      "cameraTitle": "Sin acceso a la cámara",
+      "cameraMessage": "Fincho necesita la cámara para tomar tu foto de perfil. Actívala en Ajustes.",
+      "libraryTitle": "Sin acceso a tus fotos",
+      "libraryMessage": "Fincho necesita acceso a tus fotos para elegir tu foto de perfil. Actívalo en Ajustes."
+    },
+    "remove": "Eliminar foto",
+    "removeConfirmTitle": "¿Eliminar tu foto de perfil?",
+    "removeConfirm": "Eliminar",
+    "removeError": "No pudimos eliminar tu foto. Tu foto se mantiene.",
+    "changeHint": "Toca dos veces para cambiarla",
+    "uploaded": "Foto actualizada",
+    "removed": "Foto eliminada"
+  },
+  "signOut": {
+    "title": "¿Cerrar sesión?",
+    "message": "Tendrás que volver a iniciar sesión para ver tus datos."
+  },
+  "language": {
+    "system": "Usar idioma del dispositivo"
+  },
+  "theme": {
+    "light": "Claro",
+    "dark": "Oscuro",
+    "system": "Sistema"
+  },
+  "textSize": {
+    "small": "Pequeño",
+    "normal": "Normal",
+    "large": "Grande",
+    "xlarge": "Muy grande",
+    "previewTitle": "Vista previa",
+    "previewBody": "Así se verán los textos de Fincho: tus compromisos, vencimientos y recordatorios.",
+    "reset": "Restablecer"
   }
 }

@@ -1,4 +1,5 @@
-import { View, Text } from "react-native";
+import { View } from "react-native";
+import { AppText } from "@/components/ui/AppText";
 import { useTranslation } from "react-i18next";
 import { router } from "expo-router";
 import { ScreenHeader } from "../../components/ui/ScreenHeader";
@@ -7,10 +8,10 @@ export default function Home() {
   const { t } = useTranslation();
 
   return (
-    <View className="flex-1 bg-white px-6 dark:bg-black">
-      <ScreenHeader title="Fincho" onAvatarPress={() => router.push("/account")} />
+    <View className="flex-1 bg-background px-6">
+      <ScreenHeader title={t("app.name")} onAvatarPress={() => router.push("/account")} />
       <View className="flex-1 items-center justify-center">
-        <Text className="text-xl font-semibold text-black dark:text-white">{t("home.welcome")}</Text>
+        <AppText className="text-xl font-semibold text-text">{t("home.welcome")}</AppText>
       </View>
     </View>
   );

@@ -1,8 +1,12 @@
 {
+  "app": {
+    "name": "Fincho"
+  },
   "common": {
     "cancel": "Cancel",
     "selectOption": "Select an option",
-    "signOut": "Sign out"
+    "signOut": "Sign out",
+    "retry": "Retry"
   },
   "errors": {
     "emailInvalid": "Invalid email",
@@ -75,10 +79,70 @@
     "home": "Home",
     "library": "Library",
     "finances": "Finances",
-    "account": "Account"
+    "account": "Profile"
   },
   "account": {
-    "theme": "Change theme",
-    "deleteAccount": "Delete account"
+    "theme": "Theme",
+    "deleteAccount": "Delete account",
+    "avatar": "Profile photo",
+    "loadError": "We couldn't load your profile.",
+    "language": "Language",
+    "notifications": "Notifications",
+    "textSize": "Text size",
+    "privacyPolicy": "Privacy policy",
+    "terms": "Terms and conditions",
+    "version": "App version",
+    "sections": {
+      "preferences": "Preferences",
+      "accessibility": "Accessibility",
+      "privacy": "Privacy",
+      "about": "About"
+    },
+    "highContrast": "High contrast",
+    "highContrastHint": "Increases the contrast of text, buttons and borders"
+  },
+  "avatar": {
+    "takePhoto": "Take photo",
+    "chooseFromLibrary": "Choose from library",
+    "openSettings": "Open Settings",
+    "uploadError": "We couldn't update your photo. Your previous photo is kept.",
+    "invalid": {
+      "format": "Invalid format. Use a JPG, PNG or HEIC image.",
+      "size": "The image is larger than 10 MB. Choose a smaller one."
+    },
+    "permission": {
+      "cameraTitle": "No camera access",
+      "cameraMessage": "Fincho needs the camera to take your profile photo. Turn it on in Settings.",
+      "libraryTitle": "No photo access",
+      "libraryMessage": "Fincho needs access to your photos to choose your profile photo. Turn it on in Settings."
+    },
+    "remove": "Remove photo",
+    "removeConfirmTitle": "Remove your profile photo?",
+    "removeConfirm": "Remove",
+    "removeError": "We couldn't remove your photo. Your photo is kept.",
+    "changeHint": "Double-tap to change it",
+    "uploaded": "Photo updated",
+    "removed": "Photo removed"
+  },
+  "signOut": {
+    "title": "Sign out?",
+    "message": "You'll need to sign in again to see your data."
+  },
+  "language": {
+    "system": "Use device language"
+  },
+  "theme": {
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "textSize": {
+    "small": "Small",
+    "normal": "Normal",
+    "large": "Large",
+    "xlarge": "Extra large",
+    "previewTitle": "Preview",
+    "previewBody": "This is how text will look in Fincho: your commitments, due dates and reminders.",
+    "reset": "Reset"
   }
 }

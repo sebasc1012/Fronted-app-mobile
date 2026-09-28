@@ -1,4 +1,5 @@
-import { View, Text, Pressable } from "react-native";
+import { View, Pressable } from "react-native";
+import { AppText } from "@/components/ui/AppText";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTranslation } from "react-i18next";
 import { Avatar } from "./Avatar";
@@ -15,9 +16,9 @@ export function ScreenHeader({ title, onAvatarPress }: ScreenHeaderProps) {
 
   return (
     <View className="flex-row items-center justify-between gap-4" style={{ paddingTop: top + 8 }}>
-      <Text className="flex-1 text-4xl font-bold text-black dark:text-white" numberOfLines={1}>
+      <AppText className="flex-1 text-4xl font-bold text-text" numberOfLines={2}>
         {title}
-      </Text>
+      </AppText>
       <Pressable onPress={onAvatarPress} accessibilityRole="button" accessibilityLabel={t("nav.account")}>
         <Avatar />
       </Pressable>

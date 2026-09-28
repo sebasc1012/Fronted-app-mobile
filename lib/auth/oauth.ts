@@ -30,6 +30,8 @@ export async function signInWithProvider(provider: OAuthProvider): Promise<OAuth
     options: {
       redirectTo,
       skipBrowserRedirect: true,
+      // Tras cerrar sesión, Google pide elegir cuenta en vez de entrar con la anterior.
+      ...(provider === "google" && { queryParams: { prompt: "select_account" } }),
     },
   });
   console.log("[DEBUG][oauth] signInWithOAuth() resolved:", {
@@ -46,7 +48,10 @@ export async function signInWithProvider(provider: OAuthProvider): Promise<OAuth
     return { status: "error", errorKey: "errors.generic" };
   }
 
-  const result = await WebBrowser.openAuthSessionAsync(data.url, redirectTo);
+  // iOS: sesión efímera, no reutiliza las cookies del navegador entre logins.
+  const result = await WebBrowser.openAuthSessionAsync(data.url, redirectTo, {
+    preferEphemeralSession: true,
+  });
   console.log("[DEBUG][oauth] openAuthSessionAsync() resolved:", { type: result.type });
 
   if (result.type === "cancel" || result.type === "dismiss") {

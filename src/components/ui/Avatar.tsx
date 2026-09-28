@@ -1,32 +1,46 @@
 import { useState } from "react";
-import { View, Text } from "react-native";
+import { View } from "react-native";
+import { AppText } from "@/components/ui/AppText";
 import { Image } from "expo-image";
 import { useAuth } from "../../../contexts/AuthContext";
 import { useProfile } from "@/hooks/useProfile";
 
-// Avatar del usuario actual: foto del perfil o, si no hay o falla la carga, su inicial.
+// "Sebastián" → S · "Sebastián Castro López" → SL · sin nombre → inicial del correo.
+export function getInitials(fullName?: string | null, email?: string | null) {
+  const words = fullName?.trim().split(/\s+/).filter(Boolean) ?? [];
+  if (words.length === 0) return (email?.[0] ?? "?").toUpperCase();
+  return (words[0][0] + (words.length > 1 ? words[words.length - 1][0] : "")).toUpperCase();
+}
+
+// Avatar del usuario actual: foto del perfil o, si no hay o falla la carga, sus iniciales.
 export function Avatar({ size = 44 }: { size?: number }) {
   const { user } = useAuth();
   const { data: profile } = useProfile(true);
-  const [failed, setFailed] = useState(false);
-  const initial = (profile?.fullName || user?.email || "?")[0].toUpperCase();
+  // Se guarda la URL que falló (no un booleano): una foto nueva vuelve a intentarse.
+  const [failedUrl, setFailedUrl] = useState<string | null>(null);
+  const url = profile?.avatarUrl;
 
   return (
+    // Decorativo: siempre va dentro de un botón que lleva la etiqueta ("Foto de perfil",
+    // "Perfil"); así el lector no enfoca el avatar aparte ni lee las iniciales sueltas.
     <View
-      className="items-center justify-center overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700"
+      accessibilityElementsHidden
+      importantForAccessibility="no-hide-descendants"
+      className="items-center justify-center overflow-hidden rounded-full bg-surface-strong"
       style={{ width: size, height: size }}
     >
-      {profile?.avatarUrl && !failed ? (
+      {url && url !== failedUrl ? (
         <Image
-          source={profile.avatarUrl}
+          testID="avatar-image"
+          source={url}
           style={{ width: size, height: size }}
           contentFit="cover"
-          onError={() => setFailed(true)}
+          onError={() => setFailedUrl(url)}
         />
       ) : (
-        <Text className="font-semibold text-gray-700 dark:text-gray-200" style={{ fontSize: size * 0.4 }}>
-          {initial}
-        </Text>
+        <AppText allowFontScaling={false} className="font-semibold text-text-muted" style={{ fontSize: size * 0.4 }}>
+          {getInitials(profile?.fullName, user?.email)}
+        </AppText>
       )}
     </View>
   );

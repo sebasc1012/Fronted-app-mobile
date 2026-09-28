@@ -1,14 +1,14 @@
-import { useColorScheme } from "react-native";
 import { NativeTabs } from "expo-router/unstable-native-tabs";
 import { useTranslation } from "react-i18next";
+import { useColors } from "../../constants/colors";
 
 // Tab bar nativa: en iOS 26 trae Liquid Glass y sus animaciones (píldora, lente, arrastre).
 export default function AppLayout() {
   const { t } = useTranslation();
-  const dark = useColorScheme() === "dark";
+  const colors = useColors();
 
   return (
-    <NativeTabs tintColor={dark ? "#818CF8" : "#4F46E5"}>
+    <NativeTabs tintColor={colors.primary}>
       <NativeTabs.Trigger name="index">
         <NativeTabs.Trigger.Icon sf="house" md="home" />
         <NativeTabs.Trigger.Label>{t("nav.home")}</NativeTabs.Trigger.Label>

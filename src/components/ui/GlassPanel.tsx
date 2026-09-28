@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { View } from "react-native";
 import { BlurView } from "expo-blur";
+import { palettes } from "../../constants/colors";
 
 type GlassPanelProps = {
   children: ReactNode;
@@ -11,7 +12,7 @@ export function GlassPanel({ children }: GlassPanelProps) {
     <View
       style={{
         borderRadius: 26,
-        shadowColor: "#000",
+        shadowColor: palettes.light.overlay,
         shadowOffset: { width: 0, height: 12 },
         shadowOpacity: 0.15,
         shadowRadius: 24,
@@ -25,7 +26,7 @@ export function GlassPanel({ children }: GlassPanelProps) {
           borderRadius: 26,
           overflow: "hidden",
           padding: 20,
-          backgroundColor: "rgba(255,255,255,0.25)",
+          backgroundColor: `${palettes.light.background}40`, // blanco al 25 %
         }}
       >
         {children}

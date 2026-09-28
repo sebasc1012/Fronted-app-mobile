@@ -23,7 +23,7 @@ describe("useOAuth", () => {
     await act(() => result.current.handleOAuth("google"));
 
     expect(result.current.oauthError).toBeNull();
-    expect(result.current.oauthLoading).toBe(false);
+    expect(result.current.loadingProvider).toBeNull();
   });
 
   it("does not set an error when the user cancels", async () => {
@@ -33,7 +33,7 @@ describe("useOAuth", () => {
     await act(() => result.current.handleOAuth("google"));
 
     expect(result.current.oauthError).toBeNull();
-    expect(result.current.oauthLoading).toBe(false);
+    expect(result.current.loadingProvider).toBeNull();
   });
 
   it("sets oauthError on failure", async () => {
@@ -45,7 +45,7 @@ describe("useOAuth", () => {
     expect(result.current.oauthError).toBe("errors.generic");
   });
 
-  it("sets oauthLoading to true while pending and false once resolved", async () => {
+  it("tracks which provider is loading and clears it once resolved", async () => {
     let resolvePromise: (value: any) => void = () => {};
     signInWithOAuth.mockReturnValue(
       new Promise((resolve) => {
@@ -57,12 +57,12 @@ describe("useOAuth", () => {
     await act(async () => {
       result.current.handleOAuth("google");
     });
-    expect(result.current.oauthLoading).toBe(true);
+    expect(result.current.loadingProvider).toBe("google"); // solo el botón tocado muestra el spinner
 
     await act(async () => {
       resolvePromise({ error: null });
     });
 
-    expect(result.current.oauthLoading).toBe(false);
+    expect(result.current.loadingProvider).toBeNull();
   });
 });

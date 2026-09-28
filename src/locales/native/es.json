@@ -1,0 +1,6 @@
+{
+  "ios": {
+    "NSCameraUsageDescription": "Fincho usa la cámara para tomar tu foto de perfil.",
+    "NSPhotoLibraryUsageDescription": "Fincho accede a tus fotos para que elijas tu foto de perfil."
+  }
+}

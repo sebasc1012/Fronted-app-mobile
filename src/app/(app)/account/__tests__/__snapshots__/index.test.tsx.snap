@@ -1,0 +1,837 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Account panel renders at 'Extra large' text size without errors (snapshot) 1`] = `
+<RCTScrollView
+  className="flex-1 bg-background"
+  contentContainerClassName="px-6"
+  contentContainerStyle={
+    {
+      "paddingBottom": 96,
+      "paddingTop": 16,
+    }
+  }
+>
+  <View>
+    <View
+      className="items-center"
+    >
+      <View
+        accessibilityHint="avatar.changeHint"
+        accessibilityLabel="account.avatar"
+        accessibilityRole="imagebutton"
+        accessibilityState={
+          {
+            "busy": false,
+            "checked": undefined,
+            "disabled": false,
+            "expanded": undefined,
+            "selected": undefined,
+          }
+        }
+        accessibilityValue={
+          {
+            "max": undefined,
+            "min": undefined,
+            "now": undefined,
+            "text": undefined,
+          }
+        }
+        accessible={true}
+        collapsable={false}
+        focusable={true}
+        onBlur={[Function]}
+        onClick={[Function]}
+        onFocus={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+      >
+        <View
+          accessibilityElementsHidden={true}
+          className="items-center justify-center overflow-hidden rounded-full bg-surface-strong"
+          importantForAccessibility="no-hide-descendants"
+          style={
+            {
+              "height": 112,
+              "width": 112,
+            }
+          }
+        >
+          <Text
+            allowFontScaling={false}
+            style={
+              {
+                "fontSize": 44.800000000000004,
+              }
+            }
+          >
+            SL
+          </Text>
+        </View>
+      </View>
+      <Text
+        maxFontSizeMultiplier={1.5384615384615383}
+        style={
+          [
+            undefined,
+            {
+              "fontSize": 18.2,
+            },
+          ]
+        }
+      >
+        Sebastián Castro López
+      </Text>
+      <Text
+        maxFontSizeMultiplier={1.5384615384615383}
+        style={
+          [
+            undefined,
+            {
+              "fontSize": 18.2,
+            },
+          ]
+        }
+      >
+        seba@fincho.com
+      </Text>
+    </View>
+    <View
+      className="mt-6"
+    >
+      <Text
+        accessibilityRole="header"
+        maxFontSizeMultiplier={1.5384615384615383}
+        style={
+          [
+            undefined,
+            {
+              "fontSize": 18.2,
+            },
+          ]
+        }
+      >
+        account.sections.preferences
+      </Text>
+      <View
+        className="overflow-hidden rounded-2xl bg-surface "
+      >
+        <View>
+          <View
+            accessibilityLabel="account.theme"
+            accessibilityRole="button"
+            accessibilityState={
+              {
+                "busy": undefined,
+                "checked": undefined,
+                "disabled": undefined,
+                "expanded": undefined,
+                "selected": undefined,
+              }
+            }
+            accessibilityValue={
+              {
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
+              }
+            }
+            accessible={true}
+            className="min-h-12 flex-row items-center gap-4 px-4 py-3 active:opacity-60"
+            collapsable={false}
+            focusable={true}
+            onBlur={[Function]}
+            onClick={[Function]}
+            onFocus={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+          >
+            <View
+              color="#000000"
+              size={22}
+              testID="icon-SunMoon"
+            />
+            <Text
+              maxFontSizeMultiplier={1.5384615384615383}
+              style={
+                [
+                  undefined,
+                  {
+                    "fontSize": 18.2,
+                  },
+                ]
+              }
+            >
+              account.theme
+            </Text>
+            <View
+              color="#4B5563"
+              size={20}
+              testID="icon-ChevronRight"
+            />
+          </View>
+        </View>
+        <View>
+          <View
+            className="mx-4 h-px bg-surface-strong"
+          />
+          <View
+            accessibilityLabel="account.language"
+            accessibilityRole="button"
+            accessibilityState={
+              {
+                "busy": undefined,
+                "checked": undefined,
+                "disabled": undefined,
+                "expanded": undefined,
+                "selected": undefined,
+              }
+            }
+            accessibilityValue={
+              {
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
+              }
+            }
+            accessible={true}
+            className="min-h-12 flex-row items-center gap-4 px-4 py-3 active:opacity-60"
+            collapsable={false}
+            focusable={true}
+            onBlur={[Function]}
+            onClick={[Function]}
+            onFocus={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+          >
+            <View
+              color="#000000"
+              size={22}
+              testID="icon-Languages"
+            />
+            <Text
+              maxFontSizeMultiplier={1.5384615384615383}
+              style={
+                [
+                  undefined,
+                  {
+                    "fontSize": 18.2,
+                  },
+                ]
+              }
+            >
+              account.language
+            </Text>
+            <View
+              color="#4B5563"
+              size={20}
+              testID="icon-ChevronRight"
+            />
+          </View>
+        </View>
+        <View>
+          <View
+            className="mx-4 h-px bg-surface-strong"
+          />
+          <View
+            accessibilityLabel="account.notifications"
+            accessibilityRole="button"
+            accessibilityState={
+              {
+                "busy": undefined,
+                "checked": undefined,
+                "disabled": undefined,
+                "expanded": undefined,
+                "selected": undefined,
+              }
+            }
+            accessibilityValue={
+              {
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
+              }
+            }
+            accessible={true}
+            className="min-h-12 flex-row items-center gap-4 px-4 py-3 active:opacity-60"
+            collapsable={false}
+            focusable={true}
+            onBlur={[Function]}
+            onClick={[Function]}
+            onFocus={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+          >
+            <View
+              color="#000000"
+              size={22}
+              testID="icon-Bell"
+            />
+            <Text
+              maxFontSizeMultiplier={1.5384615384615383}
+              style={
+                [
+                  undefined,
+                  {
+                    "fontSize": 18.2,
+                  },
+                ]
+              }
+            >
+              account.notifications
+            </Text>
+            <View
+              color="#4B5563"
+              size={20}
+              testID="icon-ChevronRight"
+            />
+          </View>
+        </View>
+      </View>
+    </View>
+    <View
+      className="mt-6"
+    >
+      <Text
+        accessibilityRole="header"
+        maxFontSizeMultiplier={1.5384615384615383}
+        style={
+          [
+            undefined,
+            {
+              "fontSize": 18.2,
+            },
+          ]
+        }
+      >
+        account.sections.accessibility
+      </Text>
+      <View
+        className="overflow-hidden rounded-2xl bg-surface "
+      >
+        <View>
+          <View
+            accessibilityLabel="account.textSize"
+            accessibilityRole="button"
+            accessibilityState={
+              {
+                "busy": undefined,
+                "checked": undefined,
+                "disabled": undefined,
+                "expanded": undefined,
+                "selected": undefined,
+              }
+            }
+            accessibilityValue={
+              {
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
+              }
+            }
+            accessible={true}
+            className="min-h-12 flex-row items-center gap-4 px-4 py-3 active:opacity-60"
+            collapsable={false}
+            focusable={true}
+            onBlur={[Function]}
+            onClick={[Function]}
+            onFocus={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+          >
+            <View
+              color="#000000"
+              size={22}
+              testID="icon-ALargeSmall"
+            />
+            <Text
+              maxFontSizeMultiplier={1.5384615384615383}
+              style={
+                [
+                  undefined,
+                  {
+                    "fontSize": 18.2,
+                  },
+                ]
+              }
+            >
+              account.textSize
+            </Text>
+            <View
+              color="#4B5563"
+              size={20}
+              testID="icon-ChevronRight"
+            />
+          </View>
+        </View>
+        <View>
+          <View
+            className="mx-4 h-px bg-surface-strong"
+          />
+          <View
+            accessibilityHint="account.highContrastHint"
+            accessibilityLabel="account.highContrast"
+            accessibilityRole="switch"
+            accessibilityState={
+              {
+                "busy": undefined,
+                "checked": false,
+                "disabled": undefined,
+                "expanded": undefined,
+                "selected": undefined,
+              }
+            }
+            accessibilityValue={
+              {
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
+              }
+            }
+            accessible={true}
+            className="min-h-12 flex-row items-center gap-4 px-4 py-3"
+            collapsable={false}
+            focusable={true}
+            onBlur={[Function]}
+            onClick={[Function]}
+            onFocus={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+          >
+            <View
+              color="#000000"
+              size={22}
+              testID="icon-Contrast"
+            />
+            <View
+              className="flex-1"
+            >
+              <Text
+                maxFontSizeMultiplier={1.5384615384615383}
+                style={
+                  [
+                    undefined,
+                    {
+                      "fontSize": 18.2,
+                    },
+                  ]
+                }
+              >
+                account.highContrast
+              </Text>
+              <Text
+                maxFontSizeMultiplier={1.5384615384615383}
+                style={
+                  [
+                    undefined,
+                    {
+                      "fontSize": 18.2,
+                    },
+                  ]
+                }
+              >
+                account.highContrastHint
+              </Text>
+            </View>
+            <RCTSwitch
+              accessibilityElementsHidden={true}
+              accessibilityRole="switch"
+              importantForAccessibility="no-hide-descendants"
+              onChange={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              onTintColor="#4338CA"
+              style={
+                {
+                  "alignSelf": "flex-start",
+                }
+              }
+              tintColor="#E5E7EB"
+              value={false}
+            />
+          </View>
+        </View>
+      </View>
+    </View>
+    <View
+      className="mt-6"
+    >
+      <Text
+        accessibilityRole="header"
+        maxFontSizeMultiplier={1.5384615384615383}
+        style={
+          [
+            undefined,
+            {
+              "fontSize": 18.2,
+            },
+          ]
+        }
+      >
+        account.sections.privacy
+      </Text>
+      <View
+        className="overflow-hidden rounded-2xl bg-surface "
+      >
+        <View>
+          <View
+            accessibilityLabel="account.privacyPolicy"
+            accessibilityRole="button"
+            accessibilityState={
+              {
+                "busy": undefined,
+                "checked": undefined,
+                "disabled": undefined,
+                "expanded": undefined,
+                "selected": undefined,
+              }
+            }
+            accessibilityValue={
+              {
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
+              }
+            }
+            accessible={true}
+            className="min-h-12 flex-row items-center gap-4 px-4 py-3 active:opacity-60"
+            collapsable={false}
+            focusable={true}
+            onBlur={[Function]}
+            onClick={[Function]}
+            onFocus={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+          >
+            <View
+              color="#000000"
+              size={22}
+              testID="icon-ShieldCheck"
+            />
+            <Text
+              maxFontSizeMultiplier={1.5384615384615383}
+              style={
+                [
+                  undefined,
+                  {
+                    "fontSize": 18.2,
+                  },
+                ]
+              }
+            >
+              account.privacyPolicy
+            </Text>
+            <View
+              color="#4B5563"
+              size={20}
+              testID="icon-ChevronRight"
+            />
+          </View>
+        </View>
+        <View>
+          <View
+            className="mx-4 h-px bg-surface-strong"
+          />
+          <View
+            accessibilityLabel="account.deleteAccount"
+            accessibilityRole="button"
+            accessibilityState={
+              {
+                "busy": undefined,
+                "checked": undefined,
+                "disabled": undefined,
+                "expanded": undefined,
+                "selected": undefined,
+              }
+            }
+            accessibilityValue={
+              {
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
+              }
+            }
+            accessible={true}
+            className="min-h-12 flex-row items-center gap-4 px-4 py-3 active:opacity-60"
+            collapsable={false}
+            focusable={true}
+            onBlur={[Function]}
+            onClick={[Function]}
+            onFocus={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+          >
+            <View
+              color="#991B1B"
+              size={22}
+              testID="icon-Trash2"
+            />
+            <Text
+              maxFontSizeMultiplier={1.5384615384615383}
+              style={
+                [
+                  undefined,
+                  {
+                    "fontSize": 18.2,
+                  },
+                ]
+              }
+            >
+              account.deleteAccount
+            </Text>
+            <View
+              color="#4B5563"
+              size={20}
+              testID="icon-ChevronRight"
+            />
+          </View>
+        </View>
+      </View>
+    </View>
+    <View
+      className="mt-6"
+    >
+      <Text
+        accessibilityRole="header"
+        maxFontSizeMultiplier={1.5384615384615383}
+        style={
+          [
+            undefined,
+            {
+              "fontSize": 18.2,
+            },
+          ]
+        }
+      >
+        account.sections.about
+      </Text>
+      <View
+        className="overflow-hidden rounded-2xl bg-surface "
+      >
+        <View>
+          <View
+            accessibilityLabel="account.terms"
+            accessibilityRole="button"
+            accessibilityState={
+              {
+                "busy": undefined,
+                "checked": undefined,
+                "disabled": undefined,
+                "expanded": undefined,
+                "selected": undefined,
+              }
+            }
+            accessibilityValue={
+              {
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
+              }
+            }
+            accessible={true}
+            className="min-h-12 flex-row items-center gap-4 px-4 py-3 active:opacity-60"
+            collapsable={false}
+            focusable={true}
+            onBlur={[Function]}
+            onClick={[Function]}
+            onFocus={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+          >
+            <View
+              color="#000000"
+              size={22}
+              testID="icon-FileText"
+            />
+            <Text
+              maxFontSizeMultiplier={1.5384615384615383}
+              style={
+                [
+                  undefined,
+                  {
+                    "fontSize": 18.2,
+                  },
+                ]
+              }
+            >
+              account.terms
+            </Text>
+            <View
+              color="#4B5563"
+              size={20}
+              testID="icon-ChevronRight"
+            />
+          </View>
+        </View>
+        <View>
+          <View
+            className="mx-4 h-px bg-surface-strong"
+          />
+          <View
+            accessibilityLabel="account.version, 1.2.3"
+            accessible={true}
+            className="min-h-12 flex-row items-center gap-4 px-4 py-3"
+          >
+            <View
+              color="#000000"
+              size={22}
+              testID="icon-Info"
+            />
+            <Text
+              maxFontSizeMultiplier={1.5384615384615383}
+              style={
+                [
+                  undefined,
+                  {
+                    "fontSize": 18.2,
+                  },
+                ]
+              }
+            >
+              account.version
+            </Text>
+            <Text
+              maxFontSizeMultiplier={1.5384615384615383}
+              style={
+                [
+                  undefined,
+                  {
+                    "fontSize": 18.2,
+                  },
+                ]
+              }
+            >
+              1.2.3
+            </Text>
+          </View>
+        </View>
+      </View>
+    </View>
+    <View
+      className="mt-6"
+    >
+      <Text
+        accessibilityRole="header"
+        maxFontSizeMultiplier={1.5384615384615383}
+        style={
+          [
+            undefined,
+            {
+              "fontSize": 18.2,
+            },
+          ]
+        }
+      >
+        common.signOut
+      </Text>
+      <View
+        className="overflow-hidden rounded-2xl bg-surface "
+      >
+        <View>
+          <View
+            accessibilityLabel="common.signOut"
+            accessibilityRole="button"
+            accessibilityState={
+              {
+                "busy": false,
+                "checked": undefined,
+                "disabled": false,
+                "expanded": undefined,
+                "selected": undefined,
+              }
+            }
+            accessibilityValue={
+              {
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
+              }
+            }
+            accessible={true}
+            className="min-h-12 flex-row items-center gap-4 px-4 py-3 active:opacity-60"
+            collapsable={false}
+            focusable={true}
+            onBlur={[Function]}
+            onClick={[Function]}
+            onFocus={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+          >
+            <View
+              color="#000000"
+              size={22}
+              testID="icon-LogOut"
+            />
+            <Text
+              maxFontSizeMultiplier={1.5384615384615383}
+              style={
+                [
+                  undefined,
+                  {
+                    "fontSize": 18.2,
+                  },
+                ]
+              }
+            >
+              common.signOut
+            </Text>
+            <View
+              color="#4B5563"
+              size={20}
+              testID="icon-ChevronRight"
+            />
+          </View>
+        </View>
+      </View>
+    </View>
+  </View>
+</RCTScrollView>
+`;

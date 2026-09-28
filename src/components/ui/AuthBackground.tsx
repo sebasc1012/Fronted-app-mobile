@@ -1,9 +1,11 @@
 import { View } from "react-native";
 import Svg, { Path } from "react-native-svg";
+import { useColors } from "../../constants/colors";
 
 export function AuthBackground() {
+  const colors = useColors();
   return (
-    <View className="absolute inset-0" style={{ backgroundColor: "#E2C9A6" }}>
+    <View className="absolute inset-0 bg-brand-sand">
       <Svg
         width="100%"
         height="100%"
@@ -11,7 +13,7 @@ export function AuthBackground() {
         preserveAspectRatio="none"
         style={{ position: "absolute", inset: 0 }}
       >
-        <Path d="M0,38 C25,55 55,92 100,88 L100,100 L0,100 Z" fill="#F7EAD9" />
+        <Path d="M0,38 C25,55 55,92 100,88 L100,100 L0,100 Z" fill={colors["brand-cream"]} />
       </Svg>
     </View>
   );

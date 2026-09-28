@@ -4,16 +4,17 @@ import { OAuthProvider } from "../../lib/auth/oauth";
 
 export function useOAuth() {
   const { signInWithOAuth } = useAuth();
-  const [oauthLoading, setOauthLoading] = useState(false);
+  // Proveedor en curso (no un booleano): el spinner va solo en el botón tocado.
+  const [loadingProvider, setLoadingProvider] = useState<OAuthProvider | null>(null);
   const [oauthError, setOauthError] = useState<string | null>(null);
 
   const handleOAuth = async (provider: OAuthProvider) => {
     console.log('[DEBUG][useOAuth] handleOAuth() tapped, provider =', provider);
     setOauthError(null);
-    setOauthLoading(true);
+    setLoadingProvider(provider);
     const { error, cancelled } = await signInWithOAuth(provider);
     console.log('[DEBUG][useOAuth] signInWithOAuth() returned:', { error, cancelled });
-    setOauthLoading(false);
+    setLoadingProvider(null);
 
     if (error) {
       console.log('[DEBUG][useOAuth] setting oauthError');
@@ -30,5 +31,5 @@ export function useOAuth() {
     console.log('[DEBUG][useOAuth] success — expecting root guard to redirect');
   };
 
-  return { handleOAuth, oauthLoading, oauthError };
+  return { handleOAuth, loadingProvider, oauthError };
 }

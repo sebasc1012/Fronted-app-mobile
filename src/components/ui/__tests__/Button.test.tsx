@@ -1,5 +1,6 @@
+import { StyleSheet } from "react-native";
 import React from "react";
-import { Text } from "react-native";
+import { AppText } from "../AppText";
 import { render, screen, fireEvent } from "@testing-library/react-native";
 import { Button } from "../Button";
 
@@ -51,7 +52,7 @@ describe("Button", () => {
       <Button
         title="Continuar con Google"
         onPress={() => {}}
-        icon={<Text>logo</Text>}
+        icon={<AppText>logo</AppText>}
       />,
     );
     expect(screen.getByText("logo")).toBeTruthy();
@@ -64,5 +65,11 @@ describe("Button", () => {
     expect(screen.root!.props.className).toContain("rounded-full");
     expect(screen.root!.props.className).toContain("border");
     expect(screen.root!.props.className).not.toContain("bg-");
+  });
+
+  it("renders variant='destructive' in red with white text", async () => {
+    await render(<Button title="Eliminar" onPress={() => {}} variant="destructive" />);
+    expect(screen.root!.props.className).toContain("bg-danger");
+    expect(StyleSheet.flatten(screen.getByText("Eliminar").props.style)).toMatchObject({ color: "#FFFFFF" });
   });
 });

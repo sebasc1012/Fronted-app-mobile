@@ -1,6 +1,9 @@
 import { useState } from "react";
-import { Modal, Pressable, Text, View } from "react-native";
+import { Modal, Pressable, View } from "react-native";
+import { AppText } from "@/components/ui/AppText";
 import { useTranslation } from "react-i18next";
+import { useHighContrastBorder } from "../../constants/colors";
+import { FieldError } from "./Input";
 
 export type SelectOption<T extends string> = {
   label: string;
@@ -28,6 +31,8 @@ export function Select<T extends string>({
 }: SelectProps<T>) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
+  const highContrast = useHighContrastBorder() !== "";
+  const borderStyle = error ? "border-danger" : highContrast ? "border-border" : "border-transparent";
 
   const selectedOption = options.find((option) => option.value === value);
 
@@ -39,28 +44,26 @@ export function Select<T extends string>({
   return (
     <View className="mb-4">
       {label && (
-        <Text className="mb-2 text-sm font-medium text-[#2E2A28]">
+        <AppText className="mb-2 text-sm font-medium text-brand-ink">
           {label}
-        </Text>
+        </AppText>
       )}
 
       <Pressable
         onPress={() => setOpen(true)}
         disabled={disabled}
-        className={`h-[52px] flex-row items-center rounded-[5px] border bg-white px-4 ${
-          error ? "border-danger" : "border-transparent"
-        } ${disabled ? "opacity-50" : ""}`}
+        className={`min-h-[52px] flex-row items-center py-3 rounded-[5px] ${highContrast ? "border-2" : "border"} bg-background px-4 ${borderStyle} ${disabled ? "opacity-50" : ""}`}
       >
-        <Text
+        <AppText
           className={`text-base ${
-            selectedOption ? "text-[#2E2A28]" : "text-[#9CA3AF]"
+            selectedOption ? "text-brand-ink" : "text-text-muted"
           }`}
         >
           {selectedOption?.label ?? placeholder ?? t("common.selectOption")}
-        </Text>
+        </AppText>
       </Pressable>
 
-      {error && <Text className="mt-1.5 text-xs text-danger">{error}</Text>}
+      {error && <FieldError message={error} />}
 
       <Modal
         visible={open}
@@ -69,16 +72,16 @@ export function Select<T extends string>({
         onRequestClose={() => setOpen(false)}
       >
         <Pressable
-          className="flex-1 justify-end bg-black/40"
+          className="flex-1 justify-end bg-overlay/40"
           onPress={() => setOpen(false)}
         >
           <Pressable
-            className="rounded-t-2xl bg-white px-6 pb-8 pt-5"
+            className="rounded-t-2xl bg-background px-6 pb-8 pt-5"
             onPress={(event) => event.stopPropagation()}
           >
-            <Text className="mb-4 text-lg font-semibold text-gray-900">
+            <AppText className="mb-4 text-lg font-semibold text-text">
               {label}
-            </Text>
+            </AppText>
 
             {options.map((option) => {
               const selected = option.value === value;
@@ -88,25 +91,25 @@ export function Select<T extends string>({
                   key={option.value}
                   onPress={() => handleSelect(option.value)}
                   className={`rounded-lg px-4 py-4 ${
-                    selected ? "bg-gray-100" : ""
+                    selected ? "bg-surface" : ""
                   }`}
                 >
-                  <Text
+                  <AppText
                     className={`text-base ${
-                      selected ? "font-semibold text-gray-900" : "text-gray-700"
+                      selected ? "font-semibold text-text" : "text-text-muted"
                     }`}
                   >
                     {option.label}
-                  </Text>
+                  </AppText>
                 </Pressable>
               );
             })}
 
             <Pressable
               onPress={() => setOpen(false)}
-              className="mt-3 items-center rounded-lg bg-gray-200 py-3"
+              className="mt-3 items-center rounded-lg bg-surface-strong py-3"
             >
-              <Text className="font-semibold text-gray-900">{t("common.cancel")}</Text>
+              <AppText className="font-semibold text-text">{t("common.cancel")}</AppText>
             </Pressable>
           </Pressable>
         </Pressable>

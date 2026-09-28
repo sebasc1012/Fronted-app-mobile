@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { api } from "../../lib/api";
 import { supabase } from "../../lib/supabase";
 
-type Profile = {
+export type Profile = {
   id: string;
   fullName: string | null;
   gender: string | null;
@@ -24,7 +24,7 @@ async function fetchProfile(): Promise<Profile | null> {
     // 401 = token stale/invalid (leftover SecureStore session). Force logout
     // instead of treating it as "needs onboarding".
     if (error?.response?.status === 401) {
-      await supabase.auth.signOut();
+      await supabase.auth.signOut({ scope: "local" });
       return null;
     }
     throw error;

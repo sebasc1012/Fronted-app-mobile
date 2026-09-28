@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { View, Text, ScrollView } from "react-native";
+import { View, ScrollView } from "react-native";
+import { AppText } from "@/components/ui/AppText";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as ImagePicker from "expo-image-picker";
 import { Input } from "../../components/ui/Input";
 import { Button } from "../../components/ui/Button";
 import { Select } from "../../components/ui/Select";
@@ -14,7 +14,8 @@ import {
   onboardingSchema,
 } from "@/squema/onboarding.schema";
 import { GENDER_OPTIONS } from "@/constants/gender.const";
-import { supabase } from "../../../lib/supabase";
+import { putAvatarFile } from "../../../lib/avatar";
+import { useAvatarPicker } from "@/hooks/useAvatar";
 import { useAuth } from "../../../contexts/AuthContext";
 import { useTranslation } from "react-i18next";
 
@@ -41,36 +42,16 @@ export default function Onboarding() {
     },
   });
 
+  const pickAvatar = useAvatarPicker();
   const pickImage = async () => {
-    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!permission.granted) return;
-
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      quality: 0.7,
-      allowsEditing: true,
-      aspect: [1, 1],
-    });
-
-    if (!result.canceled) {
-      setAvatarUri(result.assets[0].uri);
-    }
+    const uri = await pickAvatar("library");
+    if (uri) setAvatarUri(uri);
   };
 
+  // El perfil todavía no existe: solo se sube el archivo y la URL va en el POST del perfil.
   const uploadAvatar = async (): Promise<string | undefined> => {
     if (!avatarUri || !user) return undefined;
-
-    const response = await fetch(avatarUri);
-    const blob = await response.blob();
-    const path = `${user.id}/avatar.jpg`;
-
-    const { error } = await supabase.storage
-      .from("avatars")
-      .upload(path, blob, { contentType: "image/jpeg", upsert: true });
-
-    if (error) throw error;
-    const { data } = supabase.storage.from("avatars").getPublicUrl(path);
-    return data.publicUrl;
+    return (await putAvatarFile(avatarUri, user.id)).url;
   };
 
   const onSubmit = async (data: OnboardingFormValues) => {
@@ -117,10 +98,10 @@ export default function Onboarding() {
         keyboardShouldPersistTaps="handled"
       >
         <GlassPanel>
-          <Text className="mb-2 text-2xl font-bold">{t("onboarding.title")}</Text>
-          <Text className="mb-6 text-base text-gray-500">
+          <AppText className="mb-2 text-2xl font-bold">{t("onboarding.title")}</AppText>
+          <AppText className="mb-6 text-base text-text-muted">
             {t("onboarding.subtitle")}
-          </Text>
+          </AppText>
 
           <Controller
             control={control}
@@ -192,15 +173,15 @@ export default function Onboarding() {
           />
 
           {avatarUri && (
-            <Text className="mt-2 text-sm text-gray-500">
+            <AppText className="mt-2 text-sm text-text-muted">
               {t("onboarding.photoSelected")}
-            </Text>
+            </AppText>
           )}
 
           {serverError && (
-            <Text className="mb-4 mt-4 text-center text-sm text-red-500">
+            <AppText className="mb-4 mt-4 text-center text-sm text-danger">
               {t(serverError)}
-            </Text>
+            </AppText>
           )}
 
           <Button

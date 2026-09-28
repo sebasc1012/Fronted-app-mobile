@@ -1,11 +1,13 @@
 import { useState } from "react";
-import { View, Text } from "react-native";
+import { View, ScrollView } from "react-native";
+import { AppText } from "@/components/ui/AppText";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { Input } from "../../components/ui/Input";
 import { Button } from "../../components/ui/Button";
+import { useColors } from "../../constants/colors";
 import { AuthBackground } from "../../components/ui/AuthBackground";
 import { GlassPanel } from "../../components/ui/GlassPanel";
 import { AppleIcon } from "../../components/ui/icons/AppleIcon";
@@ -20,8 +22,9 @@ import { loginSchema, LoginForm } from "@/squema/auth.schema";
 
 export default function Login() {
   const { t } = useTranslation();
+  const colors = useColors();
   const { signIn } = useAuth();
-  const { handleOAuth, oauthLoading, oauthError } = useOAuth();
+  const { handleOAuth, loadingProvider, oauthError } = useOAuth();
   const [serverError, setServerError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -44,7 +47,11 @@ export default function Login() {
   return (
     <View className="flex-1">
       <AuthBackground />
-      <View className="flex-1 justify-center px-4">
+      <ScrollView
+        className="flex-1 px-4"
+        contentContainerStyle={{ flexGrow: 1, justifyContent: "center", paddingVertical: 40 }}
+        keyboardShouldPersistTaps="handled"
+      >
         <GlassPanel>
           <Controller
             control={control}
@@ -80,29 +87,30 @@ export default function Login() {
           />
 
           {(serverError || oauthError) && (
-            <Text className="mb-3 text-sm text-danger">
+            <AppText className="mb-3 text-sm text-danger">
               {t(serverError ?? oauthError!)}
-            </Text>
+            </AppText>
           )}
 
-          <Text className="mb-6 text-right text-sm text-[#2E2A28]">
+          <AppText className="mb-6 text-right text-sm text-brand-ink">
             {t("auth.login.forgotPassword")}
-          </Text>
+          </AppText>
 
           <Button
             title={t("auth.common.next")}
             onPress={handleSubmit(onSubmit)}
             loading={loading}
-            color="#8A6F56"
+            disabled={!!loadingProvider}
+            color={colors["brand-accent"]}
             radius={10}
           />
 
           <View className="my-6 flex-row items-center">
-            <View className="h-px flex-1 bg-gray-300" />
-            <Text className="mx-3 text-sm text-gray-500">
+            <View className="h-px flex-1 bg-border/40" />
+            <AppText className="mx-3 text-sm text-text-muted">
               {t("auth.common.or")}
-            </Text>
-            <View className="h-px flex-1 bg-gray-300" />
+            </AppText>
+            <View className="h-px flex-1 bg-border/40" />
           </View>
 
           <View className="gap-3">
@@ -112,8 +120,8 @@ export default function Login() {
               pill
               icon={<AppleIcon />}
               onPress={() => handleOAuth("apple")}
-              loading={oauthLoading}
-              disabled={loading}
+              loading={loadingProvider === "apple"}
+              disabled={loading || !!loadingProvider}
             />
 
             <Button
@@ -122,8 +130,8 @@ export default function Login() {
               pill
               icon={<GoogleIcon />}
               onPress={() => handleOAuth("google")}
-              loading={oauthLoading}
-              disabled={loading}
+              loading={loadingProvider === "google"}
+              disabled={loading || !!loadingProvider}
             />
 
             <Button
@@ -132,15 +140,15 @@ export default function Login() {
               pill
               icon={<FacebookIcon />}
               onPress={() => handleOAuth("facebook")}
-              loading={oauthLoading}
-              disabled={loading}
+              loading={loadingProvider === "facebook"}
+              disabled={loading || !!loadingProvider}
             />
           </View>
-          <Text className="mt-6 w-full text-center text-sm text-primary">
+          <AppText className="mt-6 w-full text-center text-sm text-primary">
             <Link href="/(auth)/signup">{t("auth.login.noAccount")}</Link>
-          </Text>
+          </AppText>
         </GlassPanel>
-      </View>
+      </ScrollView>
     </View>
   );
 }
